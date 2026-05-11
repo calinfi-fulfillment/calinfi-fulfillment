@@ -20,6 +20,10 @@ This runbook is for a separate ODUN Fulfillment V1 Vercel staging project. Do no
 - Preview env was configured on the separate Fulfillment project with the non-PM Supabase public URL/key and all live/provider/export/Stripe Checkout flags disabled.
 - No service-role key, Stripe live secret, provider API secret, PM production env, or custom production CALINFI domain was added.
 - GitHub integration is not connected yet; Vercel rejected direct Git connection, so the current preview was deployed manually from the local branch.
+- Re-check on 2026-05-11 confirmed:
+  - GitHub CLI viewer has `ADMIN` permission on `calinfi-fulfillment/calinfi-fulfillment`.
+  - `vercel git connect` still fails for the repo.
+  - GitHub App installation lookup does not confirm a usable Vercel app installation for this repo.
 - An earlier deployment failed before serving because the project framework preset was `Other`; the preset was corrected to Next.js before the ready preview deployment.
 
 ## Required Vercel Project
@@ -75,6 +79,30 @@ Completed preview verification:
 - No production domain alias is attached.
 - No live provider, label, export, Stripe Checkout, or partner push action is enabled.
 - Direct anonymous fetches return HTTP 401 because Vercel Deployment Protection is enabled; protected preview smoke used Vercel-authenticated access.
+
+## Git Integration Next Action Checklist
+
+Use the Vercel dashboard path only if CLI connection keeps failing:
+
+- [ ] Open Vercel project `odun-fulfillment-v1`.
+- [ ] Connect Git repository `calinfi-fulfillment/calinfi-fulfillment`.
+- [ ] If prompted, install or update the Vercel GitHub App for the `calinfi-fulfillment` account.
+- [ ] Grant access only to `calinfi-fulfillment/calinfi-fulfillment`, not all repositories.
+- [ ] Keep framework preset as Next.js and root directory as repository root.
+- [ ] Keep production branch as `main`; use PR/non-main branches for previews.
+- [ ] Do not attach PM or CALINFI production domains.
+- [ ] Do not enable production env, provider API, Stripe Checkout, partner push, or live exports during this step.
+- [ ] After connection, trigger or wait for a PR preview on `codex/phase-13-staging`.
+- [ ] Verify `/api/health`, `/`, and `/reports` through the preview URL.
+
+Post-connect CLI checks:
+
+```bash
+npx -y vercel@latest git ls --scope hello-75539063s-projects
+npx -y vercel@latest inspect <preview-url> --scope hello-75539063s-projects
+npm run check:staging-prep
+npm run test:no-secrets
+```
 
 ## Blockers
 
