@@ -4,6 +4,7 @@ import { ClipboardList, LockKeyhole, PackageCheck, PauseCircle, Route } from "lu
 import { useMemo, useState } from "react";
 
 import { StatusBadge } from "@/components/status-badge";
+import { formatOpsValue } from "@/lib/ops-ui/labels";
 
 type OrderRow = {
   address: string;
@@ -22,8 +23,8 @@ const routeOptions = ["REGIONAL_3PL", "CHINA_HK_DIRECT_DDP", "PARTNER_MANAGED", 
 export function OrdersWorkbench({ rows }: OrdersWorkbenchProps) {
   const [selectedOrderKey, setSelectedOrderKey] = useState(rows[0]?.sourceOrderKey ?? "");
   const [route, setRoute] = useState(rows[0]?.route ?? routeOptions[0]);
-  const [holdReason, setHoldReason] = useState("Address or SKU review");
-  const [events, setEvents] = useState<string[]>(["Order workbench ready in local preview"]);
+  const [holdReason, setHoldReason] = useState("Adres veya ürün kodu kontrolü");
+  const [events, setEvents] = useState<string[]>(["Sipariş kontrol ekranı güvenli önizleme modunda"]);
 
   const selectedOrder = useMemo(
     () => rows.find((row) => row.sourceOrderKey === selectedOrderKey) ?? rows[0],
@@ -31,17 +32,17 @@ export function OrdersWorkbench({ rows }: OrdersWorkbenchProps) {
   );
   const checks = useMemo(
     () => [
-      { label: "Address complete", status: selectedOrder?.address === "complete" ? "ready" : "review" },
-      { label: "Product Master ready", status: selectedOrder?.products === "ready" ? "ready" : "blocker" },
-      { label: "Payment lock not required yet", status: selectedOrder?.status === "selection_submitted" ? "ready" : "review" },
-      { label: "Route selected", status: route ? "ready" : "blocker" },
+      { label: "Adres tamam", status: selectedOrder?.address === "complete" ? "ready" : "review" },
+      { label: "Ürün bilgisi hazır", status: selectedOrder?.products === "ready" ? "ready" : "blocker" },
+      { label: "Ödeme kilidi henüz gerekmiyor", status: selectedOrder?.status === "selection_submitted" ? "ready" : "review" },
+      { label: "Kargo yolu seçildi", status: route ? "ready" : "blocker" },
     ],
     [route, selectedOrder],
   );
   const blockedCount = checks.filter((check) => check.status === "blocker").length;
 
   function addEvent(event: string) {
-    const target = selectedOrder?.sourceOrderKey ?? "selected order";
+    const target = formatOpsValue("sourceOrderKey", selectedOrder?.sourceOrderKey ?? "selected order");
     setEvents((currentEvents) => [`${event}: ${target}`, ...currentEvents].slice(0, 5));
   }
 
@@ -49,35 +50,35 @@ export function OrdersWorkbench({ rows }: OrdersWorkbenchProps) {
     <section className="workbench-panel" data-testid="orders-workbench">
       <div className="control-rail">
         <div>
-          <p className="eyebrow">Order Control</p>
-          <h2>Readiness workbench</h2>
+          <p className="eyebrow">Sipariş kontrolü</p>
+          <h2>Hazır mı?</h2>
         </div>
         <StatusBadge label={blockedCount > 0 ? "blocked" : "ready"} />
       </div>
 
       <div className="field-grid">
         <label>
-          Order
+          Sipariş
           <select onChange={(event) => setSelectedOrderKey(event.target.value)} value={selectedOrderKey}>
             {rows.map((row) => (
               <option key={row.sourceOrderKey} value={row.sourceOrderKey}>
-                {row.sourceOrderKey}
+                {formatOpsValue("sourceOrderKey", row.sourceOrderKey)}
               </option>
             ))}
           </select>
         </label>
         <label>
-          Route decision
+          Kargo yolu
           <select onChange={(event) => setRoute(event.target.value)} value={route}>
             {routeOptions.map((option) => (
               <option key={option} value={option}>
-                {option}
+                {formatOpsValue("route", option)}
               </option>
             ))}
           </select>
         </label>
         <label>
-          Hold reason
+          Bekletme sebebi
           <input onChange={(event) => setHoldReason(event.target.value)} value={holdReason} />
         </label>
       </div>
@@ -92,25 +93,25 @@ export function OrdersWorkbench({ rows }: OrdersWorkbenchProps) {
       </div>
 
       <div className="button-row">
-        <button onClick={() => addEvent("Route preview staged")} type="button">
+        <button onClick={() => addEvent("Kargo yolu önizlendi")} type="button">
           <Route aria-hidden="true" size={16} />
-          Stage route
+          Rotayı hazırla
         </button>
-        <button className="button-secondary" onClick={() => addEvent("Quote readiness checked")} type="button">
+        <button className="button-secondary" onClick={() => addEvent("Kargo fiyatı kontrol edildi")} type="button">
           <ClipboardList aria-hidden="true" size={16} />
-          Check quote
+          Fiyatı kontrol et
         </button>
-        <button className="button-secondary" onClick={() => addEvent(`Manual hold staged (${holdReason})`)} type="button">
+        <button className="button-secondary" onClick={() => addEvent(`Bekletme hazırlandı (${holdReason})`)} type="button">
           <PauseCircle aria-hidden="true" size={16} />
-          Stage hold
+          Beklet
         </button>
-        <button className="button-secondary" onClick={() => addEvent("Fulfillment readiness preview")} type="button">
+        <button className="button-secondary" onClick={() => addEvent("Kargoya hazırlık önizlendi")} type="button">
           <PackageCheck aria-hidden="true" size={16} />
-          Preview lock
+          Kilidi önizle
         </button>
         <button className="button-danger" disabled type="button">
           <LockKeyhole aria-hidden="true" size={16} />
-          Mutate PM
+          PM verisini değiştir
         </button>
       </div>
 

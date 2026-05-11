@@ -9,7 +9,12 @@ export default function PaymentsPage() {
   const stripeReadiness = createStripeCheckoutReadiness();
 
   return (
-    <AppShell active="Payments" title="Payments" subtitle="Test Checkout, test webhook normalization, and mismatch review.">
+    <AppShell
+      active="Ödemeler"
+      title="Ödeme kontrolü"
+      subtitle="Kargo ücreti ile ödeme haberi aynıysa sipariş kilitlenmeye hazır olur; uyuşmazlık varsa incelemeye düşer."
+      steps={["Güncel fiyatı seç", "Test ödeme haberini kontrol et", "Tutar ve para birimi eşleşsin", "Eşleşirse kilit önizlemesi yap"]}
+    >
       <div className="workflow-grid">
         <DataTable columns={["sourceOrderKey", "quote", "status", "guard"]} rows={paymentRows} />
         <div className="side-stack">

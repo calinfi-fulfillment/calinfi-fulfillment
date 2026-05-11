@@ -4,6 +4,7 @@ import { CheckCircle2, ClipboardCheck, Columns3, Filter, Search, X } from "lucid
 import { useMemo, useState } from "react";
 
 import { StatusBadge } from "@/components/status-badge";
+import { formatColumnLabel, formatOpsValue } from "@/lib/ops-ui/labels";
 
 type DataTableProps<T extends Record<string, string>> = {
   columns: Array<keyof T>;
@@ -17,10 +18,6 @@ type IndexedRow<T extends Record<string, string>> = {
 };
 
 const filterColumnHints = ["status", "severity", "route", "payment", "guard", "products", "address", "quote", "customs", "owner"];
-
-function humanizeColumn(column: string) {
-  return column.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/_/g, " ");
-}
 
 function rowId(row: Record<string, string>, index: number) {
   return row.sourceOrderKey ?? row.sku ?? row.code ?? row.metric ?? `${index + 1}`;
@@ -54,7 +51,7 @@ export function DataTable<T extends Record<string, string>>({ columns, rows }: D
         Array.from(new Set(indexedRows.map(({ row }) => row[column]).filter(Boolean))).map((value) => ({
           column,
           key: `${column}:${value}`,
-          label: `${humanizeColumn(column)}: ${value}`,
+          label: `${formatColumnLabel(column)}: ${formatOpsValue(column, value)}`,
           value,
         })),
       ),
@@ -62,7 +59,7 @@ export function DataTable<T extends Record<string, string>>({ columns, rows }: D
   );
 
   const [activeFilter, setActiveFilter] = useState("all");
-  const [localEvent, setLocalEvent] = useState("No staged local action");
+  const [localEvent, setLocalEvent] = useState("Henüz güvenli önizleme yok");
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(indexedRows[0]?.id ?? null);
   const [visibleColumns, setVisibleColumns] = useState<string[]>(stringColumns);
@@ -73,7 +70,11 @@ export function DataTable<T extends Record<string, string>>({ columns, rows }: D
 
     return indexedRows.filter(({ row }) => {
       const matchesQuery =
-        normalizedQuery.length === 0 || Object.values(row).some((value) => value.toLowerCase().includes(normalizedQuery));
+        normalizedQuery.length === 0 ||
+        Object.entries(row).some(
+          ([column, value]) =>
+            value.toLowerCase().includes(normalizedQuery) || formatOpsValue(column, value).toLowerCase().includes(normalizedQuery),
+        );
       const matchesFilter = !selectedFilter || row[selectedFilter.column] === selectedFilter.value;
 
       return matchesQuery && matchesFilter;
@@ -94,8 +95,8 @@ export function DataTable<T extends Record<string, string>>({ columns, rows }: D
   }
 
   function stageAction(action: string) {
-    const target = selectedRow?.id ?? "filtered queue";
-    setLocalEvent(`${action} staged for ${target}`);
+    const target = selectedRow ? formatOpsValue("sourceOrderKey", selectedRow.id) : "filtrelenen liste";
+    setLocalEvent(`${target} için "${action}" hazırlandı`);
   }
 
   return (
@@ -104,17 +105,17 @@ export function DataTable<T extends Record<string, string>>({ columns, rows }: D
         <label className="search-control">
           <Search aria-hidden="true" size={16} />
           <input
-            aria-label="Search rows"
+            aria-label="Kayıt ara"
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search"
+            placeholder="Sipariş, ürün veya durum ara"
             type="search"
             value={query}
           />
         </label>
         <label className="select-control">
           <Filter aria-hidden="true" size={16} />
-          <select aria-label="Filter rows" onChange={(event) => setActiveFilter(event.target.value)} value={activeFilter}>
-            <option value="all">All rows</option>
+          <select aria-label="Kayıtları filtrele" onChange={(event) => setActiveFilter(event.target.value)} value={activeFilter}>
+            <option value="all">Tüm kayıtlar</option>
             {filterOptions.map((option) => (
               <option key={option.key} value={option.key}>
                 {option.label}
@@ -122,18 +123,18 @@ export function DataTable<T extends Record<string, string>>({ columns, rows }: D
             ))}
           </select>
         </label>
-        <div className="table-actions" aria-label="Local row actions">
-          <button className="button-secondary" onClick={() => stageAction("Review")} type="button">
+        <div className="table-actions" aria-label="Güvenli yerel tablo işlemleri">
+          <button className="button-secondary" onClick={() => stageAction("Kontrol")} type="button">
             <ClipboardCheck aria-hidden="true" size={16} />
-            Review
+            Kontrol et
           </button>
-          <button className="button-secondary" onClick={() => stageAction("Safe next step")} type="button">
+          <button className="button-secondary" onClick={() => stageAction("Güvenli önizleme")} type="button">
             <CheckCircle2 aria-hidden="true" size={16} />
-            Stage
+            Önizle
           </button>
           <button className="button-ghost" onClick={() => setSelectedId(filteredRows[0]?.id ?? null)} type="button">
             <X aria-hidden="true" size={16} />
-            Reset
+            Sıfırla
           </button>
         </div>
       </div>
@@ -141,21 +142,21 @@ export function DataTable<T extends Record<string, string>>({ columns, rows }: D
       <details className="column-picker">
         <summary>
           <Columns3 aria-hidden="true" size={16} />
-          Columns
+          Tablo sütunları
         </summary>
         <div>
           {stringColumns.map((column) => (
             <label className="checkbox-control" key={column}>
               <input checked={visibleColumns.includes(column)} onChange={() => toggleColumn(column)} type="checkbox" />
-              {humanizeColumn(column)}
+              {formatColumnLabel(column)}
             </label>
           ))}
         </div>
       </details>
 
       <div className="table-status-line">
-        <span>{filteredRows.length} rows</span>
-        <span>{selectedCount} selected</span>
+        <span>{filteredRows.length} kayıt</span>
+        <span>{selectedCount} seçili</span>
         <span>{localEvent}</span>
       </div>
 
@@ -163,9 +164,9 @@ export function DataTable<T extends Record<string, string>>({ columns, rows }: D
         <table>
           <thead>
             <tr>
-              <th>Select</th>
+              <th>Seç</th>
               {visibleColumns.map((column) => (
-                <th key={column}>{humanizeColumn(column)}</th>
+                <th key={column}>{formatColumnLabel(column)}</th>
               ))}
             </tr>
           </thead>
@@ -174,20 +175,22 @@ export function DataTable<T extends Record<string, string>>({ columns, rows }: D
               <tr data-selected={id === selectedRow?.id ? "true" : "false"} key={id} onClick={() => setSelectedId(id)}>
                 <td>
                   <input
-                    aria-label={`Select ${id}`}
+                    aria-label={`${formatOpsValue("sourceOrderKey", id)} seç`}
                     checked={id === selectedRow?.id}
                     onChange={() => setSelectedId(id)}
                     type="radio"
                   />
                 </td>
                 {visibleColumns.map((column) => (
-                  <td key={column}>{shouldBadge(column, row[column]) ? <StatusBadge label={row[column]} /> : row[column]}</td>
+                  <td key={column}>
+                    {shouldBadge(column, row[column]) ? <StatusBadge label={row[column]} /> : formatOpsValue(column, row[column])}
+                  </td>
                 ))}
               </tr>
             ))}
             {filteredRows.length === 0 ? (
               <tr>
-                <td colSpan={visibleColumns.length + 1}>No rows match the current controls.</td>
+                <td colSpan={visibleColumns.length + 1}>Bu filtrelerle eşleşen kayıt yok.</td>
               </tr>
             ) : null}
           </tbody>
@@ -195,16 +198,22 @@ export function DataTable<T extends Record<string, string>>({ columns, rows }: D
       </div>
 
       {selectedRow ? (
-        <aside className="row-inspector" aria-label="Selected row detail">
+        <aside className="row-inspector" aria-label="Seçili kayıt detayı">
           <div>
-            <p className="eyebrow">Selected</p>
-            <h2>{selectedRow.id}</h2>
+            <p className="eyebrow">Seçili kayıt</p>
+            <h2>{formatOpsValue("sourceOrderKey", selectedRow.id)}</h2>
           </div>
           <dl>
             {stringColumns.map((column) => (
               <div key={column}>
-                <dt>{humanizeColumn(column)}</dt>
-                <dd>{shouldBadge(column, selectedRow.row[column]) ? <StatusBadge label={selectedRow.row[column]} /> : selectedRow.row[column]}</dd>
+                <dt>{formatColumnLabel(column)}</dt>
+                <dd>
+                  {shouldBadge(column, selectedRow.row[column]) ? (
+                    <StatusBadge label={selectedRow.row[column]} />
+                  ) : (
+                    formatOpsValue(column, selectedRow.row[column])
+                  )}
+                </dd>
               </div>
             ))}
           </dl>

@@ -4,6 +4,7 @@ import { BadgeDollarSign, LockKeyhole, ShieldAlert, ShieldCheck } from "lucide-r
 import { useMemo, useState } from "react";
 
 import { StatusBadge } from "@/components/status-badge";
+import { formatOpsValue } from "@/lib/ops-ui/labels";
 
 type PaymentRow = {
   guard: string;
@@ -23,7 +24,7 @@ export function PaymentEventWorkbench({ rows }: PaymentEventWorkbenchProps) {
   const [orderKey, setOrderKey] = useState(rows[0]?.sourceOrderKey ?? "");
   const [quoteTotal, setQuoteTotal] = useState("25.25");
   const [sessionId, setSessionId] = useState("cs_test_mock_001");
-  const [result, setResult] = useState("No payment event staged");
+  const [result, setResult] = useState("Henüz ödeme olayı hazırlanmadı");
 
   const review = useMemo(() => {
     const amountNumber = Number.parseFloat(amount) || 0;
@@ -37,52 +38,52 @@ export function PaymentEventWorkbench({ rows }: PaymentEventWorkbenchProps) {
   }, [amount, currency, quoteTotal]);
 
   function stageEvent() {
-    setResult(`Test webhook ${sessionId} normalized for ${orderKey}: ${currency} ${amount} -> ${review.label}`);
+    setResult(`${formatOpsValue("sourceOrderKey", orderKey)} için test ödeme haberi kontrol edildi: ${currency} ${amount} -> ${formatOpsValue("status", review.label)}`);
   }
 
   return (
     <section className="workbench-panel" data-testid="payment-event-workbench">
       <div className="control-rail">
         <div>
-          <p className="eyebrow">Payment Control</p>
-          <h2>Event review</h2>
+          <p className="eyebrow">Ödeme kontrolü</p>
+          <h2>Ödeme haberi eşleşiyor mu?</h2>
         </div>
         <StatusBadge label={review.tone} />
       </div>
 
       <div className="field-grid two">
         <label>
-          Order
+          Sipariş
           <select onChange={(event) => setOrderKey(event.target.value)} value={orderKey}>
             {rows.map((row) => (
               <option key={row.sourceOrderKey} value={row.sourceOrderKey}>
-                {row.sourceOrderKey}
+                {formatOpsValue("sourceOrderKey", row.sourceOrderKey)}
               </option>
             ))}
           </select>
         </label>
         <label>
-          Event type
+          Ödeme türü
           <select onChange={(event) => setEventType(event.target.value)} value={eventType}>
-            <option value="stripe_checkout_completed">Stripe checkout completed</option>
-            <option value="owner_covered_approved">Owner covered approved</option>
-            <option value="manual_review">Manual review</option>
+            <option value="stripe_checkout_completed">Stripe test ödemesi tamamlandı</option>
+            <option value="owner_covered_approved">Owner karşıladı</option>
+            <option value="manual_review">Manuel kontrol</option>
           </select>
         </label>
         <label>
-          Test session
+          Test oturumu
           <input onChange={(event) => setSessionId(event.target.value)} value={sessionId} />
         </label>
         <label>
-          Event amount
+          Gelen ödeme tutarı
           <input inputMode="decimal" onChange={(event) => setAmount(event.target.value)} value={amount} />
         </label>
         <label>
-          Quote total
+          Beklenen kargo tutarı
           <input inputMode="decimal" onChange={(event) => setQuoteTotal(event.target.value)} value={quoteTotal} />
         </label>
         <label>
-          Currency
+          Para birimi
           <select onChange={(event) => setCurrency(event.target.value)} value={currency}>
             <option value="USD">USD</option>
             <option value="EUR">EUR</option>
@@ -92,27 +93,35 @@ export function PaymentEventWorkbench({ rows }: PaymentEventWorkbenchProps) {
       </div>
 
       <div className="decision-summary">
-        <span>Test webhook guard result</span>
-        <strong>{review.label}</strong>
-        <small>Lock is allowed only when test mode, metadata, amount, currency, order, and quote all match.</small>
+        <span>Test ödeme sonucu</span>
+        <strong>{formatOpsValue("status", review.label)}</strong>
+        <small>Kilit sadece sipariş, fiyat, tutar ve para birimi eşleşirse güvenlidir.</small>
       </div>
 
       <div className="button-row">
         <button onClick={stageEvent} type="button">
           <BadgeDollarSign aria-hidden="true" size={16} />
-          Stage event
+          Ödemeyi kontrol et
         </button>
-        <button className="button-secondary" onClick={() => setResult(`Mismatch review staged for ${orderKey}`)} type="button">
+        <button
+          className="button-secondary"
+          onClick={() => setResult(`${formatOpsValue("sourceOrderKey", orderKey)} için uyuşmazlık kontrolü hazırlandı`)}
+          type="button"
+        >
           <ShieldAlert aria-hidden="true" size={16} />
-          Review mismatch
+          Uyuşmazlığı incele
         </button>
-        <button className="button-secondary" onClick={() => setResult(`Idempotency replay preview for ${orderKey}`)} type="button">
+        <button
+          className="button-secondary"
+          onClick={() => setResult(`${formatOpsValue("sourceOrderKey", orderKey)} için tekrar ödeme kontrolü önizlendi`)}
+          type="button"
+        >
           <ShieldCheck aria-hidden="true" size={16} />
-          Replay check
+          Tekrarı kontrol et
         </button>
         <button className="button-danger" disabled type="button">
           <LockKeyhole aria-hidden="true" size={16} />
-          Lock live order
+          Canlı siparişi kilitle
         </button>
       </div>
 

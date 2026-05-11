@@ -25,18 +25,18 @@ export default function Home() {
     ready: readinessRows.filter((row) => row.status === "ready").length,
     review: readinessRows.filter((row) => row.status === "review").length,
   };
-  const readinessSummary = `${readinessCounts.ready} ready, ${readinessCounts.review} review, ${readinessCounts.blocked} blocked.`;
 
   return (
     <AppShell
-      active="Cockpit"
-      title="Ops Cockpit"
-      subtitle="Founder/admin queue view for Phase 2 readiness, payment lock, and handoff safety."
+      active="Kontrol Paneli"
+      title="Bugün ne yapacağız?"
+      subtitle="Bu ekran siparişleri basit sıraya dizer: önce eksikleri çöz, sonra kargo fiyatı çıkar, ödeme tamamlanınca kargoya hazırla."
+      steps={["Eksikleri bul", "Kargo fiyatını hazırla", "Ödeme durumunu kontrol et", "Kargoya verilecekleri ayır"]}
     >
       <section className="safety-strip" data-danger={blockedPmSupabase || !liveFlagsOff ? "true" : "false"}>
-        <span>{blockedPmSupabase ? "PM Supabase blocked" : liveFlagsOff ? "Live mutation flags off" : "Review live flags"}</span>
-        <span>{publicSupabaseReady ? "Fulfillment Supabase configured" : "Preview/local mode"}</span>
-        <span>Provider, export, and partner push disabled</span>
+        <span>{blockedPmSupabase ? "PM verisi korunuyor" : liveFlagsOff ? "Canlı değişiklikler kapalı" : "Canlı ayarlar kontrol edilmeli"}</span>
+        <span>{publicSupabaseReady ? "Fulfillment test veritabanı bağlı" : "Yerel önizleme modu"}</span>
+        <span>Kargo firması, dışa aktarım ve partner gönderimi kapalı</span>
       </section>
 
       <section className="queue-grid">
@@ -45,8 +45,8 @@ export default function Home() {
         ))}
         <QueueCard
           count={readinessCounts.blocked}
-          detail={readinessSummary}
-          label="Product readiness"
+          detail={`${readinessCounts.ready} hazır, ${readinessCounts.review} kontrol, ${readinessCounts.blocked} blokaj.`}
+          label="Ürün hazırlığı"
           tone={readinessCounts.blocked > 0 ? "danger" : "good"}
         />
       </section>
@@ -62,7 +62,7 @@ export default function Home() {
         <div className="panel">
           <div className="panel-header">
             <p className="eyebrow">Next safe action</p>
-            <h2>Ops queue</h2>
+            <h2>Sıradaki güvenli iş</h2>
           </div>
           <ActionList rows={nextActionRows} />
         </div>
@@ -70,7 +70,7 @@ export default function Home() {
         <div className="panel">
           <div className="panel-header">
             <p className="eyebrow">Route review</p>
-            <h2>DDP and manual candidates</h2>
+            <h2>Manuel kontrol isteyen rotalar</h2>
           </div>
           <DataTable columns={["sourceOrderKey", "country", "route", "payment", "action"]} rows={routeReviewRows} />
         </div>
@@ -79,7 +79,7 @@ export default function Home() {
       <section className="panel">
         <div className="panel-header">
           <p className="eyebrow">Product Master</p>
-          <h2>Readiness blockers</h2>
+          <h2>Ürün bilgi eksikleri</h2>
         </div>
         <DataTable columns={["sku", "title", "status", "packaging", "customs"]} rows={readinessRows} />
       </section>

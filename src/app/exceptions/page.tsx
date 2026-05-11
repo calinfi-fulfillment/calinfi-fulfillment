@@ -5,7 +5,12 @@ import { exceptionRows } from "@/lib/ops-ui/fixtures";
 
 export default function ExceptionsPage() {
   return (
-    <AppShell active="Exceptions" title="Exceptions" subtitle="Operational blockers and review items.">
+    <AppShell
+      active="Sorunlar"
+      title="Sorun çözme masası"
+      subtitle="Kargo fiyatı, ödeme veya ürün hazırlığını durduran konular burada tek tek sahibine atanır."
+      steps={["Sorunu seç", "Sorumlusunu belirle", "Not ekle", "Çözüm hazırsa kontrol et"]}
+    >
       <div className="workflow-grid">
         <DataTable columns={["code", "severity", "owner", "age"]} rows={exceptionRows} />
         <ExceptionTriage rows={exceptionRows} />

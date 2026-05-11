@@ -16,7 +16,7 @@ import { OPS_NAV_ITEMS } from "../src/lib/ops-ui/navigation";
 
 assert.deepEqual(
   OPS_NAV_ITEMS.map((item) => item.label),
-  ["Cockpit", "Orders", "Quotes", "Payments", "Handoffs", "Exceptions", "Reports"],
+  ["Kontrol Paneli", "Siparişler", "Kargo Ücreti", "Ödemeler", "Kargoya Hazır", "Sorunlar", "Raporlar"],
 );
 
 for (const route of ["orders", "quotes", "payments", "handoffs", "exceptions", "reports"]) {
@@ -62,38 +62,46 @@ const stagingReadinessSource = readFileSync("src/components/staging-pilot-readin
 const localStagingSource = readFileSync("src/components/local-staging-mode-readiness.tsx", "utf8");
 const providerReadinessSource = readFileSync("src/components/provider-api-readiness.tsx", "utf8");
 const stripeCheckoutReadinessSource = readFileSync("src/components/stripe-checkout-readiness.tsx", "utf8");
+const appShellSource = readFileSync("src/components/app-shell.tsx", "utf8");
+const labelsSource = readFileSync("src/lib/ops-ui/labels.ts", "utf8");
 
 assert.match(dataTableSource, /data-testid="interactive-data-table"/);
 assert.match(dataTableSource, /type="search"/);
 assert.match(dataTableSource, /type="radio"/);
+assert.match(dataTableSource, /Sipariş, ürün veya durum ara/);
+assert.match(appShellSource, /page-guide/);
+assert.match(appShellSource, /ODUN Kargo Paneli/);
+assert.match(labelsSource, /Sipariş/);
+assert.match(labelsSource, /Blokaj/);
 assert.match(cockpitSource, /OpsCommandCenter/);
+assert.match(cockpitSource, /Bugün ne yapacağız/);
 assert.match(handoffsSource, /HandoffWorkbench/);
 assert.match(handoffsSource, /ProviderApiReadiness/);
 assert.match(ordersSource, /OrdersWorkbench/);
 assert.match(paymentsSource, /PaymentEventWorkbench/);
 assert.match(paymentsSource, /StripeCheckoutReadinessPanel/);
-assert.match(paymentsSource, /test webhook normalization/i);
+assert.match(paymentsSource, /Ödeme kontrolü/);
 assert.match(quotesSource, /ManualDdpQuote/);
 assert.match(quotesSource, /ProviderApiReadiness/);
-assert.match(quotesSource, /mock provider rates/i);
-assert.match(handoffsSource, /provider handoff stays mock-only/i);
+assert.match(quotesSource, /Kargo ücreti çıkar/);
+assert.match(handoffsSource, /Kargoya teslim hazırlığı/);
 assert.match(reportsSource, /data-testid="reports-dashboard"/);
 assert.match(cockpitSource, /StagingPilotReadiness/);
 assert.match(cockpitSource, /LocalStagingModeReadiness/);
 assert.match(stagingReadinessSource, /data-testid="staging-pilot-readiness"/);
-assert.match(stagingReadinessSource, /Connect staging Supabase/);
-assert.match(stagingReadinessSource, /Provider API push/);
+assert.match(stagingReadinessSource, /Test Supabase bağla/);
+assert.match(stagingReadinessSource, /Firmaya canlı gönder/);
 assert.match(localStagingSource, /data-testid="vercel-bypass-readiness"/);
-assert.match(localStagingSource, /local-staging mode/i);
-assert.match(providerReadinessSource, /Mock rates/);
-assert.match(providerReadinessSource, /Mock handoff/);
-assert.match(providerReadinessSource, /Mock tracking/);
-assert.match(providerReadinessSource, /Easyship rates plan/);
-assert.match(providerReadinessSource, /Easyship handoff guard/);
-assert.match(providerReadinessSource, /Easyship readiness/);
+assert.match(localStagingSource, /Yerel test modu/);
+assert.match(providerReadinessSource, /Maket fiyat/);
+assert.match(providerReadinessSource, /Maket teslim/);
+assert.match(providerReadinessSource, /Maket takip/);
+assert.match(providerReadinessSource, /Easyship fiyat planı/);
+assert.match(providerReadinessSource, /Easyship teslim kilidi/);
+assert.match(providerReadinessSource, /Easyship durumu/);
 assert.match(stripeCheckoutReadinessSource, /data-testid="stripe-checkout-readiness"/);
-assert.match(stripeCheckoutReadinessSource, /Create test checkout/);
-assert.match(stripeCheckoutReadinessSource, /Live checkout/);
+assert.match(stripeCheckoutReadinessSource, /Test ödemesi aç/);
+assert.match(stripeCheckoutReadinessSource, /Canlı ödeme/);
 
 console.log(
   JSON.stringify(

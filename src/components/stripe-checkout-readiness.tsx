@@ -1,6 +1,7 @@
 import { CreditCard, KeyRound, LockKeyhole, ShieldCheck, ToggleLeft, TriangleAlert } from "lucide-react";
 
 import { StatusBadge } from "@/components/status-badge";
+import { formatOpsValue } from "@/lib/ops-ui/labels";
 import type { StripeCheckoutReadiness } from "@/lib/stripe-checkout";
 
 type StripeCheckoutReadinessProps = {
@@ -26,16 +27,16 @@ export function StripeCheckoutReadinessPanel({ readiness }: StripeCheckoutReadin
     <section className="workbench-panel" data-testid="stripe-checkout-readiness">
       <div className="control-rail">
         <div>
-          <p className="eyebrow">Stripe Test Checkout</p>
-          <h2>Checkout readiness</h2>
+          <p className="eyebrow">Stripe test ödemesi</p>
+          <h2>Ödeme açılabilir mi?</h2>
         </div>
         <StatusBadge label={statusLabel(readiness)} />
       </div>
 
       <div className="decision-summary">
-        <span>Creation guard</span>
-        <strong>{readiness.code}</strong>
-        <small>Checkout session creation requires test mode, a restricted test key, a fresh quote, and matching metadata.</small>
+        <span>Güvenlik kontrolü</span>
+        <strong>{formatOpsValue("status", readiness.code)}</strong>
+        <small>Ödeme ekranı için test modu, kısıtlı test anahtarı, güncel fiyat ve eşleşen sipariş bilgisi gerekir.</small>
       </div>
 
       <div className="checklist">
@@ -46,7 +47,7 @@ export function StripeCheckoutReadinessPanel({ readiness }: StripeCheckoutReadin
             <div className="check-row" key={check.name}>
               <span>
                 <Icon aria-hidden="true" size={15} />
-                {check.name}
+              {formatOpsValue("status", check.name)}
               </span>
               <StatusBadge label={check.ok ? "ready" : "blocked"} />
             </div>
@@ -57,15 +58,15 @@ export function StripeCheckoutReadinessPanel({ readiness }: StripeCheckoutReadin
       <div className="button-row">
         <button disabled title="Requires a selected fresh quote payload" type="button">
           <CreditCard aria-hidden="true" size={16} />
-          Create test checkout
+          Test ödemesi aç
         </button>
         <button className="button-secondary" disabled type="button">
           <ShieldCheck aria-hidden="true" size={16} />
-          Verify webhook
+          Webhook kontrol et
         </button>
         <button className="button-danger" disabled type="button">
           <LockKeyhole aria-hidden="true" size={16} />
-          Live checkout
+          Canlı ödeme
         </button>
       </div>
     </section>

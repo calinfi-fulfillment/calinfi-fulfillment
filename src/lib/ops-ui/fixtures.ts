@@ -1,30 +1,30 @@
 export const cockpitQueues = [
-  { label: "Ready for quote", count: 18, detail: "Fresh intake with Product Master ready", tone: "good" },
-  { label: "Blocked before Phase 2", count: 7, detail: "Hold, missing SKU, or address review", tone: "danger" },
-  { label: "Payment pending", count: 12, detail: "Fresh quote selected, waiting for PM event", tone: "warning" },
-  { label: "Handoff ready", count: 4, detail: "Paid locked and safe to export", tone: "neutral" },
+  { label: "Fiyat bekleyen", count: 18, detail: "Ürün ve adres hazır; kargo fiyatı çıkarılabilir.", tone: "good" },
+  { label: "Önce çözülmeli", count: 7, detail: "Adres, SKU veya bekletme sebebi var.", tone: "danger" },
+  { label: "Ödeme bekleyen", count: 12, detail: "Fiyat seçildi; ödeme haberi bekleniyor.", tone: "warning" },
+  { label: "Kargoya hazır", count: 4, detail: "Ödeme tamam; dışa aktarım önizlenebilir.", tone: "neutral" },
 ] as const;
 
 export const nextActionRows = [
   {
     priority: "1",
-    queue: "Product Master",
-    item: "Review missing customs fields",
-    owner: "Core Data",
+    queue: "Ürün bilgisi",
+    item: "Gümrük alanları eksik olan ürünü tamamla",
+    owner: "Veri",
     status: "blocker",
   },
   {
     priority: "2",
     queue: "DDP / Partner",
-    item: "Approve manual DDP quote for HK test route",
-    owner: "Ops",
+    item: "Hong Kong test rotası için manuel kargo fiyatını onayla",
+    owner: "Operasyon",
     status: "review",
   },
   {
     priority: "3",
-    queue: "Payments",
-    item: "Process signed synthetic covered-payment event",
-    owner: "Payment",
+    queue: "Ödeme",
+    item: "Test ödeme olayını kontrol et",
+    owner: "Finans",
     status: "ready",
   },
 ] as const;
@@ -32,21 +32,21 @@ export const nextActionRows = [
 export const readinessRows = [
   {
     sku: "CLF-ODN-CORE",
-    title: "ODUN Core Box",
+    title: "ODUN Ana Kutu",
     status: "ready",
     packaging: "ready",
     customs: "ready",
   },
   {
     sku: "CLF-ACC-STAND",
-    title: "Display Stand",
+    title: "Stand",
     status: "review",
     packaging: "missing dimensions",
     customs: "not needed",
   },
   {
     sku: "CLF-ACC-DDP",
-    title: "DDP Test Add-on",
+    title: "DDP Test Eklentisi",
     status: "blocker",
     packaging: "ready",
     customs: "missing HS/origin/value",
@@ -132,20 +132,20 @@ export const exceptionRows = [
   {
     code: "missing_product_master_sku",
     severity: "blocker",
-    owner: "Core Data",
+    owner: "Veri",
     age: "0d",
   },
   {
     code: "payment_amount_mismatch",
     severity: "review",
-    owner: "Payment",
+    owner: "Finans",
     age: "1d",
   },
 ] as const;
 
 export const reportRows = [
-  { metric: "Ready orders", value: "18" },
-  { metric: "Blocked orders", value: "7" },
-  { metric: "Payment pending", value: "12" },
-  { metric: "Handoff ready", value: "4" },
+  { metric: "Fiyata hazır sipariş", value: "18" },
+  { metric: "Blokajlı sipariş", value: "7" },
+  { metric: "Ödeme bekleyen", value: "12" },
+  { metric: "Kargoya hazır", value: "4" },
 ] as const;

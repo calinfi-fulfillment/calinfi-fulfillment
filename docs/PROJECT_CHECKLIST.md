@@ -259,6 +259,16 @@ Bu dosya ODUN Fulfillment V1 için canonical proje checklist'idir. Her implement
 - [x] Shipment/label/export/tracking disabled kaldı. Verified by smoke script forced guards and no shipment/label/tracking endpoint calls.
 - [x] `test:no-secrets`, `typecheck`, `lint`, `build` geçti. Verified by `npm run test:no-secrets`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npm test`.
 
+## 17. Turkish Simple Ops UI
+
+- [x] Navigation, page titles, and page subtitles Turkish-first oldu. Verified by `npm run test:ops-ui`.
+- [x] Each page has a four-step plain-language guide. Verified by `AppShell` `page-guide` and `npm run test:ops-ui`.
+- [x] Table controls, column labels, status badges, and selected-row inspector are Turkish and operator-friendly. Verified by `src/lib/ops-ui/labels.ts`, `DataTable`, and `npm run test:ops-ui`.
+- [x] Orders, Quotes, Payments, Handoffs, Exceptions, Reports workbenches use plain Turkish action labels. Verified by focused source regression and `npm run test:ops-ui`.
+- [x] Safety/live-action disabled messaging stayed visible. Verified by disabled live buttons and safety strip source inspection.
+- [x] `test:ops-ui`, `typecheck`, `lint`, `build`, `test:no-secrets` geçti. Verified by focused checks and `npm test`.
+- [x] Local smoke for `/`, `/orders`, `/quotes`, `/payments`, `/handoffs`, `/exceptions`, `/reports` passed. Verified by local HTTP 200 smoke.
+
 ## Audit Gates
 
 Sınır Bekçisi veya eşdeğer boundary audit aşağıdaki noktalarda çalıştırılmalı:

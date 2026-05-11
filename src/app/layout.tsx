@@ -3,13 +3,13 @@ import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ODUN Fulfillment V1",
-  description: "Handoff-first fulfillment system for CALINFI / ODUN.",
+  title: "ODUN Kargo Paneli",
+  description: "CALINFI / ODUN için güvenli fulfillment ve kargo hazırlık paneli.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="tr">
       <body>{children}</body>
     </html>
   );

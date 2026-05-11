@@ -4,6 +4,7 @@ import { Cable, KeyRound, LockKeyhole, RotateCw, ShieldCheck, Webhook } from "lu
 import { useMemo, useState } from "react";
 
 import { StatusBadge } from "@/components/status-badge";
+import { formatOpsValue } from "@/lib/ops-ui/labels";
 import {
   buildEasyshipRatesRequestPlan,
   createEasyshipReadiness,
@@ -13,17 +14,17 @@ import {
 } from "@/lib/provider-adapter";
 
 const readinessChecks = [
-  { icon: KeyRound, label: "Credential vault", status: "not connected" },
-  { icon: Cable, label: "Quote/order endpoint map", status: "draft" },
-  { icon: Webhook, label: "Tracking webhook contract", status: "draft" },
-  { icon: ShieldCheck, label: "Idempotency key strategy", status: "ready" },
+  { icon: KeyRound, label: "API anahtarı kasası", status: "not connected" },
+  { icon: Cable, label: "Fiyat ve sipariş adresleri", status: "draft" },
+  { icon: Webhook, label: "Takip webhook anlaşması", status: "draft" },
+  { icon: ShieldCheck, label: "Tekrar gönderim koruması", status: "ready" },
 ] as const;
 
 export function ProviderApiReadiness() {
-  const [provider, setProvider] = useState("First fulfillment partner");
+  const [provider, setProvider] = useState("İlk fulfillment firması");
   const [environment, setEnvironment] = useState("mock");
-  const [handshake, setHandshake] = useState("No provider handshake run");
-  const [preview, setPreview] = useState("No mock provider preview staged");
+  const [handshake, setHandshake] = useState("Henüz firma bağlantı testi çalışmadı");
+  const [preview, setPreview] = useState("Henüz firma önizlemesi hazırlanmadı");
   const health = createProviderHealthReport({
     FULFILLMENT_ENABLE_PROVIDER_API_QUOTES: "false",
     FULFILLMENT_ENABLE_PARTNER_API_PUSH: "false",
@@ -54,7 +55,7 @@ export function ProviderApiReadiness() {
   function stageMockRates() {
     const rates = mockFulfillmentProviderAdapter.getRates!(mockQuoteRequest);
     const bestRate = rates[0]!;
-    setPreview(`${bestRate.serviceLevel}: ${bestRate.currency} ${(bestRate.totalCents / 100).toFixed(2)} / ETA ${bestRate.etaDaysMin}-${bestRate.etaDaysMax} days`);
+    setPreview(`${bestRate.serviceLevel}: ${bestRate.currency} ${(bestRate.totalCents / 100).toFixed(2)} / ${bestRate.etaDaysMin}-${bestRate.etaDaysMax} gün`);
   }
 
   function stageMockHandoff() {
@@ -66,12 +67,12 @@ export function ProviderApiReadiness() {
       idempotencyKey: "mock-provider-order:handoff:v1",
     });
 
-    setPreview(`${result.status}: ${result.providerHandoffId}`);
+    setPreview(`${formatOpsValue("status", result.status)}: ${result.providerHandoffId}`);
   }
 
   function stageMockTracking() {
     const tracking = mockFulfillmentProviderAdapter.getTracking!({ providerHandoffId: "mock-handoff:mock-provider-order" });
-    setPreview(`${tracking.status}: ${tracking.trackingNumber}`);
+    setPreview(`${formatOpsValue("status", tracking.status)}: ${tracking.trackingNumber}`);
   }
 
   function stageEasyshipRatesPlan() {
@@ -109,7 +110,7 @@ export function ProviderApiReadiness() {
       },
     );
 
-    setPreview(`Easyship ${plan.method} ${plan.url.replace("https://public-api.easyship.com", "")} planned; token redacted`);
+    setPreview(`Easyship ${plan.method} ${plan.url.replace("https://public-api.easyship.com", "")} planlandı; token gizli`);
   }
 
   function stageEasyshipBlockedHandoff() {
@@ -121,35 +122,35 @@ export function ProviderApiReadiness() {
       idempotencyKey: "easyship-mock-provider-order:handoff:v1",
     });
 
-    setPreview(`${result.status}: ${result.reason}`);
+    setPreview(`${formatOpsValue("status", result.status)}: ${result.reason}`);
   }
 
   return (
     <section className="workbench-panel" data-testid="provider-api-readiness">
       <div className="control-rail">
         <div>
-          <p className="eyebrow">Provider API Prep</p>
-          <h2>Connection readiness</h2>
+          <p className="eyebrow">Kargo firması bağlantısı</p>
+          <h2>Bağlantı güvenli mi?</h2>
         </div>
         <StatusBadge label={health.ok && environment === "mock" ? "safe preview" : "review"} />
       </div>
 
       <div className="field-grid">
         <label>
-          Provider
+          Firma
           <input onChange={(event) => setProvider(event.target.value)} value={provider} />
         </label>
         <label>
-          Environment
+          Ortam
           <select onChange={(event) => setEnvironment(event.target.value)} value={environment}>
-            <option value="mock">Mock only</option>
-            <option value="sandbox">Sandbox planned</option>
-            <option value="production">Production disabled</option>
+            <option value="mock">Sadece maket</option>
+            <option value="sandbox">Sandbox planı</option>
+            <option value="production">Canlı kapalı</option>
           </select>
         </label>
         <label>
-          API key
-          <input disabled placeholder="Connect later via environment secret" type="password" />
+          API anahtarı
+          <input disabled placeholder="Daha sonra ortam sırrı ile bağlanacak" type="password" />
         </label>
       </div>
 
@@ -167,7 +168,7 @@ export function ProviderApiReadiness() {
           <div className="check-row" key={check.name}>
             <span>
               <ShieldCheck aria-hidden="true" size={15} />
-              {check.name}
+              {formatOpsValue("status", check.name)}
             </span>
             <StatusBadge label={check.ok ? "ready" : "blocked"} />
           </div>
@@ -175,40 +176,40 @@ export function ProviderApiReadiness() {
       </div>
 
       <div className="decision-summary">
-        <span>Mock provider preview</span>
+        <span>Firma önizlemesi</span>
         <strong>{preview}</strong>
-        <small>No provider API, label, export, or partner push is called from this panel.</small>
+        <small>Bu panelden canlı API, etiket, dışa aktarım veya partner gönderimi yapılmaz.</small>
       </div>
 
       <div className="decision-summary">
-        <span>Easyship readiness</span>
-        <strong>{easyshipReadiness.code}</strong>
-        <small>Sandbox rate request planning is allowed; shipment creation, labels, tracking calls, and production mode stay disabled.</small>
+        <span>Easyship durumu</span>
+        <strong>{formatOpsValue("status", easyshipReadiness.code)}</strong>
+        <small>Sandbox fiyat planı serbest; gönderi oluşturma, etiket, takip ve canlı mod kapalı kalır.</small>
       </div>
 
       <div className="button-row">
-        <button onClick={() => setHandshake(`${provider} mock handshake completed in ${environment} mode`)} type="button">
+        <button onClick={() => setHandshake(`${provider} için ${environment} modunda maket bağlantı testi tamamlandı`)} type="button">
           <RotateCw aria-hidden="true" size={16} />
-          Mock handshake
+          Bağlantıyı dene
         </button>
         <button className="button-secondary" onClick={stageMockRates} type="button">
-          Mock rates
+          Maket fiyat
         </button>
         <button className="button-secondary" onClick={stageMockHandoff} type="button">
-          Mock handoff
+          Maket teslim
         </button>
         <button className="button-secondary" onClick={stageMockTracking} type="button">
-          Mock tracking
+          Maket takip
         </button>
         <button className="button-secondary" onClick={stageEasyshipRatesPlan} type="button">
-          Easyship rates plan
+          Easyship fiyat planı
         </button>
         <button className="button-secondary" onClick={stageEasyshipBlockedHandoff} type="button">
-          Easyship handoff guard
+          Easyship teslim kilidi
         </button>
         <button className="button-danger" disabled type="button">
           <LockKeyhole aria-hidden="true" size={16} />
-          Connect live API
+          Canlı API bağla
         </button>
       </div>
       <p className="local-state" aria-live="polite">

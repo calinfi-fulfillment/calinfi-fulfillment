@@ -7,18 +7,19 @@ type AppShellProps = {
   active: OpsNavLabel;
   title: string;
   subtitle: string;
+  steps?: readonly string[];
   children: ReactNode;
 };
 
-export function AppShell({ active, children, subtitle, title }: AppShellProps) {
+export function AppShell({ active, children, steps, subtitle, title }: AppShellProps) {
   return (
     <main className="ops-layout">
-      <aside className="sidebar" aria-label="Operations navigation">
+      <aside className="sidebar" aria-label="Operasyon menüsü">
         <div className="brand">
           <span className="brand-mark">OF</span>
           <div>
-            <strong>ODUN Fulfillment</strong>
-            <span>V1 cockpit</span>
+            <strong>ODUN Kargo Paneli</strong>
+            <span>Güvenli test modu</span>
           </div>
         </div>
         <nav className="nav-list">
@@ -33,11 +34,21 @@ export function AppShell({ active, children, subtitle, title }: AppShellProps) {
       <section className="content">
         <header className="topbar">
           <div>
-            <p className="eyebrow">Operations</p>
+            <p className="eyebrow">Kargo operasyonu</p>
             <h1>{title}</h1>
             <p>{subtitle}</p>
           </div>
         </header>
+        {steps ? (
+          <section className="page-guide" aria-label="Sayfa adımları">
+            {steps.map((step, index) => (
+              <article key={step}>
+                <strong>{index + 1}</strong>
+                <span>{step}</span>
+              </article>
+            ))}
+          </section>
+        ) : null}
         {children}
       </section>
     </main>

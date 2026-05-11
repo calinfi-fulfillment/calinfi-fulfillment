@@ -1,6 +1,7 @@
 import { Laptop, ShieldCheck, TriangleAlert } from "lucide-react";
 
 import { StatusBadge } from "@/components/status-badge";
+import { formatOpsValue } from "@/lib/ops-ui/labels";
 import type { VercelBypassReport } from "@/lib/vercel-bypass";
 
 type LocalStagingModeReadinessProps = {
@@ -18,16 +19,16 @@ export function LocalStagingModeReadiness({ report }: LocalStagingModeReadinessP
     <section className="workbench-panel" data-testid="vercel-bypass-readiness">
       <div className="control-rail">
         <div>
-          <p className="eyebrow">Vercel Bypass</p>
-          <h2>Local-staging mode</h2>
+          <p className="eyebrow">Güvenli çalışma</p>
+          <h2>Yerel test modu</h2>
         </div>
         <StatusBadge label={report.okForDevelopment ? "dev ready" : "blocked"} />
       </div>
 
       <div className="decision-summary">
-        <span>Current mode</span>
-        <strong>{report.mode}</strong>
-        <small>Vercel Git integration is launch work, not a local/staging development blocker.</small>
+        <span>Mevcut mod</span>
+        <strong>Yerel + staging geliştirme</strong>
+        <small>Vercel bağlantısı canlı yayına yaklaşırken çözülecek; bugün geliştirmeyi durdurmaz.</small>
       </div>
 
       <div className="checklist">
@@ -38,7 +39,7 @@ export function LocalStagingModeReadiness({ report }: LocalStagingModeReadinessP
             <div className="check-row" key={check.name}>
               <span>
                 <Icon aria-hidden="true" size={15} />
-                {check.name}
+                {formatOpsValue("status", check.name)}
               </span>
               <StatusBadge label={labelFor(check.status)} />
             </div>

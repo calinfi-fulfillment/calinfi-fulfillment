@@ -8,7 +8,7 @@ export function ManualDdpQuote() {
   const [bufferPercent, setBufferPercent] = useState("5");
   const [currency, setCurrency] = useState("USD");
   const [providerQuote, setProviderQuote] = useState("manual-ddp-hk-test");
-  const [stagedQuote, setStagedQuote] = useState("No quote staged");
+  const [stagedQuote, setStagedQuote] = useState("Henüz fiyat önizlemesi hazırlanmadı");
 
   const quoteMath = useMemo(() => {
     const baseAmount = Number.parseFloat(amount) || 0;
@@ -26,25 +26,25 @@ export function ManualDdpQuote() {
   return (
     <section className="quote-control-panel" data-testid="manual-ddp-control">
       <div className="panel-header">
-        <p className="eyebrow">Manual DDP Quote</p>
-        <h2>HK direct route</h2>
+        <p className="eyebrow">Manuel DDP fiyatı</p>
+        <h2>Hong Kong direkt rota</h2>
       </div>
 
       <div className="field-grid">
         <label>
-          Order key
-          <input readOnly value="pm:synthetic-ddp-001" />
+          Sipariş
+          <input readOnly value="DDP test siparişi" />
         </label>
         <label>
-          Provider quote
+          Firma teklif kodu
           <input onChange={(event) => setProviderQuote(event.target.value)} value={providerQuote} />
         </label>
         <label>
-          Amount
+          Temel tutar
           <input inputMode="decimal" onChange={(event) => setAmount(event.target.value)} value={amount} />
         </label>
         <label>
-          Currency
+          Para birimi
           <select onChange={(event) => setCurrency(event.target.value)} value={currency}>
             <option value="USD">USD</option>
             <option value="HKD">HKD</option>
@@ -52,7 +52,7 @@ export function ManualDdpQuote() {
           </select>
         </label>
         <label>
-          Buffer %
+          Güvenlik payı %
           <input inputMode="decimal" onChange={(event) => setBufferPercent(event.target.value)} value={bufferPercent} />
         </label>
       </div>
@@ -63,21 +63,21 @@ export function ManualDdpQuote() {
           {currency} {quoteMath.total.toFixed(2)}
         </span>
         <small>
-          buffer {currency} {quoteMath.buffer.toFixed(2)}
+          güvenlik payı {currency} {quoteMath.buffer.toFixed(2)}
         </small>
       </div>
 
       <div className="button-row">
         <button
-          onClick={() => setStagedQuote(`${providerQuote} staged at ${currency} ${quoteMath.total.toFixed(2)}`)}
+          onClick={() => setStagedQuote(`${providerQuote} için toplam ${currency} ${quoteMath.total.toFixed(2)} hazırlandı`)}
           type="button"
         >
           <Save aria-hidden="true" size={16} />
-          Stage quote
+          Fiyatı hazırla
         </button>
         <button className="button-secondary" disabled type="button">
           <ShieldCheck aria-hidden="true" size={16} />
-          Push live
+          Canlıya gönder
         </button>
       </div>
       <p className="local-state">{stagedQuote}</p>

@@ -4,6 +4,7 @@ import { BarChart3, Download, RefreshCw, ShieldCheck } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { DataTable } from "@/components/data-table";
+import { formatOpsValue } from "@/lib/ops-ui/labels";
 
 type ReportRow = {
   metric: string;
@@ -19,7 +20,7 @@ const routeOptions = ["REGIONAL_3PL", "CHINA_HK_DIRECT_DDP", "PARTNER_MANAGED"] 
 export function ReportsDashboard({ rows }: ReportsDashboardProps) {
   const [range, setRange] = useState("30d");
   const [selectedRoutes, setSelectedRoutes] = useState<string[]>(["REGIONAL_3PL", "CHINA_HK_DIRECT_DDP"]);
-  const [previewState, setPreviewState] = useState("No aggregate preview generated");
+  const [previewState, setPreviewState] = useState("Henüz özet önizlemesi üretilmedi");
 
   const maxValue = useMemo(() => Math.max(...rows.map((row) => Number.parseInt(row.value, 10) || 0), 1), [rows]);
 
@@ -32,29 +33,29 @@ export function ReportsDashboard({ rows }: ReportsDashboardProps) {
   return (
     <div className="reports-workspace" data-testid="reports-dashboard">
       <section className="report-controls">
-        <div className="segmented-control" aria-label="Report range">
+        <div className="segmented-control" aria-label="Rapor zaman aralığı">
           {["7d", "30d", "all"].map((option) => (
             <button aria-pressed={range === option} key={option} onClick={() => setRange(option)} type="button">
-              {option}
+              {option === "7d" ? "7 gün" : option === "30d" ? "30 gün" : "Tümü"}
             </button>
           ))}
         </div>
-        <div className="route-toggles" aria-label="Route filter">
+        <div className="route-toggles" aria-label="Kargo yolu filtresi">
           {routeOptions.map((route) => (
             <label className="checkbox-pill" key={route}>
               <input checked={selectedRoutes.includes(route)} onChange={() => toggleRoute(route)} type="checkbox" />
-              {route}
+              {formatOpsValue("route", route)}
             </label>
           ))}
         </div>
         <div className="button-row">
-          <button onClick={() => setPreviewState(`${range} aggregate preview for ${selectedRoutes.length} routes`)} type="button">
+          <button onClick={() => setPreviewState(`${selectedRoutes.length} kargo yolu için güvenli özet üretildi`)} type="button">
             <RefreshCw aria-hidden="true" size={16} />
-            Generate
+            Özeti üret
           </button>
-          <button className="button-secondary" onClick={() => setPreviewState(`PII-safe export preview staged for ${range}`)} type="button">
+          <button className="button-secondary" onClick={() => setPreviewState("Kişisel veri içermeyen dışa aktarım önizlendi")} type="button">
             <Download aria-hidden="true" size={16} />
-            Export preview
+            Güvenli dışa aktar
           </button>
         </div>
       </section>
@@ -82,8 +83,8 @@ export function ReportsDashboard({ rows }: ReportsDashboardProps) {
       <section className="panel">
         <div className="control-rail">
           <div>
-            <p className="eyebrow">Aggregate Output</p>
-            <h2>Summary table</h2>
+            <p className="eyebrow">Güvenli özet</p>
+            <h2>Toplamlar</h2>
           </div>
           <span>
             <ShieldCheck aria-hidden="true" size={16} />

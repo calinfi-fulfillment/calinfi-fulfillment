@@ -4,6 +4,7 @@ import { ClipboardCheck, LockKeyhole, PlayCircle, ShieldCheck } from "lucide-rea
 import { useState } from "react";
 
 import { StatusBadge } from "@/components/status-badge";
+import { formatOpsValue } from "@/lib/ops-ui/labels";
 import type { StagingPrepCheck, SyntheticPilotImportPlan } from "@/lib/staging-prep";
 
 type StagingPilotReadinessProps = {
@@ -14,39 +15,39 @@ type StagingPilotReadinessProps = {
 };
 
 export function StagingPilotReadiness({ checks, importPlan, mode, ok }: StagingPilotReadinessProps) {
-  const [event, setEvent] = useState("No Phase 13 action staged");
+  const [event, setEvent] = useState("Henüz pilot testi başlatılmadı");
   const blockedChecks = checks.filter((check) => !check.ok && check.severity === "blocking");
 
   return (
     <section className="workbench-panel" data-testid="staging-pilot-readiness">
       <div className="control-rail">
         <div>
-          <p className="eyebrow">Phase 13</p>
-          <h2>Staging Pilot Readiness</h2>
+          <p className="eyebrow">Pilot hazırlığı</p>
+          <h2>Teste hazır mıyız?</h2>
         </div>
         <StatusBadge label={ok ? mode : "blocked"} />
       </div>
 
       <div className="queue-grid compact">
         <article className="mini-metric">
-          <span>Fixture</span>
+          <span>Test siparişi</span>
           <strong>{importPlan.orders}</strong>
-          <small>{importPlan.fixtureSafe ? "PII-safe synthetic orders" : "fixture review needed"}</small>
+          <small>{importPlan.fixtureSafe ? "Kişisel veri yok" : "Test verisi kontrol edilmeli"}</small>
         </article>
         <article className="mini-metric">
-          <span>Handoff preview</span>
+          <span>Kargo önizlemesi</span>
           <strong>{importPlan.exportedPreviewRows}</strong>
-          <small>in-memory export rows</small>
+          <small>canlı dosya yazmadan</small>
         </article>
         <article className="mini-metric">
-          <span>Built-ins excluded</span>
+          <span>Kutu içi ürün</span>
           <strong>{importPlan.excludedBuiltinItems}</strong>
-          <small>visible, not physical package lines</small>
+          <small>ayrı paketlenmez</small>
         </article>
         <article className="mini-metric">
-          <span>Blockers</span>
+          <span>Blokaj</span>
           <strong>{blockedChecks.length}</strong>
-          <small>DB/API untouched</small>
+          <small>DB/API değişmedi</small>
         </article>
       </div>
 
@@ -55,7 +56,7 @@ export function StagingPilotReadiness({ checks, importPlan, mode, ok }: StagingP
           <div className="check-row" key={check.name}>
             <span>
               <ShieldCheck aria-hidden="true" size={15} />
-              {check.name}
+              {formatOpsValue("status", check.name)}
             </span>
             <StatusBadge label={check.ok ? "ready" : check.severity} />
           </div>
@@ -63,29 +64,29 @@ export function StagingPilotReadiness({ checks, importPlan, mode, ok }: StagingP
       </div>
 
       <div className="button-row">
-        <button onClick={() => setEvent(`Mock pilot staged: ${importPlan.orders} orders / ${importPlan.exportedPreviewRows} export rows`)} type="button">
+        <button onClick={() => setEvent(`${importPlan.orders} test siparişi ve ${importPlan.exportedPreviewRows} kargo satırı önizlendi`)} type="button">
           <PlayCircle aria-hidden="true" size={16} />
-          Run mock pilot
+          Test pilotu çalıştır
         </button>
-        <button className="button-secondary" onClick={() => setEvent(`${blockedChecks.length} blockers ready for review`)} type="button">
+        <button className="button-secondary" onClick={() => setEvent(`${blockedChecks.length} blokaj kontrol için hazır`)} type="button">
           <ClipboardCheck aria-hidden="true" size={16} />
-          Review blockers
+          Blokajları göster
         </button>
-        <button className="button-secondary" onClick={() => setEvent("Owner approval package prepared locally")} type="button">
+        <button className="button-secondary" onClick={() => setEvent("Owner onay paketi yerelde hazırlandı")} type="button">
           <ShieldCheck aria-hidden="true" size={16} />
-          Prepare owner approval
+          Onay paketini hazırla
         </button>
         <button className="button-danger" disabled type="button">
           <LockKeyhole aria-hidden="true" size={16} />
-          Connect staging Supabase
+          Test Supabase bağla
         </button>
         <button className="button-danger" disabled type="button">
           <LockKeyhole aria-hidden="true" size={16} />
-          Stripe live
+          Stripe canlı
         </button>
         <button className="button-danger" disabled type="button">
           <LockKeyhole aria-hidden="true" size={16} />
-          Provider API push
+          Firmaya canlı gönder
         </button>
       </div>
 

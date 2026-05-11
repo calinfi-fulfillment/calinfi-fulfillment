@@ -4,6 +4,7 @@ import { ClipboardCheck, MessageSquareText, ShieldCheck, UserCheck } from "lucid
 import { useMemo, useState } from "react";
 
 import { StatusBadge } from "@/components/status-badge";
+import { formatOpsValue } from "@/lib/ops-ui/labels";
 
 type ExceptionRow = {
   age: string;
@@ -18,9 +19,9 @@ type ExceptionTriageProps = {
 
 export function ExceptionTriage({ rows }: ExceptionTriageProps) {
   const [code, setCode] = useState(rows[0]?.code ?? "");
-  const [owner, setOwner] = useState(rows[0]?.owner ?? "Ops");
-  const [note, setNote] = useState("Review blocker before quote/payment.");
-  const [resolution, setResolution] = useState("No triage action staged");
+  const [owner, setOwner] = useState(rows[0]?.owner ?? "Operasyon");
+  const [note, setNote] = useState("Kargo fiyatı veya ödeme açılmadan önce bu blokajı kontrol et.");
+  const [resolution, setResolution] = useState("Henüz sorun çözüm işlemi hazırlanmadı");
 
   const selectedException = useMemo(() => rows.find((row) => row.code === code) ?? rows[0], [code, rows]);
 
@@ -28,54 +29,54 @@ export function ExceptionTriage({ rows }: ExceptionTriageProps) {
     <section className="workbench-panel" data-testid="exception-triage">
       <div className="control-rail">
         <div>
-          <p className="eyebrow">Exception Control</p>
-          <h2>Triage desk</h2>
+          <p className="eyebrow">Sorun kontrolü</p>
+          <h2>Kime atanacak?</h2>
         </div>
         <StatusBadge label={selectedException?.severity ?? "review"} />
       </div>
 
       <div className="field-grid">
         <label>
-          Issue
+          Sorun
           <select onChange={(event) => setCode(event.target.value)} value={code}>
             {rows.map((row) => (
               <option key={row.code} value={row.code}>
-                {row.code}
+                {formatOpsValue("code", row.code)}
               </option>
             ))}
           </select>
         </label>
         <label>
-          Owner
+          Sorumlu
           <select onChange={(event) => setOwner(event.target.value)} value={owner}>
-            <option value="Core Data">Core Data</option>
-            <option value="Ops">Ops</option>
-            <option value="Payment">Payment</option>
+            <option value="Veri">Veri</option>
+            <option value="Operasyon">Operasyon</option>
+            <option value="Finans">Finans</option>
             <option value="Founder">Founder</option>
           </select>
         </label>
         <label>
-          Note
+          Not
           <textarea onChange={(event) => setNote(event.target.value)} rows={4} value={note} />
         </label>
       </div>
 
       <div className="button-row">
-        <button onClick={() => setResolution(`${code} assigned to ${owner}`)} type="button">
+        <button onClick={() => setResolution(`${formatOpsValue("code", code)} ${owner} ekibine atandı`)} type="button">
           <UserCheck aria-hidden="true" size={16} />
-          Assign
+          Ata
         </button>
-        <button className="button-secondary" onClick={() => setResolution(`Review note staged: ${note}`)} type="button">
+        <button className="button-secondary" onClick={() => setResolution(`Kontrol notu hazırlandı: ${note}`)} type="button">
           <MessageSquareText aria-hidden="true" size={16} />
-          Add note
+          Not ekle
         </button>
-        <button className="button-secondary" onClick={() => setResolution(`${code} marked ready for verification`)} type="button">
+        <button className="button-secondary" onClick={() => setResolution(`${formatOpsValue("code", code)} doğrulama için hazırlandı`)} type="button">
           <ClipboardCheck aria-hidden="true" size={16} />
-          Verify
+          Doğrula
         </button>
         <button className="button-danger" disabled type="button">
           <ShieldCheck aria-hidden="true" size={16} />
-          Resolve live
+          Canlı çöz
         </button>
       </div>
 

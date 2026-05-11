@@ -6,7 +6,12 @@ import { quoteRows } from "@/lib/ops-ui/fixtures";
 
 export default function QuotesPage() {
   return (
-    <AppShell active="Quotes" title="Quotes" subtitle="Fresh quote queue with manual DDP capture and mock provider rates.">
+    <AppShell
+      active="Kargo Ücreti"
+      title="Kargo ücreti çıkar"
+      subtitle="Bu ekranda siparişe uygun kargo yolunu görür, test fiyatı veya manuel DDP fiyatı hazırlarsın."
+      steps={["Siparişi seç", "Kargo yolunu kontrol et", "Fiyatı önizle", "Canlı işlem kapalı kalsın"]}
+    >
       <div className="split">
         <DataTable columns={["sourceOrderKey", "route", "mode", "quote", "expires"]} rows={quoteRows} />
         <div className="side-stack">
