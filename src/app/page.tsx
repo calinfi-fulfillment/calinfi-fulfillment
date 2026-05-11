@@ -7,6 +7,7 @@ import { DataTable } from "@/components/data-table";
 import { LocalStagingModeReadiness } from "@/components/local-staging-mode-readiness";
 import { OpsCommandCenter } from "@/components/ops-command-center";
 import { QueueCard } from "@/components/queue-card";
+import { ShippingConsole } from "@/components/shipping-console";
 import { StagingPilotReadiness } from "@/components/staging-pilot-readiness";
 import { cockpitQueues, nextActionRows, readinessRows, routeReviewRows } from "@/lib/ops-ui/fixtures";
 import { areLiveMutationFlagsDisabled, hasFulfillmentSupabasePublicConfig, isPledgeManagerSupabaseUrl } from "@/lib/safety";
@@ -38,6 +39,8 @@ export default function Home() {
         <span>{publicSupabaseReady ? "Fulfillment test veritabanı bağlı" : "Yerel önizleme modu"}</span>
         <span>Kargo firması, dışa aktarım ve partner gönderimi kapalı</span>
       </section>
+
+      <ShippingConsole />
 
       <section className="queue-grid">
         {cockpitQueues.map((queue) => (

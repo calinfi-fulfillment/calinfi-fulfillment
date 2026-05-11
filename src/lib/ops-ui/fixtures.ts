@@ -149,3 +149,66 @@ export const reportRows = [
   { metric: "Ödeme bekleyen", value: "12" },
   { metric: "Kargoya hazır", value: "4" },
 ] as const;
+
+export const shippingOverviewRows = [
+  { label: "Fiyat alınabilir", value: "18", detail: "Adres ve paket bilgisi hazır" },
+  { label: "Etiket bekler", value: "4", detail: "Ödeme kilidi tamamlandı" },
+  { label: "Takipte", value: "0", detail: "Canlı takip henüz kapalı" },
+  { label: "Kontrol gerekli", value: "7", detail: "Eksik ürün/adres/gümrük bilgisi" },
+] as const;
+
+export const shippingRateRows = [
+  {
+    id: "easyship-sandbox-standard",
+    carrier: "Sandbox Standard",
+    service: "Ekonomik",
+    eta: "5-8 gün",
+    price: "USD 24.80",
+    score: "En düşük fiyat",
+    status: "ready",
+  },
+  {
+    id: "easyship-sandbox-express",
+    carrier: "Sandbox Express",
+    service: "Hızlı",
+    eta: "2-4 gün",
+    price: "USD 38.40",
+    score: "Daha hızlı",
+    status: "review",
+  },
+  {
+    id: "manual-ddp-preview",
+    carrier: "Manuel DDP",
+    service: "Çin/HK direkt",
+    eta: "Operasyon onayı",
+    price: "USD 130.45",
+    score: "Gümrük kontrolü ister",
+    status: "blocker",
+  },
+] as const;
+
+export const shipmentConsoleRows = [
+  {
+    sourceOrderKey: "pm:synthetic-order-001",
+    destination: "ABD / Seattle",
+    package: "ODUN ana kutu",
+    route: "REGIONAL_3PL",
+    quote: "quote ready",
+    label: "label_pending",
+  },
+  {
+    sourceOrderKey: "pm:synthetic-ddp-001",
+    destination: "Hong Kong",
+    package: "ODUN + DDP eklenti",
+    route: "CHINA_HK_DIRECT_DDP",
+    quote: "manual needed",
+    label: "blocked",
+  },
+] as const;
+
+export const shippingGuardRows = [
+  { label: "Easyship sandbox fiyat", status: "review", detail: "Token kabul edilince gerçek sandbox fiyat çekilecek" },
+  { label: "Canlı etiket", status: "blocked", detail: "Owner onayı olmadan kapalı" },
+  { label: "Canlı takip", status: "blocked", detail: "Webhook sözleşmesi bitmeden kapalı" },
+  { label: "PM verisi", status: "ready", detail: "PM canlı verisi değişmez" },
+] as const;

@@ -269,6 +269,17 @@ Bu dosya ODUN Fulfillment V1 için canonical proje checklist'idir. Her implement
 - [x] `test:ops-ui`, `typecheck`, `lint`, `build`, `test:no-secrets` geçti. Verified by focused checks and `npm test`.
 - [x] Local smoke for `/`, `/orders`, `/quotes`, `/payments`, `/handoffs`, `/exceptions`, `/reports` passed. Verified by local HTTP 200 smoke.
 
+## 18. Easyship-Style Shipping Console
+
+- [x] Easyship'in birebir marka/UI kopyası yerine ODUN'a özel kargo merkezi yaklaşımı uygulandı. Verified by `ShippingConsole` copy and source inspection.
+- [x] `/shipping` route eklendi ve navigation içine bağlandı. Verified by `npm run test:ops-ui` and local `/shipping` smoke.
+- [x] Ana ekrana Easyship tarzı kargo merkezi paneli eklendi. Verified by `ShippingConsole` on `/` and local `/` smoke.
+- [x] Gönderi hazırlık adımları hazır: sipariş, paket, fiyat, etiket. Verified by `ship-stepper` UI and `npm run test:ops-ui`.
+- [x] Kargo fiyat kartları ve güvenli seçili fiyat önizlemesi hazır. Verified by rate-card UI and local-only event state.
+- [x] Canlı etiket/gönderi/takip aksiyonları disabled kaldı. Verified by disabled live label button and safety note.
+- [x] `test:ops-ui`, `typecheck`, `lint`, `build`, `test:no-secrets`, `npm test` geçti. Verified by focused checks and full regression.
+- [x] Local smoke for `/`, `/shipping`, `/quotes`, `/handoffs` passed. Verified by HTTP 200 smoke.
+
 ## Audit Gates
 
 Sınır Bekçisi veya eşdeğer boundary audit aşağıdaki noktalarda çalıştırılmalı:

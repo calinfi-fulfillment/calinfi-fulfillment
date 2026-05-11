@@ -3,6 +3,7 @@ import {
   ClipboardList,
   CreditCard,
   FileBarChart,
+  PlaneTakeoff,
   PackageCheck,
   ReceiptText,
   Truck,
@@ -10,6 +11,7 @@ import {
 
 export const OPS_NAV_ITEMS = [
   { href: "/", label: "Kontrol Paneli", icon: ClipboardList },
+  { href: "/shipping", label: "Kargo Merkezi", icon: PlaneTakeoff },
   { href: "/orders", label: "Siparişler", icon: PackageCheck },
   { href: "/quotes", label: "Kargo Ücreti", icon: ReceiptText },
   { href: "/payments", label: "Ödemeler", icon: CreditCard },

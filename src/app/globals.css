@@ -903,6 +903,246 @@ td input[type="radio"] {
   padding: 0;
 }
 
+.shipping-console {
+  display: grid;
+  gap: 16px;
+}
+
+.shipping-hero,
+.ship-table-panel,
+.ship-disabled-note,
+.ship-event-bar {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.shipping-hero {
+  align-items: center;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 18px;
+}
+
+.shipping-hero h2 {
+  font-size: 24px;
+  line-height: 1.15;
+}
+
+.shipping-hero p:not(.eyebrow) {
+  color: var(--muted);
+  line-height: 1.5;
+  margin-top: 8px;
+  max-width: 780px;
+}
+
+.ship-hero-actions,
+.ship-overview,
+.ship-workspace,
+.ship-form-grid,
+.rate-board,
+.ship-stepper {
+  display: grid;
+  gap: 12px;
+}
+
+.ship-hero-actions {
+  grid-template-columns: repeat(3, max-content);
+}
+
+.ship-overview {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.ship-metric,
+.ship-builder,
+.ship-side-panel,
+.ship-guard-list article,
+.ship-flow-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.ship-metric {
+  display: grid;
+  gap: 8px;
+  min-height: 118px;
+  padding: 14px;
+}
+
+.ship-metric span,
+.ship-flow-card span,
+.ship-guard-list span {
+  color: #344054;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ship-metric strong {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.ship-metric small,
+.ship-flow-card li,
+.ship-guard-list small {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.ship-workspace {
+  align-items: start;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.34fr);
+}
+
+.ship-builder,
+.ship-side-panel,
+.ship-table-panel {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+}
+
+.ship-stepper {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.ship-stepper article {
+  align-items: center;
+  background: #f7f9fb;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 30px minmax(0, 1fr);
+  min-height: 58px;
+  padding: 10px;
+}
+
+.ship-stepper article[data-active="true"] {
+  background: var(--accent-soft);
+  border-color: #a7dfd4;
+}
+
+.ship-stepper strong {
+  align-items: center;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--accent);
+  display: inline-flex;
+  height: 30px;
+  justify-content: center;
+  width: 30px;
+}
+
+.ship-stepper span {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ship-form-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.rate-board {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.rate-card {
+  align-items: start;
+  background: #fff;
+  border: 1px solid var(--border);
+  color: #243142;
+  display: grid;
+  gap: 8px;
+  justify-content: stretch;
+  min-height: 154px;
+  padding: 12px;
+  text-align: left;
+}
+
+.rate-card[aria-pressed="true"] {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+}
+
+.rate-card span {
+  align-items: center;
+  color: #344054;
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 800;
+  gap: 7px;
+}
+
+.rate-card strong {
+  font-size: 24px;
+}
+
+.rate-card small,
+.rate-card em {
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
+  line-height: 1.35;
+}
+
+.ship-guard-list {
+  display: grid;
+  gap: 8px;
+}
+
+.ship-guard-list article {
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+}
+
+.ship-guard-list span,
+.ship-flow-card span {
+  align-items: center;
+  display: inline-flex;
+  gap: 7px;
+}
+
+.ship-flow-card {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+}
+
+.ship-flow-card ol {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.ship-event-bar,
+.ship-disabled-note {
+  align-items: center;
+  color: #344054;
+  display: flex;
+  font-size: 13px;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 12px;
+}
+
+.ship-event-bar {
+  background: var(--accent-soft);
+  border-color: #a7dfd4;
+}
+
+.ship-disabled-note {
+  background: #fff7ed;
+  border-color: #fed7aa;
+}
+
 @media (max-width: 860px) {
   .ops-layout {
     grid-template-columns: 1fr;
@@ -925,6 +1165,16 @@ td input[type="radio"] {
   }
 
   .page-guide {
+    grid-template-columns: 1fr;
+  }
+
+  .shipping-hero,
+  .ship-workspace,
+  .ship-form-grid,
+  .rate-board,
+  .ship-overview,
+  .ship-stepper,
+  .ship-hero-actions {
     grid-template-columns: 1fr;
   }
 

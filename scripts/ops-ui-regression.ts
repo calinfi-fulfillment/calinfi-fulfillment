@@ -16,10 +16,10 @@ import { OPS_NAV_ITEMS } from "../src/lib/ops-ui/navigation";
 
 assert.deepEqual(
   OPS_NAV_ITEMS.map((item) => item.label),
-  ["Kontrol Paneli", "Siparişler", "Kargo Ücreti", "Ödemeler", "Kargoya Hazır", "Sorunlar", "Raporlar"],
+  ["Kontrol Paneli", "Kargo Merkezi", "Siparişler", "Kargo Ücreti", "Ödemeler", "Kargoya Hazır", "Sorunlar", "Raporlar"],
 );
 
-for (const route of ["orders", "quotes", "payments", "handoffs", "exceptions", "reports"]) {
+for (const route of ["shipping", "orders", "quotes", "payments", "handoffs", "exceptions", "reports"]) {
   assert.equal(existsSync(`src/app/${route}/page.tsx`), true, `${route} page must exist`);
 }
 
@@ -64,6 +64,8 @@ const providerReadinessSource = readFileSync("src/components/provider-api-readin
 const stripeCheckoutReadinessSource = readFileSync("src/components/stripe-checkout-readiness.tsx", "utf8");
 const appShellSource = readFileSync("src/components/app-shell.tsx", "utf8");
 const labelsSource = readFileSync("src/lib/ops-ui/labels.ts", "utf8");
+const shippingConsoleSource = readFileSync("src/components/shipping-console.tsx", "utf8");
+const shippingPageSource = readFileSync("src/app/shipping/page.tsx", "utf8");
 
 assert.match(dataTableSource, /data-testid="interactive-data-table"/);
 assert.match(dataTableSource, /type="search"/);
@@ -73,7 +75,13 @@ assert.match(appShellSource, /page-guide/);
 assert.match(appShellSource, /ODUN Kargo Paneli/);
 assert.match(labelsSource, /Sipariş/);
 assert.match(labelsSource, /Blokaj/);
+assert.match(shippingConsoleSource, /data-testid="shipping-console"/);
+assert.match(shippingConsoleSource, /Easyship tarzı kargo akışı/);
+assert.match(shippingConsoleSource, /Canlı etiket bas/);
+assert.match(shippingConsoleSource, /Canlı etiket, canlı gönderi ve canlı takip hâlâ kapalıdır/);
+assert.match(shippingPageSource, /Kargo merkezi/);
 assert.match(cockpitSource, /OpsCommandCenter/);
+assert.match(cockpitSource, /ShippingConsole/);
 assert.match(cockpitSource, /Bugün ne yapacağız/);
 assert.match(handoffsSource, /HandoffWorkbench/);
 assert.match(handoffsSource, /ProviderApiReadiness/);
