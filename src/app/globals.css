@@ -111,6 +111,7 @@ textarea {
 .content {
   display: grid;
   gap: 22px;
+  min-width: 0;
   padding: 28px;
 }
 
@@ -456,6 +457,20 @@ button {
   padding: 8px 12px;
   text-align: center;
   white-space: normal;
+}
+
+.button-link {
+  align-items: center;
+  background: var(--button);
+  border-radius: 8px;
+  color: #fff;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 700;
+  justify-content: center;
+  min-height: 40px;
+  padding: 9px 12px;
+  text-align: center;
 }
 
 button:hover:not(:disabled) {
@@ -903,6 +918,17 @@ td input[type="radio"] {
   padding: 0;
 }
 
+.shipping-shortcut {
+  align-items: center;
+  grid-template-columns: minmax(0, 1fr) max-content;
+}
+
+.shipping-shortcut p:not(.eyebrow) {
+  color: var(--muted);
+  line-height: 1.45;
+  margin-top: 6px;
+}
+
 .shipping-console {
   display: grid;
   gap: 16px;
@@ -918,10 +944,10 @@ td input[type="radio"] {
 }
 
 .shipping-hero {
-  align-items: center;
+  align-items: start;
   display: grid;
   gap: 16px;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: 1fr;
   padding: 18px;
 }
 
@@ -937,6 +963,24 @@ td input[type="radio"] {
   max-width: 780px;
 }
 
+.ship-safety-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.ship-safety-pills span {
+  background: var(--accent-soft);
+  border: 1px solid #a7dfd4;
+  border-radius: 999px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.2;
+  padding: 7px 10px;
+}
+
 .ship-hero-actions,
 .ship-overview,
 .ship-workspace,
@@ -948,11 +992,16 @@ td input[type="radio"] {
 }
 
 .ship-hero-actions {
-  grid-template-columns: repeat(3, max-content);
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.ship-hero-actions button {
+  min-width: 160px;
 }
 
 .ship-overview {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 
 .ship-metric,
@@ -995,7 +1044,7 @@ td input[type="radio"] {
 
 .ship-workspace {
   align-items: start;
-  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.34fr);
+  grid-template-columns: 1fr;
 }
 
 .ship-builder,
@@ -1006,8 +1055,12 @@ td input[type="radio"] {
   padding: 16px;
 }
 
+.ship-side-panel {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
 .ship-stepper {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
 }
 
 .ship-stepper article {
@@ -1045,11 +1098,11 @@ td input[type="radio"] {
 }
 
 .ship-form-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
 }
 
 .rate-board {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
 }
 
 .rate-card {
@@ -1063,6 +1116,7 @@ td input[type="radio"] {
   min-height: 154px;
   padding: 12px;
   text-align: left;
+  width: 100%;
 }
 
 .rate-card[aria-pressed="true"] {
@@ -1124,7 +1178,7 @@ td input[type="radio"] {
 
 .ship-event-bar,
 .ship-disabled-note {
-  align-items: center;
+  align-items: flex-start;
   color: #344054;
   display: flex;
   font-size: 13px;
@@ -1141,6 +1195,21 @@ td input[type="radio"] {
 .ship-disabled-note {
   background: #fff7ed;
   border-color: #fed7aa;
+}
+
+@media (min-width: 1280px) {
+  .shipping-hero {
+    align-items: center;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .ship-workspace {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 0.34fr);
+  }
+
+  .ship-side-panel {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 860px) {
@@ -1169,7 +1238,9 @@ td input[type="radio"] {
   }
 
   .shipping-hero,
+  .shipping-shortcut,
   .ship-workspace,
+  .ship-side-panel,
   .ship-form-grid,
   .rate-board,
   .ship-overview,

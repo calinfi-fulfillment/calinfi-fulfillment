@@ -1,13 +1,14 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
+import Link from "next/link";
+
 import { ActionList } from "@/components/action-list";
 import { AppShell } from "@/components/app-shell";
 import { DataTable } from "@/components/data-table";
 import { LocalStagingModeReadiness } from "@/components/local-staging-mode-readiness";
 import { OpsCommandCenter } from "@/components/ops-command-center";
 import { QueueCard } from "@/components/queue-card";
-import { ShippingConsole } from "@/components/shipping-console";
 import { StagingPilotReadiness } from "@/components/staging-pilot-readiness";
 import { cockpitQueues, nextActionRows, readinessRows, routeReviewRows } from "@/lib/ops-ui/fixtures";
 import { areLiveMutationFlagsDisabled, hasFulfillmentSupabasePublicConfig, isPledgeManagerSupabaseUrl } from "@/lib/safety";
@@ -40,8 +41,6 @@ export default function Home() {
         <span>Kargo firması, dışa aktarım ve partner gönderimi kapalı</span>
       </section>
 
-      <ShippingConsole />
-
       <section className="queue-grid">
         {cockpitQueues.map((queue) => (
           <QueueCard count={queue.count} detail={queue.detail} key={queue.label} label={queue.label} tone={queue.tone} />
@@ -52,6 +51,17 @@ export default function Home() {
           label="Ürün hazırlığı"
           tone={readinessCounts.blocked > 0 ? "danger" : "good"}
         />
+      </section>
+
+      <section className="panel shipping-shortcut">
+        <div>
+          <p className="eyebrow">Kargo Merkezi</p>
+          <h2>Easyship tarzı akış ayrı ekranda</h2>
+          <p>Sipariş seçme, paket ölçüsü, kargo fiyat kartları ve canlı etiket güvenlik kontrolleri tek sayfada toplandı.</p>
+        </div>
+        <Link className="button-link" href="/shipping">
+          Kargo Merkezi&apos;ni aç
+        </Link>
       </section>
 
       <OpsCommandCenter actions={nextActionRows} queues={cockpitQueues} routes={routeReviewRows} />

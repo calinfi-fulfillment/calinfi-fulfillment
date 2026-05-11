@@ -280,6 +280,16 @@ Bu dosya ODUN Fulfillment V1 için canonical proje checklist'idir. Her implement
 - [x] `test:ops-ui`, `typecheck`, `lint`, `build`, `test:no-secrets`, `npm test` geçti. Verified by focused checks and full regression.
 - [x] Local smoke for `/`, `/shipping`, `/quotes`, `/handoffs` passed. Verified by HTTP 200 smoke.
 
+## 19. Stitch Concept Redesign Pass
+
+- [x] Whole-app Stitch prompt hazırlandı. Verified by `docs/design/STITCH_APP_PROMPT.md`.
+- [x] Prompt ODUN/PM/Fulfillment sınırlarını ve canlı aksiyon güvenliklerini açık anlatıyor. Verified by prompt source and `npm run test:ops-ui`.
+- [x] Kargo Merkezi layout taşma/üst üste binme riskine karşı yeniden düzenlendi. Verified by responsive CSS auto-fit/flex wrap pass.
+- [x] Kontrol Paneli, Kargo Merkezi'ni tam panel yerine sade shortcut olarak gösteriyor. Verified by `shipping-shortcut`.
+- [x] Responsive shipping grids auto-fit/flex wrap davranışına geçti. Verified by `.ship-overview`, `.ship-form-grid`, `.rate-board`, `.ship-hero-actions`.
+- [x] `test:ops-ui`, `typecheck`, `lint`, `build`, `test:no-secrets`, `npm test` geçti. Verified by focused and full regression.
+- [x] Local smoke for `/`, `/shipping`, `/quotes`, `/handoffs` passed. Verified by HTTP 200 smoke.
+
 ## Audit Gates
 
 Sınır Bekçisi veya eşdeğer boundary audit aşağıdaki noktalarda çalıştırılmalı:

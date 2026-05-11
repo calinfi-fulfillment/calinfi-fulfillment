@@ -48,6 +48,11 @@ export function ShippingConsole() {
           <p className="eyebrow">Easyship tarzı kargo akışı</p>
           <h2>Kargo Merkezi</h2>
           <p>Siparişi seç, paket ölçüsünü kontrol et, fiyatı karşılaştır, canlı etiket basmadan güvenli önizleme yap.</p>
+          <div className="ship-safety-pills" aria-label="Kargo güvenlik durumu">
+            <span>Canlı etiket kapalı</span>
+            <span>PM verisi korunuyor</span>
+            <span>Sandbox fiyat denemesi</span>
+          </div>
         </div>
         <div className="ship-hero-actions">
           <button onClick={stageRateCheck} type="button">
