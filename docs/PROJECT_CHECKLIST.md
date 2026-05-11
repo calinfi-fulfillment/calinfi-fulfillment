@@ -120,7 +120,10 @@ Bu dosya ODUN Fulfillment V1 için canonical proje checklist'idir. Her implement
 - [x] `test:route-quote` geçti. Verified by `npm test`.
 - [x] `test:manual-ddp` geçti. Verified by `npm test`.
 - [x] `test:payment-contract` geçti. Verified by `npm test`.
+- [x] `test:stripe-contract` geçti. Verified by focused regression and `npm test`.
 - [x] `test:payment-lock` geçti. Verified by `npm test`.
+- [x] `test:provider-adapter` geçti. Verified by focused regression and `npm test`.
+- [x] `test:provider-mock-handoff` geçti. Verified by focused regression and `npm test`.
 - [x] `test:ops-ui` geçti. Verified by `npm test`.
 - [x] `test:handoff` geçti. Verified by `npm test`.
 - [x] `test:reports` geçti. Verified by `npm test`.
@@ -128,6 +131,7 @@ Bu dosya ODUN Fulfillment V1 için canonical proje checklist'idir. Her implement
 - [x] `test:staging-prep` geçti. Verified by `npm test`.
 - [x] `test:preflight` geçti. Verified by `npm test`.
 - [x] `test:pilot-dry-run` geçti. Verified by `npm test`.
+- [x] `test:vercel-bypass-mode` geçti. Verified by focused regression and `npm test`.
 - [x] `test:no-secrets` geçti. Verified by `npm test`.
 - [x] `check:preflight` geçti. Verified by current local env preflight.
 - [x] `typecheck`, `lint`, `build` geçti. Verified by `npm run typecheck`, `npm run lint`, and `npm run build`.
@@ -174,6 +178,11 @@ Bu dosya ODUN Fulfillment V1 için canonical proje checklist'idir. Her implement
 - Manual protected Vercel Preview deployment `dpl_7B3Cbxp5sJoxAgjxRRrSVigCxqHV` is ready at https://odun-fulfillment-v1-qpqnp1r8q-hello-75539063s-projects.vercel.app.
 - Protected preview smoke passed for `/api/health`, `/`, and `/reports`; direct anonymous fetches return HTTP 401 because Deployment Protection is enabled.
 - Vercel Git integration is still blocked; direct Git connection to `calinfi-fulfillment/calinfi-fulfillment` was rejected even though GitHub CLI viewer has repo `ADMIN` permission, so automatic PR previews require Vercel GitHub app/repo setup.
+- Vercel Git integration is now treated as launch/pre-production work, not a development blocker; local + Supabase staging continuation is documented in `docs/runbooks/LOCAL_STAGING_WITHOUT_VERCEL.md`.
+- Stripe test contract validation and synthetic webhook normalization were added without creating Stripe Checkout sessions; verified by `npm run test:stripe-contract`.
+- Provider-agnostic mock adapter was added for rates, handoff, tracking, and health checks; verified by `npm run test:provider-adapter` and `npm run test:provider-mock-handoff`.
+- Cockpit, Payments, Quotes, and Handoffs now show local-staging/Vercel-bypass, test webhook, mock rate, and mock handoff readiness surfaces; verified by `npm run test:ops-ui`.
+- Full Vercel-free continuation regression passed: `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, `npm run check:staging-prep`, and local smoke on `/`, `/quotes`, `/payments`, `/handoffs`, and `/api/health`.
 
 ## 13. Staging Pilot
 
@@ -194,10 +203,16 @@ Bu dosya ODUN Fulfillment V1 için canonical proje checklist'idir. Her implement
 - [x] Vercel staging setup checklist eklendi. Verified by `docs/runbooks/VERCEL_STAGING.md`.
 - [x] Fresh Fulfillment Vercel staging project verified. Verified by Vercel project `odun-fulfillment-v1` / `prj_gxorHDOfctSfP6KcAo6stLzFIkyf`.
 - [x] Vercel Git integration next-action checklist eklendi. Verified by `docs/runbooks/VERCEL_STAGING.md`.
-- [ ] Vercel Git integration confirmed. BLOCKED: direct Git connection was rejected; install/authorize Vercel GitHub app for repo `calinfi-fulfillment/calinfi-fulfillment`, limited to this repo only.
+- [ ] Vercel Git integration confirmed. BLOCKED: account mismatch; direct Git connection was rejected, so resolve under launch/pre-production instead of local development.
 - [x] Vercel preview env configured. Verified by Preview env setup on project `odun-fulfillment-v1`; live/provider/export/Stripe Checkout flags remain disabled and no service-role key was added.
 - [x] Vercel preview smoke passed. Verified by protected preview smoke for `/api/health`, `/`, and `/reports` on deployment `dpl_7B3Cbxp5sJoxAgjxRRrSVigCxqHV`.
-- [ ] Stripe test mode doğrulandı. BLOCKED: repo defaults `STRIPE_MODE=test`, but real Stripe test account/env verification requires owner-approved setup.
+- [x] Vercel'siz local/staging devam checklist'i eklendi. Verified by `docs/runbooks/LOCAL_STAGING_WITHOUT_VERCEL.md` and `npm run test:vercel-bypass-mode`.
+- [x] Local/staging dev mode confirmed. Verified by `npm run test:vercel-bypass-mode`, `npm run check:staging-prep`, and non-PM Supabase staging config.
+- [x] Supabase staging checks passed. Verified by `npm run check:staging-prep` and prior `npm run test:staging-schema-public`.
+- [x] Stripe test contract prep tamamlandı. Verified by `npm run test:stripe-contract`; no Checkout session is created and live mode is blocked.
+- [x] Provider adapter prep tamamlandı. Verified by `npm run test:provider-adapter` and `npm run test:provider-mock-handoff`; external actions remain `none`.
+- [ ] PM baseline/audit still blocked until approval. BLOCKED: PM production read-only baseline and formal pre-pilot audit require separate owner-approved scope.
+- [ ] Stripe test mode doğrulandı. BLOCKED: synthetic contract validator passed, but real Stripe test account/env verification requires owner-approved setup.
 - [ ] PM production read-only aggregate baseline alındı. BLOCKED: requires owner-approved production read-only aggregate check.
 - [x] 1-2 allowlisted pilot senaryosu planlandı. Verified by `docs/runbooks/STAGING_PILOT.md` and `npm run test:staging-launch-gates`.
 - [ ] Sınır Bekçisi pre-pilot audit geçti. BLOCKED: formal pre-pilot audit requires staging env and owner-approved baseline context.

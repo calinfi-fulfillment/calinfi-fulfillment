@@ -54,7 +54,59 @@ export type ShippingQuoteDraft = {
   voidReason?: string;
 };
 
+export type ProviderRate = ShippingQuoteDraft & {
+  serviceLevel: string;
+  etaDaysMin: number;
+  etaDaysMax: number;
+  externalActions: "none";
+};
+
+export type ProviderHandoffRequest = {
+  orderId: string;
+  sourceOrderKey: string;
+  routeType: FulfillmentRouteType;
+  shippingMode: ShippingMode;
+  idempotencyKey: string;
+};
+
+export type ProviderHandoffResult = {
+  ok: boolean;
+  provider: string;
+  providerHandoffId: string;
+  status: "mock_created" | "blocked";
+  idempotencyKey: string;
+  externalActions: "none";
+  reason?: string;
+};
+
+export type ProviderTrackingRequest = {
+  providerHandoffId: string;
+};
+
+export type ProviderTrackingResult = {
+  provider: string;
+  providerHandoffId: string;
+  status: "label_pending" | "in_fulfillment" | "shipped" | "delivered" | "blocked";
+  trackingNumber?: string;
+  externalActions: "none";
+};
+
+export type ProviderHealthReport = {
+  ok: boolean;
+  provider: string;
+  mode: "mock_only" | "blocked_live_flag";
+  checks: Array<{
+    name: string;
+    ok: boolean;
+    detail: string;
+  }>;
+};
+
 export type QuoteAdapter = {
   name: string;
   quote(request: QuoteRequest): ShippingQuoteDraft;
+  getRates?(request: QuoteRequest): ProviderRate[];
+  createHandoff?(request: ProviderHandoffRequest): ProviderHandoffResult;
+  getTracking?(request: ProviderTrackingRequest): ProviderTrackingResult;
+  healthCheck?(env?: Partial<Record<string, string | undefined>>): ProviderHealthReport;
 };

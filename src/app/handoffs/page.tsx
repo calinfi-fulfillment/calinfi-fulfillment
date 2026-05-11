@@ -6,7 +6,7 @@ import { handoffRows } from "@/lib/ops-ui/fixtures";
 
 export default function HandoffsPage() {
   return (
-    <AppShell active="Handoffs" title="Handoffs" subtitle="Only paid locked orders become export-ready.">
+    <AppShell active="Handoffs" title="Handoffs" subtitle="Only paid locked orders become export-ready; provider handoff stays mock-only.">
       <div className="workflow-grid">
         <DataTable columns={["sourceOrderKey", "route", "status", "exportType"]} rows={handoffRows} />
         <div className="side-stack">

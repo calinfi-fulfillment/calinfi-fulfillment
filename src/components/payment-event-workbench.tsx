@@ -22,6 +22,7 @@ export function PaymentEventWorkbench({ rows }: PaymentEventWorkbenchProps) {
   const [eventType, setEventType] = useState("stripe_checkout_completed");
   const [orderKey, setOrderKey] = useState(rows[0]?.sourceOrderKey ?? "");
   const [quoteTotal, setQuoteTotal] = useState("25.25");
+  const [sessionId, setSessionId] = useState("cs_test_mock_001");
   const [result, setResult] = useState("No payment event staged");
 
   const review = useMemo(() => {
@@ -36,7 +37,7 @@ export function PaymentEventWorkbench({ rows }: PaymentEventWorkbenchProps) {
   }, [amount, currency, quoteTotal]);
 
   function stageEvent() {
-    setResult(`${eventType} staged for ${orderKey}: ${currency} ${amount} -> ${review.label}`);
+    setResult(`Test webhook ${sessionId} normalized for ${orderKey}: ${currency} ${amount} -> ${review.label}`);
   }
 
   return (
@@ -69,6 +70,10 @@ export function PaymentEventWorkbench({ rows }: PaymentEventWorkbenchProps) {
           </select>
         </label>
         <label>
+          Test session
+          <input onChange={(event) => setSessionId(event.target.value)} value={sessionId} />
+        </label>
+        <label>
           Event amount
           <input inputMode="decimal" onChange={(event) => setAmount(event.target.value)} value={amount} />
         </label>
@@ -87,9 +92,9 @@ export function PaymentEventWorkbench({ rows }: PaymentEventWorkbenchProps) {
       </div>
 
       <div className="decision-summary">
-        <span>Guard result</span>
+        <span>Test webhook guard result</span>
         <strong>{review.label}</strong>
-        <small>Lock is allowed only when amount, currency, order, and quote all match.</small>
+        <small>Lock is allowed only when test mode, metadata, amount, currency, order, and quote all match.</small>
       </div>
 
       <div className="button-row">

@@ -24,6 +24,8 @@ This runbook is for a separate ODUN Fulfillment V1 Vercel staging project. Do no
   - GitHub CLI viewer has `ADMIN` permission on `calinfi-fulfillment/calinfi-fulfillment`.
   - `vercel git connect` still fails for the repo.
   - GitHub App installation lookup does not confirm a usable Vercel app installation for this repo.
+- Owner confirmed the likely cause is account mismatch: Vercel is connected to a different account than the new Fulfillment GitHub repository.
+- Local + Supabase staging development continues without Vercel Git integration; see `docs/runbooks/LOCAL_STAGING_WITHOUT_VERCEL.md`.
 - An earlier deployment failed before serving because the project framework preset was `Other`; the preset was corrected to Next.js before the ready preview deployment.
 
 ## Required Vercel Project
@@ -106,7 +108,7 @@ npm run test:no-secrets
 
 ## Blockers
 
-- GitHub integration must be connected to `calinfi-fulfillment/calinfi-fulfillment` before automatic PR previews can replace manual preview deploys.
+- GitHub integration is blocked by account mismatch and must be resolved before automatic PR previews or production promotion can replace manual/local staging workflows.
 - Stripe test account/webhook verification remains pending owner-approved setup.
 - PM production read-only aggregate baseline remains pending owner-approved audit.
 - Formal Sınır Bekçisi pre-pilot audit remains pending after GitHub integration, Stripe test setup, and PM baseline context are ready.

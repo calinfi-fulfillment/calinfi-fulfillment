@@ -6,6 +6,7 @@ import { areLiveMutationFlagsDisabled, isPledgeManagerSupabaseUrl } from "../src
 const requiredDocs = [
   "docs/runbooks/STAGING_PILOT.md",
   "docs/runbooks/STAGING_SUPABASE_SETUP.md",
+  "docs/runbooks/LOCAL_STAGING_WITHOUT_VERCEL.md",
   "docs/runbooks/ROLLBACK_FLAGS.md",
   "docs/runbooks/BACKUP_SNAPSHOT.md",
   "docs/runbooks/LAUNCH_READINESS.md",

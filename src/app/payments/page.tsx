@@ -5,7 +5,7 @@ import { paymentRows } from "@/lib/ops-ui/fixtures";
 
 export default function PaymentsPage() {
   return (
-    <AppShell active="Payments" title="Payments" subtitle="Signed event queue and mismatch review.">
+    <AppShell active="Payments" title="Payments" subtitle="Signed test webhook normalization and mismatch review.">
       <div className="workflow-grid">
         <DataTable columns={["sourceOrderKey", "quote", "status", "guard"]} rows={paymentRows} />
         <PaymentEventWorkbench rows={paymentRows} />

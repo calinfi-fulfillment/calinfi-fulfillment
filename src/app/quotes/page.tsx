@@ -6,7 +6,7 @@ import { quoteRows } from "@/lib/ops-ui/fixtures";
 
 export default function QuotesPage() {
   return (
-    <AppShell active="Quotes" title="Quotes" subtitle="Fresh quote queue with manual DDP capture.">
+    <AppShell active="Quotes" title="Quotes" subtitle="Fresh quote queue with manual DDP capture and mock provider rates.">
       <div className="split">
         <DataTable columns={["sourceOrderKey", "route", "mode", "quote", "expires"]} rows={quoteRows} />
         <div className="side-stack">

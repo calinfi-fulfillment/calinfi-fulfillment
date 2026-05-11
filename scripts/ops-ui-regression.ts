@@ -38,6 +38,7 @@ for (const component of [
   "src/components/data-table.tsx",
   "src/components/exception-triage.tsx",
   "src/components/handoff-workbench.tsx",
+  "src/components/local-staging-mode-readiness.tsx",
   "src/components/manual-ddp-quote.tsx",
   "src/components/orders-workbench.tsx",
   "src/components/ops-command-center.tsx",
@@ -57,6 +58,8 @@ const paymentsSource = readFileSync("src/app/payments/page.tsx", "utf8");
 const quotesSource = readFileSync("src/app/quotes/page.tsx", "utf8");
 const reportsSource = readFileSync("src/components/reports-dashboard.tsx", "utf8");
 const stagingReadinessSource = readFileSync("src/components/staging-pilot-readiness.tsx", "utf8");
+const localStagingSource = readFileSync("src/components/local-staging-mode-readiness.tsx", "utf8");
+const providerReadinessSource = readFileSync("src/components/provider-api-readiness.tsx", "utf8");
 
 assert.match(dataTableSource, /data-testid="interactive-data-table"/);
 assert.match(dataTableSource, /type="search"/);
@@ -66,13 +69,22 @@ assert.match(handoffsSource, /HandoffWorkbench/);
 assert.match(handoffsSource, /ProviderApiReadiness/);
 assert.match(ordersSource, /OrdersWorkbench/);
 assert.match(paymentsSource, /PaymentEventWorkbench/);
+assert.match(paymentsSource, /test webhook normalization/i);
 assert.match(quotesSource, /ManualDdpQuote/);
 assert.match(quotesSource, /ProviderApiReadiness/);
+assert.match(quotesSource, /mock provider rates/i);
+assert.match(handoffsSource, /provider handoff stays mock-only/i);
 assert.match(reportsSource, /data-testid="reports-dashboard"/);
 assert.match(cockpitSource, /StagingPilotReadiness/);
+assert.match(cockpitSource, /LocalStagingModeReadiness/);
 assert.match(stagingReadinessSource, /data-testid="staging-pilot-readiness"/);
 assert.match(stagingReadinessSource, /Connect staging Supabase/);
 assert.match(stagingReadinessSource, /Provider API push/);
+assert.match(localStagingSource, /data-testid="vercel-bypass-readiness"/);
+assert.match(localStagingSource, /local-staging mode/i);
+assert.match(providerReadinessSource, /Mock rates/);
+assert.match(providerReadinessSource, /Mock handoff/);
+assert.match(providerReadinessSource, /Mock tracking/);
 
 console.log(
   JSON.stringify(

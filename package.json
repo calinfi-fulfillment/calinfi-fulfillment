@@ -11,7 +11,7 @@
     "check:preflight": "tsx scripts/preflight.ts",
     "check:staging-prep": "tsx scripts/staging-prep.ts",
     "check:staging-schema-public": "tsx scripts/staging-schema-public-regression.ts",
-    "test": "npm run test:safety && npm run test:schema && npm run test:intake && npm run test:built-ins && npm run test:product-readiness && npm run test:route-quote && npm run test:manual-ddp && npm run test:payment-contract && npm run test:payment-lock && npm run test:ops-ui && npm run test:handoff && npm run test:reports && npm run test:staging-launch-gates && npm run test:staging-prep && npm run test:preflight && npm run test:pilot-dry-run && npm run test:no-secrets",
+    "test": "npm run test:safety && npm run test:schema && npm run test:intake && npm run test:built-ins && npm run test:product-readiness && npm run test:route-quote && npm run test:manual-ddp && npm run test:payment-contract && npm run test:stripe-contract && npm run test:payment-lock && npm run test:provider-adapter && npm run test:provider-mock-handoff && npm run test:ops-ui && npm run test:handoff && npm run test:reports && npm run test:staging-launch-gates && npm run test:staging-prep && npm run test:preflight && npm run test:pilot-dry-run && npm run test:vercel-bypass-mode && npm run test:no-secrets",
     "test:safety": "npm run test:pm-supabase-guard && npm run test:live-flags",
     "test:pm-supabase-guard": "tsx scripts/pm-supabase-guard-regression.ts",
     "test:live-flags": "tsx scripts/live-flags-regression.ts",
@@ -22,7 +22,10 @@
     "test:route-quote": "tsx scripts/route-quote-regression.ts",
     "test:manual-ddp": "tsx scripts/manual-ddp-regression.ts",
     "test:payment-contract": "tsx scripts/payment-contract-regression.ts",
+    "test:stripe-contract": "tsx scripts/stripe-contract-regression.ts",
     "test:payment-lock": "tsx scripts/payment-lock-regression.ts",
+    "test:provider-adapter": "tsx scripts/provider-adapter-regression.ts",
+    "test:provider-mock-handoff": "tsx scripts/provider-mock-handoff-regression.ts",
     "test:ops-ui": "tsx scripts/ops-ui-regression.ts",
     "test:handoff": "tsx scripts/handoff-regression.ts",
     "test:reports": "tsx scripts/reports-regression.ts",
@@ -31,6 +34,7 @@
     "test:staging-schema-public": "tsx scripts/staging-schema-public-regression.ts",
     "test:preflight": "tsx scripts/preflight-regression.ts",
     "test:pilot-dry-run": "tsx scripts/synthetic-pilot-dry-run.ts",
+    "test:vercel-bypass-mode": "tsx scripts/vercel-bypass-mode-regression.ts",
     "test:no-secrets": "tsx scripts/no-secrets-regression.ts"
   },
   "dependencies": {

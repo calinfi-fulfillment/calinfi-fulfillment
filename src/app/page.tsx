@@ -4,18 +4,21 @@ import { join } from "node:path";
 import { ActionList } from "@/components/action-list";
 import { AppShell } from "@/components/app-shell";
 import { DataTable } from "@/components/data-table";
+import { LocalStagingModeReadiness } from "@/components/local-staging-mode-readiness";
 import { OpsCommandCenter } from "@/components/ops-command-center";
 import { QueueCard } from "@/components/queue-card";
 import { StagingPilotReadiness } from "@/components/staging-pilot-readiness";
 import { cockpitQueues, nextActionRows, readinessRows, routeReviewRows } from "@/lib/ops-ui/fixtures";
 import { areLiveMutationFlagsDisabled, hasFulfillmentSupabasePublicConfig, isPledgeManagerSupabaseUrl } from "@/lib/safety";
 import { createStagingPrepReport, createSyntheticPilotImportPlan } from "@/lib/staging-prep";
+import { createVercelBypassReport } from "@/lib/vercel-bypass";
 
 export default function Home() {
   const blockedPmSupabase = isPledgeManagerSupabaseUrl();
   const liveFlagsOff = areLiveMutationFlagsDisabled();
   const publicSupabaseReady = hasFulfillmentSupabasePublicConfig();
   const stagingPrep = createStagingPrepReport();
+  const vercelBypass = createVercelBypassReport();
   const stagingImportPlan = createSyntheticPilotImportPlan(readFileSync(join(process.cwd(), "fixtures/synthetic-pilot-orders.json"), "utf8"));
   const readinessCounts = {
     blocked: readinessRows.filter((row) => row.status === "blocker").length,
@@ -50,7 +53,10 @@ export default function Home() {
 
       <OpsCommandCenter actions={nextActionRows} queues={cockpitQueues} routes={routeReviewRows} />
 
-      <StagingPilotReadiness checks={stagingPrep.checks} importPlan={stagingImportPlan} mode={stagingPrep.mode} ok={stagingPrep.ok} />
+      <div className="dashboard-grid">
+        <LocalStagingModeReadiness report={vercelBypass} />
+        <StagingPilotReadiness checks={stagingPrep.checks} importPlan={stagingImportPlan} mode={stagingPrep.mode} ok={stagingPrep.ok} />
+      </div>
 
       <section className="dashboard-grid">
         <div className="panel">
