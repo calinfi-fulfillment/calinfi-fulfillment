@@ -1,0 +1,14 @@
+.next/
+node_modules/
+dist/
+coverage/
+.env
+.env.*
+!.env.example
+*.tsbuildinfo
+.DS_Store
+exports/
+imports/
+labels/
+tmp/
+supabase/.temp/

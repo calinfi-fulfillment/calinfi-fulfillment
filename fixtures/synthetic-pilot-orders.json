@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "mode": "synthetic-only",
+  "orders": [
+    {
+      "sourceOrderKey": "pm:pilot-synthetic-regional-001",
+      "countryCode": "US",
+      "routeType": "REGIONAL_3PL",
+      "shippingMode": "3PL_INTERNAL_LABEL",
+      "lines": [
+        { "sku": "CLF-ODN-CORE", "quantity": 1 },
+        { "sku": "CLF-ACC-UNI-HND", "quantity": 1, "isBuiltinMainBoxItem": true }
+      ],
+      "expected": "fake quote, payment event, locked order, export preview"
+    },
+    {
+      "sourceOrderKey": "pm:pilot-synthetic-ddp-001",
+      "countryCode": "HK",
+      "routeType": "CHINA_HK_DIRECT_DDP",
+      "shippingMode": "DIRECT_DDP_PROVIDER",
+      "lines": [
+        { "sku": "CLF-ODN-CORE", "quantity": 1 }
+      ],
+      "expected": "manual DDP quote, customs blockers checked, owner-approved covered event optional"
+    }
+  ]
+}

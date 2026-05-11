@@ -1,16 +1,22 @@
-## Hi there 👋
+# ODUN Fulfillment V1
 
-<!--
-**calinfi-fulfillment/calinfi-fulfillment** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+Fresh, handoff-first fulfillment system for CALINFI / ODUN Phase 2.
 
-Here are some ideas to get you started:
+This repo starts from a safety-first shell:
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+- PM Supabase project ref is blocklisted.
+- Live mutation flags default to `false`.
+- Initial tests are synthetic and do not call live Supabase, Stripe, provider APIs, labels, exports, or partner systems.
+
+Canonical project tracker:
+
+- `docs/PROJECT_CHECKLIST.md`
+
+Useful commands:
+
+```bash
+npm run typecheck
+npm run lint
+npm run build
+npm run test:safety
+```
