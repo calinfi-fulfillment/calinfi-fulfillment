@@ -1,6 +1,6 @@
 # ODUN Fulfillment V1 Project Checklist
 
-Last updated: 2026-05-11
+Last updated: 2026-05-12
 
 ## Kullanım Kuralı
 
@@ -183,6 +183,8 @@ Bu dosya ODUN Fulfillment V1 için canonical proje checklist'idir. Her implement
 - Provider-agnostic mock adapter was added for rates, handoff, tracking, and health checks; verified by `npm run test:provider-adapter` and `npm run test:provider-mock-handoff`.
 - Cockpit, Payments, Quotes, and Handoffs now show local-staging/Vercel-bypass, test webhook, mock rate, and mock handoff readiness surfaces; verified by `npm run test:ops-ui`.
 - Full Vercel-free continuation regression passed: `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, `npm run check:staging-prep`, and local smoke on `/`, `/quotes`, `/payments`, `/handoffs`, and `/api/health`.
+- Stripe test Checkout route, restricted test-key guard, Checkout metadata/idempotency builder, and Payments readiness panel were added without using or storing pasted secrets; verified by `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run test:no-secrets`.
+- Stripe Test Pilot checklist, synthetic Checkout-to-webhook pilot, and raw Stripe webhook signature endpoint were added without live Stripe calls; verified by focused `test:stripe-webhook`, `test:stripe-test-pilot`, `typecheck`, `lint`, and `test:no-secrets`.
 
 ## 13. Staging Pilot
 
@@ -210,6 +212,16 @@ Bu dosya ODUN Fulfillment V1 için canonical proje checklist'idir. Her implement
 - [x] Local/staging dev mode confirmed. Verified by `npm run test:vercel-bypass-mode`, `npm run check:staging-prep`, and non-PM Supabase staging config.
 - [x] Supabase staging checks passed. Verified by `npm run check:staging-prep` and prior `npm run test:staging-schema-public`.
 - [x] Stripe test contract prep tamamlandı. Verified by `npm run test:stripe-contract`; no Checkout session is created and live mode is blocked.
+- [x] Stripe test Checkout route eklendi. Verified by `npm run build`; route listed as `/api/stripe/checkout`.
+- [x] Restricted `rk_test` key guard eklendi. Verified by `npm run test:stripe-checkout`.
+- [x] Checkout Session metadata/idempotency builder test edildi. Verified by `npm run test:stripe-checkout`.
+- [x] Payments UI Stripe Checkout readiness paneli eklendi. Verified by `npm run test:ops-ui` and `npm run build`.
+- [x] `test:stripe-checkout`, `test:no-secrets`, `typecheck`, `lint`, `build` geçti. Verified by `npm test`, `npm run test:no-secrets`, `npm run typecheck`, `npm run lint`, and `npm run build`.
+- [x] Stripe Test Pilot checklist eklendi. Verified by this Phase 13 subsection.
+- [x] Synthetic Stripe Checkout pilot zinciri tamamlandı. Verified by `npm run test:stripe-test-pilot`; external calls are mocked.
+- [x] Stripe raw webhook signature endpoint eklendi. Verified by `npm run test:stripe-webhook` and build route listing.
+- [x] Stripe webhook duplicate/mismatch/idempotency regression geçti. Verified by `npm run test:stripe-webhook`.
+- [ ] Stripe Test Pilot değişiklikleri PR #1'e push edildi.
 - [x] Provider adapter prep tamamlandı. Verified by `npm run test:provider-adapter` and `npm run test:provider-mock-handoff`; external actions remain `none`.
 - [ ] PM baseline/audit still blocked until approval. BLOCKED: PM production read-only baseline and formal pre-pilot audit require separate owner-approved scope.
 - [ ] Stripe test mode doğrulandı. BLOCKED: synthetic contract validator passed, but real Stripe test account/env verification requires owner-approved setup.

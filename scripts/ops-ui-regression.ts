@@ -46,6 +46,7 @@ for (const component of [
   "src/components/provider-api-readiness.tsx",
   "src/components/reports-dashboard.tsx",
   "src/components/staging-pilot-readiness.tsx",
+  "src/components/stripe-checkout-readiness.tsx",
 ]) {
   assert.equal(existsSync(component), true, `${component} must exist`);
 }
@@ -60,6 +61,7 @@ const reportsSource = readFileSync("src/components/reports-dashboard.tsx", "utf8
 const stagingReadinessSource = readFileSync("src/components/staging-pilot-readiness.tsx", "utf8");
 const localStagingSource = readFileSync("src/components/local-staging-mode-readiness.tsx", "utf8");
 const providerReadinessSource = readFileSync("src/components/provider-api-readiness.tsx", "utf8");
+const stripeCheckoutReadinessSource = readFileSync("src/components/stripe-checkout-readiness.tsx", "utf8");
 
 assert.match(dataTableSource, /data-testid="interactive-data-table"/);
 assert.match(dataTableSource, /type="search"/);
@@ -69,6 +71,7 @@ assert.match(handoffsSource, /HandoffWorkbench/);
 assert.match(handoffsSource, /ProviderApiReadiness/);
 assert.match(ordersSource, /OrdersWorkbench/);
 assert.match(paymentsSource, /PaymentEventWorkbench/);
+assert.match(paymentsSource, /StripeCheckoutReadinessPanel/);
 assert.match(paymentsSource, /test webhook normalization/i);
 assert.match(quotesSource, /ManualDdpQuote/);
 assert.match(quotesSource, /ProviderApiReadiness/);
@@ -85,6 +88,9 @@ assert.match(localStagingSource, /local-staging mode/i);
 assert.match(providerReadinessSource, /Mock rates/);
 assert.match(providerReadinessSource, /Mock handoff/);
 assert.match(providerReadinessSource, /Mock tracking/);
+assert.match(stripeCheckoutReadinessSource, /data-testid="stripe-checkout-readiness"/);
+assert.match(stripeCheckoutReadinessSource, /Create test checkout/);
+assert.match(stripeCheckoutReadinessSource, /Live checkout/);
 
 console.log(
   JSON.stringify(
