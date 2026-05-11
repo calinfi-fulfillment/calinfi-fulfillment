@@ -165,7 +165,7 @@ Bu dosya ODUN Fulfillment V1 için canonical proje checklist'idir. Her implement
 - Staging Supabase migrations `0001_fulfillment_v1_core` and `0002_staging_schema_hardening` were applied to the owner-provided non-PM project.
 - Staging public schema surface was verified with read-only zero-row selects; no PII rows were read.
 - Synthetic pilot fixture was imported into staging with 2 synthetic orders, 2 synthetic backers, 1 built-in exclusion, 2 accepted quotes, 2 accepted payment events, and 2 ready handoffs.
-- Local Git branch `codex/phase-13-staging` and commit were prepared; remote push is blocked because local Git auth uses `calinfi-global`, which lacks access to `calinfi-fulfillment/calinfi-fulfillment`, and no GitHub SSH key is configured.
+- Local Git branch `codex/phase-13-staging` was pushed and draft PR #1 was opened: https://github.com/calinfi-fulfillment/calinfi-fulfillment/pull/1
 
 ## 13. Staging Pilot
 
@@ -182,7 +182,7 @@ Bu dosya ODUN Fulfillment V1 için canonical proje checklist'idir. Her implement
 - [x] Staging schema public table surface verified. Verified by `npm run test:staging-schema-public` against non-PM project ref `mgdsvapgltzwhsioccqd` with read-only zero-row selects.
 - [x] Synthetic fixtures import edildi. Verified by staging aggregate counts: 2 synthetic orders, 3 order lines, 1 built-in exclusion, 2 accepted quotes, 2 accepted payment events, and 2 ready handoffs.
 - [x] Local Git branch/commit hazırlandı. Verified by local branch `codex/phase-13-staging` and local commit.
-- [ ] GitHub branch push / draft PR açıldı. BLOCKED: local Git auth is `calinfi-global` and GitHub returned 403; SSH auth returned `Permission denied (publickey)`.
+- [x] GitHub branch push / draft PR açıldı. Verified by draft PR #1: https://github.com/calinfi-fulfillment/calinfi-fulfillment/pull/1
 - [ ] Stripe test mode doğrulandı. BLOCKED: repo defaults `STRIPE_MODE=test`, but real Stripe test account/env verification requires owner-approved setup.
 - [ ] PM production read-only aggregate baseline alındı. BLOCKED: requires owner-approved production read-only aggregate check.
 - [x] 1-2 allowlisted pilot senaryosu planlandı. Verified by `docs/runbooks/STAGING_PILOT.md` and `npm run test:staging-launch-gates`.
