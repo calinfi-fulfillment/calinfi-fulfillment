@@ -6,8 +6,13 @@ This runbook is for a separate ODUN Fulfillment V1 Vercel staging project. Do no
 
 - GitHub branch `codex/phase-13-staging` is pushed.
 - Draft PR #1 is open: https://github.com/calinfi-fulfillment/calinfi-fulfillment/pull/1
-- Vercel account discovery currently shows existing projects `calinfi-pledge-manager` and `calinfi-production-app`.
-- No separate Fulfillment Vercel project is linked yet.
+- Vercel account discovery previously showed existing projects `calinfi-pledge-manager` and `calinfi-production-app`.
+- Separate Fulfillment Vercel project is now verified:
+  - Project id: `prj_gxorHDOfctSfP6KcAo6stLzFIkyf`
+  - Project name: `odun-fulfillment-v1`
+  - Team id: `team_2jOtOHRsgfDrveJXXNwrbnvt`
+  - Latest deployment: none yet
+  - Domains: none yet
 - Local Vercel CLI is not installed in this workspace.
 
 ## Required Vercel Project
@@ -15,6 +20,7 @@ This runbook is for a separate ODUN Fulfillment V1 Vercel staging project. Do no
 Create or import a new project, for example:
 
 - Project name: `odun-fulfillment-v1`
+- Project id: `prj_gxorHDOfctSfP6KcAo6stLzFIkyf`
 - Git repository: `calinfi-fulfillment/calinfi-fulfillment`
 - Framework preset: Next.js
 - Root directory: repository root
@@ -63,6 +69,6 @@ After the project exists and the preview deployment runs:
 
 ## Blockers
 
-- Separate Fulfillment Vercel project must be created or imported.
+- GitHub integration must be connected to `calinfi-fulfillment/calinfi-fulfillment` if it is not already connected.
 - Preview env vars must be set in Vercel.
 - Deployment smoke must run against the preview URL before any production promotion.

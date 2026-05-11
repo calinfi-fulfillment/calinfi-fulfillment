@@ -167,6 +167,7 @@ Bu dosya ODUN Fulfillment V1 için canonical proje checklist'idir. Her implement
 - Synthetic pilot fixture was imported into staging with 2 synthetic orders, 2 synthetic backers, 1 built-in exclusion, 2 accepted quotes, 2 accepted payment events, and 2 ready handoffs.
 - Local Git branch `codex/phase-13-staging` was pushed and draft PR #1 was opened: https://github.com/calinfi-fulfillment/calinfi-fulfillment/pull/1
 - Vercel account discovery found only existing `calinfi-pledge-manager` and `calinfi-production-app` projects; Fulfillment deployment requires a new separate Vercel project.
+- Separate Vercel project `odun-fulfillment-v1` / `prj_gxorHDOfctSfP6KcAo6stLzFIkyf` was verified; no deployment or domain is attached yet.
 
 ## 13. Staging Pilot
 
@@ -185,8 +186,9 @@ Bu dosya ODUN Fulfillment V1 için canonical proje checklist'idir. Her implement
 - [x] Local Git branch/commit hazırlandı. Verified by local branch `codex/phase-13-staging` and local commit.
 - [x] GitHub branch push / draft PR açıldı. Verified by draft PR #1: https://github.com/calinfi-fulfillment/calinfi-fulfillment/pull/1
 - [x] Vercel staging setup checklist eklendi. Verified by `docs/runbooks/VERCEL_STAGING.md`.
-- [ ] Fresh Fulfillment Vercel staging project linked. BLOCKED: current Vercel account has `calinfi-pledge-manager` and `calinfi-production-app`; Fulfillment must use a separate new project.
-- [ ] Vercel preview env configured. BLOCKED: requires separate Fulfillment Vercel project and Preview env keys.
+- [x] Fresh Fulfillment Vercel staging project verified. Verified by Vercel project `odun-fulfillment-v1` / `prj_gxorHDOfctSfP6KcAo6stLzFIkyf`.
+- [ ] Vercel Git integration confirmed. BLOCKED: Vercel project exists but no deployment is present yet; confirm/import GitHub repo `calinfi-fulfillment/calinfi-fulfillment`.
+- [ ] Vercel preview env configured. BLOCKED: requires Preview env keys on project `odun-fulfillment-v1`.
 - [ ] Vercel preview smoke passed. BLOCKED: requires preview deployment URL.
 - [ ] Stripe test mode doğrulandı. BLOCKED: repo defaults `STRIPE_MODE=test`, but real Stripe test account/env verification requires owner-approved setup.
 - [ ] PM production read-only aggregate baseline alındı. BLOCKED: requires owner-approved production read-only aggregate check.
