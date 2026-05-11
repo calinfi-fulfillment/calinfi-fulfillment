@@ -11,6 +11,7 @@
     "check:preflight": "tsx scripts/preflight.ts",
     "check:staging-prep": "tsx scripts/staging-prep.ts",
     "check:staging-schema-public": "tsx scripts/staging-schema-public-regression.ts",
+    "smoke:easyship-sandbox-rates": "tsx scripts/easyship-sandbox-rates-smoke.ts",
     "test": "npm run test:safety && npm run test:schema && npm run test:intake && npm run test:built-ins && npm run test:product-readiness && npm run test:route-quote && npm run test:manual-ddp && npm run test:payment-contract && npm run test:stripe-contract && npm run test:stripe-checkout && npm run test:stripe-webhook && npm run test:stripe-test-pilot && npm run test:payment-lock && npm run test:provider-adapter && npm run test:provider-mock-handoff && npm run test:easyship-adapter && npm run test:ops-ui && npm run test:handoff && npm run test:reports && npm run test:staging-launch-gates && npm run test:staging-prep && npm run test:preflight && npm run test:pilot-dry-run && npm run test:vercel-bypass-mode && npm run test:no-secrets",
     "test:safety": "npm run test:pm-supabase-guard && npm run test:live-flags",
     "test:pm-supabase-guard": "tsx scripts/pm-supabase-guard-regression.ts",

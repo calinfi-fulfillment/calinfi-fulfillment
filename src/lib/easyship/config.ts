@@ -23,6 +23,7 @@ export type EasyshipReadiness = {
 };
 
 const DEFAULT_EASYSHIP_API_BASE_URL = "https://public-api.easyship.com/2024-09";
+const DEFAULT_EASYSHIP_SANDBOX_API_BASE_URL = "https://public-api-sandbox.easyship.com/2024-09";
 
 function envValue(env: SafetyEnv, key: string) {
   return String(env[key] ?? "").trim();
@@ -40,7 +41,10 @@ export function easyshipMode(env: SafetyEnv = process.env): EasyshipMode {
 }
 
 export function easyshipApiBaseUrl(env: SafetyEnv = process.env) {
-  return envValue(env, "EASYSHIP_API_BASE_URL") || DEFAULT_EASYSHIP_API_BASE_URL;
+  const explicit = envValue(env, "EASYSHIP_API_BASE_URL");
+  if (explicit) return explicit;
+
+  return easyshipMode(env) === "sandbox" ? DEFAULT_EASYSHIP_SANDBOX_API_BASE_URL : DEFAULT_EASYSHIP_API_BASE_URL;
 }
 
 export function easyshipApiToken(env: SafetyEnv = process.env) {

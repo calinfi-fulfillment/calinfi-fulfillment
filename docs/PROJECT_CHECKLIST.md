@@ -250,6 +250,15 @@ Bu dosya ODUN Fulfillment V1 için canonical proje checklist'idir. Her implement
 - [x] `test:easyship-adapter`, `test:ops-ui`, `test:no-secrets`, `typecheck`, `lint`, `build` geçti. Verified by focused checks and `npm test`.
 - [x] Live Easyship label/shipment/export disabled kaldı. Verified by `externalActions: none`, disabled env defaults, and `npm run test:easyship-adapter`.
 
+## 16. Easyship Sandbox Rate Smoke
+
+- [x] `.env.local` Easyship sandbox env user-side configured. Verified by smoke readiness reaching the Easyship sandbox request step without printing token values.
+- [x] Sandbox token was not printed or committed. Verified by redacted smoke output and `npm run test:no-secrets`.
+- [x] `smoke:easyship-sandbox-rates` script eklendi. Verified by `npm run smoke:easyship-sandbox-rates`.
+- [ ] Sandbox `/rates` smoke geçti. BLOCKED: Easyship sandbox returned HTTP 401 Unauthorized from `/2024-09/rates`; verify the sandbox token, Rates scope, and that `.env.local` uses the token from the same Easyship API integration.
+- [x] Shipment/label/export/tracking disabled kaldı. Verified by smoke script forced guards and no shipment/label/tracking endpoint calls.
+- [x] `test:no-secrets`, `typecheck`, `lint`, `build` geçti. Verified by `npm run test:no-secrets`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npm test`.
+
 ## Audit Gates
 
 Sınır Bekçisi veya eşdeğer boundary audit aşağıdaki noktalarda çalıştırılmalı:

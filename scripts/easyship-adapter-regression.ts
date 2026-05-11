@@ -81,10 +81,11 @@ assert.equal(productionBlocked.ok, false);
 assert.equal(productionBlocked.code, "easyship_production_blocked");
 
 const ratesPlan = buildEasyshipRatesRequestPlan(ratePlanInput, {
+  EASYSHIP_MODE: "sandbox",
   EASYSHIP_API_TOKEN: "sandbox_synthetic_token",
 });
 assert.equal(ratesPlan.method, "POST");
-assert.equal(ratesPlan.url, "https://public-api.easyship.com/2024-09/rates");
+assert.equal(ratesPlan.url, "https://public-api-sandbox.easyship.com/2024-09/rates");
 assert.equal(ratesPlan.headers.authorization, "Bearer <configured>");
 assert.equal(JSON.stringify(ratesPlan).includes("sandbox_synthetic_token"), false);
 assert.equal(ratesPlan.externalActions, "none");
@@ -95,10 +96,10 @@ const shipmentPlan = buildEasyshipShipmentRequestPlan(
     idempotencyKey: "easyship:pm:synthetic:v1",
     platformOrderNumber: sourceOrderKey,
   },
-  { EASYSHIP_API_TOKEN: "sandbox_synthetic_token" },
+  { EASYSHIP_MODE: "sandbox", EASYSHIP_API_TOKEN: "sandbox_synthetic_token" },
 );
 assert.equal(shipmentPlan.method, "POST");
-assert.equal(shipmentPlan.url, "https://public-api.easyship.com/2024-09/shipments");
+assert.equal(shipmentPlan.url, "https://public-api-sandbox.easyship.com/2024-09/shipments");
 assert.equal(shipmentPlan.externalActions, "none");
 
 const blockedHandoff = easyshipProviderAdapter.createHandoff!({
