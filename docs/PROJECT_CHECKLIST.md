@@ -167,7 +167,13 @@ Bu dosya ODUN Fulfillment V1 için canonical proje checklist'idir. Her implement
 - Synthetic pilot fixture was imported into staging with 2 synthetic orders, 2 synthetic backers, 1 built-in exclusion, 2 accepted quotes, 2 accepted payment events, and 2 ready handoffs.
 - Local Git branch `codex/phase-13-staging` was pushed and draft PR #1 was opened: https://github.com/calinfi-fulfillment/calinfi-fulfillment/pull/1
 - Vercel account discovery found only existing `calinfi-pledge-manager` and `calinfi-production-app` projects; Fulfillment deployment requires a new separate Vercel project.
-- Separate Vercel project `odun-fulfillment-v1` / `prj_gxorHDOfctSfP6KcAo6stLzFIkyf` was verified; no deployment or domain is attached yet.
+- Separate Vercel project `odun-fulfillment-v1` / `prj_gxorHDOfctSfP6KcAo6stLzFIkyf` was verified; no custom production domain is attached.
+- Local workspace was linked to the separate Vercel project `odun-fulfillment-v1`; `.vercel/` is ignored and remains uncommitted.
+- Vercel project framework was corrected to Next.js after an initial non-serving deployment failed with the default `Other` preset.
+- Vercel Preview env was configured with the non-PM Supabase public env and all live/provider/export/Stripe Checkout flags disabled; no service-role key or live/provider secret was added.
+- Manual protected Vercel Preview deployment `dpl_7B3Cbxp5sJoxAgjxRRrSVigCxqHV` is ready at https://odun-fulfillment-v1-qpqnp1r8q-hello-75539063s-projects.vercel.app.
+- Protected preview smoke passed for `/api/health`, `/`, and `/reports`; direct anonymous fetches return HTTP 401 because Deployment Protection is enabled.
+- Vercel Git integration is still blocked; direct Git connection to `calinfi-fulfillment/calinfi-fulfillment` was rejected, so automatic PR previews require Vercel GitHub app/repo setup.
 
 ## 13. Staging Pilot
 
@@ -187,9 +193,9 @@ Bu dosya ODUN Fulfillment V1 için canonical proje checklist'idir. Her implement
 - [x] GitHub branch push / draft PR açıldı. Verified by draft PR #1: https://github.com/calinfi-fulfillment/calinfi-fulfillment/pull/1
 - [x] Vercel staging setup checklist eklendi. Verified by `docs/runbooks/VERCEL_STAGING.md`.
 - [x] Fresh Fulfillment Vercel staging project verified. Verified by Vercel project `odun-fulfillment-v1` / `prj_gxorHDOfctSfP6KcAo6stLzFIkyf`.
-- [ ] Vercel Git integration confirmed. BLOCKED: Vercel project exists but no deployment is present yet; confirm/import GitHub repo `calinfi-fulfillment/calinfi-fulfillment`.
-- [ ] Vercel preview env configured. BLOCKED: requires Preview env keys on project `odun-fulfillment-v1`.
-- [ ] Vercel preview smoke passed. BLOCKED: requires preview deployment URL.
+- [ ] Vercel Git integration confirmed. BLOCKED: direct Git connection was rejected; install/authorize Vercel GitHub app for repo `calinfi-fulfillment/calinfi-fulfillment`.
+- [x] Vercel preview env configured. Verified by Preview env setup on project `odun-fulfillment-v1`; live/provider/export/Stripe Checkout flags remain disabled and no service-role key was added.
+- [x] Vercel preview smoke passed. Verified by protected preview smoke for `/api/health`, `/`, and `/reports` on deployment `dpl_7B3Cbxp5sJoxAgjxRRrSVigCxqHV`.
 - [ ] Stripe test mode doğrulandı. BLOCKED: repo defaults `STRIPE_MODE=test`, but real Stripe test account/env verification requires owner-approved setup.
 - [ ] PM production read-only aggregate baseline alındı. BLOCKED: requires owner-approved production read-only aggregate check.
 - [x] 1-2 allowlisted pilot senaryosu planlandı. Verified by `docs/runbooks/STAGING_PILOT.md` and `npm run test:staging-launch-gates`.

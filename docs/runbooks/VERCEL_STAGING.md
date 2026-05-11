@@ -11,9 +11,16 @@ This runbook is for a separate ODUN Fulfillment V1 Vercel staging project. Do no
   - Project id: `prj_gxorHDOfctSfP6KcAo6stLzFIkyf`
   - Project name: `odun-fulfillment-v1`
   - Team id: `team_2jOtOHRsgfDrveJXXNwrbnvt`
-  - Latest deployment: none yet
-  - Domains: none yet
-- Local Vercel CLI is not installed in this workspace.
+  - Team slug: `hello-75539063s-projects`
+  - Framework preset: Next.js
+  - Latest ready preview deployment: `dpl_7B3Cbxp5sJoxAgjxRRrSVigCxqHV`
+  - Preview URL: https://odun-fulfillment-v1-qpqnp1r8q-hello-75539063s-projects.vercel.app
+  - Custom domains: none
+- Local workspace is linked to this Vercel project with `.vercel/`; `.vercel/` is ignored and must not be committed.
+- Preview env was configured on the separate Fulfillment project with the non-PM Supabase public URL/key and all live/provider/export/Stripe Checkout flags disabled.
+- No service-role key, Stripe live secret, provider API secret, PM production env, or custom production CALINFI domain was added.
+- GitHub integration is not connected yet; Vercel rejected direct Git connection, so the current preview was deployed manually from the local branch.
+- An earlier deployment failed before serving because the project framework preset was `Other`; the preset was corrected to Next.js before the ready preview deployment.
 
 ## Required Vercel Project
 
@@ -21,7 +28,7 @@ Create or import a new project, for example:
 
 - Project name: `odun-fulfillment-v1`
 - Project id: `prj_gxorHDOfctSfP6KcAo6stLzFIkyf`
-- Git repository: `calinfi-fulfillment/calinfi-fulfillment`
+- Git repository: `calinfi-fulfillment/calinfi-fulfillment` (currently blocked; manual preview deploy used)
 - Framework preset: Next.js
 - Root directory: repository root
 - Production branch: `main`
@@ -34,7 +41,7 @@ Do not reuse:
 
 ## Required Environment Keys
 
-Set these for Preview first. Keep live/provider/export flags disabled.
+Set these for Preview first. Keep live/provider/export flags disabled. The keys below are configured for Preview on `odun-fulfillment-v1`; values are intentionally not repeated in docs.
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=
@@ -57,18 +64,21 @@ Only add service-role or DB connection secrets if a server-side mutation path is
 
 ## Verification
 
-After the project exists and the preview deployment runs:
+Completed preview verification:
 
 - Vercel project name is not PM/prod.
 - Preview env uses the non-PM Fulfillment Supabase project.
-- `npm run check:staging-prep` semantics remain true in deployment.
-- `/api/health` returns healthy.
-- `/` renders the Staging Pilot Readiness panel.
+- `/api/health` returned `ok: true` through protected preview access.
+- `/` rendered the Staging Pilot Readiness panel through protected preview access.
+- `/reports` rendered the reports surface through protected preview access.
+- `/api/health` reported `blockedPmSupabase: false`, `liveFlagsOff: true`, public Supabase configured, and service-role Supabase not configured.
 - No production domain alias is attached.
 - No live provider, label, export, Stripe Checkout, or partner push action is enabled.
+- Direct anonymous fetches return HTTP 401 because Vercel Deployment Protection is enabled; protected preview smoke used Vercel-authenticated access.
 
 ## Blockers
 
-- GitHub integration must be connected to `calinfi-fulfillment/calinfi-fulfillment` if it is not already connected.
-- Preview env vars must be set in Vercel.
-- Deployment smoke must run against the preview URL before any production promotion.
+- GitHub integration must be connected to `calinfi-fulfillment/calinfi-fulfillment` before automatic PR previews can replace manual preview deploys.
+- Stripe test account/webhook verification remains pending owner-approved setup.
+- PM production read-only aggregate baseline remains pending owner-approved audit.
+- Formal Sınır Bekçisi pre-pilot audit remains pending after GitHub integration, Stripe test setup, and PM baseline context are ready.

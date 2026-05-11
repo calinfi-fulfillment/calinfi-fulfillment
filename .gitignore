@@ -12,3 +12,4 @@ imports/
 labels/
 tmp/
 supabase/.temp/
+.vercel
