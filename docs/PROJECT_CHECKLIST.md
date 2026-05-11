@@ -221,7 +221,7 @@ Bu dosya ODUN Fulfillment V1 için canonical proje checklist'idir. Her implement
 - [x] Synthetic Stripe Checkout pilot zinciri tamamlandı. Verified by `npm run test:stripe-test-pilot`; external calls are mocked.
 - [x] Stripe raw webhook signature endpoint eklendi. Verified by `npm run test:stripe-webhook` and build route listing.
 - [x] Stripe webhook duplicate/mismatch/idempotency regression geçti. Verified by `npm run test:stripe-webhook`.
-- [ ] Stripe Test Pilot değişiklikleri PR #1'e push edildi.
+- [x] Stripe Test Pilot değişiklikleri PR #1'e push edildi. Verified by push of commit `0b134d0` to `codex/phase-13-staging`.
 - [x] Provider adapter prep tamamlandı. Verified by `npm run test:provider-adapter` and `npm run test:provider-mock-handoff`; external actions remain `none`.
 - [ ] PM baseline/audit still blocked until approval. BLOCKED: PM production read-only baseline and formal pre-pilot audit require separate owner-approved scope.
 - [ ] Stripe test mode doğrulandı. BLOCKED: synthetic contract validator passed, but real Stripe test account/env verification requires owner-approved setup.
