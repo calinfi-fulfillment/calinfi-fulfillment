@@ -185,6 +185,7 @@ Bu dosya ODUN Fulfillment V1 için canonical proje checklist'idir. Her implement
 - Full Vercel-free continuation regression passed: `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, `npm run check:staging-prep`, and local smoke on `/`, `/quotes`, `/payments`, `/handoffs`, and `/api/health`.
 - Stripe test Checkout route, restricted test-key guard, Checkout metadata/idempotency builder, and Payments readiness panel were added without using or storing pasted secrets; verified by `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run test:no-secrets`.
 - Stripe Test Pilot checklist, synthetic Checkout-to-webhook pilot, and raw Stripe webhook signature endpoint were added without live Stripe calls; verified by focused `test:stripe-webhook`, `test:stripe-test-pilot`, `typecheck`, `lint`, and `test:no-secrets`.
+- Easyship API dashboard was inspected without storing the visible token, and sandbox-safe request planning was added for rates/shipments with live label/export disabled; verified by `npm run test:easyship-adapter`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run test:no-secrets`.
 
 ## 13. Staging Pilot
 
@@ -237,6 +238,17 @@ Bu dosya ODUN Fulfillment V1 için canonical proje checklist'idir. Her implement
 - [x] No live provider/export action açık onay olmadan disabled. Verified by `.env.example`, `npm run test:live-flags`, and `npm run test:handoff`.
 - [ ] Final Sınır Bekçisi boundary audit geçti. BLOCKED: requires staging/pilot evidence and owner go/no-go context.
 - [ ] Owner go/no-go kararı alındı. BLOCKED: explicit owner launch decision required.
+
+## 15. Easyship Provider Integration Prep
+
+- [x] Easyship dashboard/API connection inspected without storing token. Verified by Chrome inspection only; token value was not copied into repo/docs.
+- [x] Easyship env guard eklendi. Verified by `.env.example` and `createEasyshipReadiness`.
+- [x] Easyship sandbox readiness check eklendi. Verified by `npm run test:easyship-adapter`.
+- [x] Easyship rates request planner hazır. Verified by `buildEasyshipRatesRequestPlan` and `npm run test:easyship-adapter`.
+- [x] Easyship shipment request planner future-gated bırakıldı. Verified by `buildEasyshipShipmentRequestPlan`; external actions remain `none`.
+- [x] Easyship UI readiness surface eklendi. Verified by `npm run test:ops-ui`.
+- [x] `test:easyship-adapter`, `test:ops-ui`, `test:no-secrets`, `typecheck`, `lint`, `build` geçti. Verified by focused checks and `npm test`.
+- [x] Live Easyship label/shipment/export disabled kaldı. Verified by `externalActions: none`, disabled env defaults, and `npm run test:easyship-adapter`.
 
 ## Audit Gates
 
