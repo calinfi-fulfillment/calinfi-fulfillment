@@ -9,6 +9,7 @@ import {
   RefreshCw,
   Search,
   ShieldCheck,
+  TriangleAlert,
   Truck,
 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -43,16 +44,19 @@ export function ShippingConsole() {
 
   return (
     <section className="shipping-console" data-testid="shipping-console">
+      <div className="ship-safety-banner" role="status" aria-label="Kargo güvenlik durumu">
+        <TriangleAlert aria-hidden="true" size={18} />
+        <strong>Canlı kargo aksiyonları kapalı.</strong>
+        <span>Canlı etiket kapalı</span>
+        <span>PM verisi korunuyor</span>
+        <span>Sandbox fiyat denemesi</span>
+      </div>
+
       <div className="shipping-hero">
         <div>
           <p className="eyebrow">Easyship tarzı kargo akışı</p>
           <h2>Kargo Merkezi</h2>
           <p>Siparişi seç, paket ölçüsünü kontrol et, fiyatı karşılaştır, canlı etiket basmadan güvenli önizleme yap.</p>
-          <div className="ship-safety-pills" aria-label="Kargo güvenlik durumu">
-            <span>Canlı etiket kapalı</span>
-            <span>PM verisi korunuyor</span>
-            <span>Sandbox fiyat denemesi</span>
-          </div>
         </div>
         <div className="ship-hero-actions">
           <button onClick={stageRateCheck} type="button">

@@ -19,7 +19,7 @@ export function AppShell({ active, children, steps, subtitle, title }: AppShellP
           <span className="brand-mark">OF</span>
           <div>
             <strong>ODUN Kargo Paneli</strong>
-            <span>Güvenli test modu</span>
+            <span>Yerel staging modu</span>
           </div>
         </div>
         <nav className="nav-list">

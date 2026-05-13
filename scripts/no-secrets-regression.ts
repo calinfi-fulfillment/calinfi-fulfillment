@@ -14,7 +14,7 @@ const secretPatterns = [
   {
     name: "non-empty-secret-env",
     pattern:
-      /\b(?:SUPABASE_SERVICE_ROLE_KEY|PM_INTAKE_SHARED_SECRET|PM_PAYMENT_EVENT_SHARED_SECRET|STRIPE_SECRET_KEY|STRIPE_WEBHOOK_SECRET)[ \t]*=[ \t]*["']?[A-Za-z0-9_./+=-]{8,}/,
+      /\b(?:SUPABASE_SERVICE_ROLE_KEY|PM_INTAKE_SHARED_SECRET|PM_PAYMENT_EVENT_SHARED_SECRET|STRIPE_SECRET_KEY|STRIPE_WEBHOOK_SECRET|SFC_APP_TOKEN|SFC_APP_KEY)[ \t]*=[ \t]*["']?[A-Za-z0-9_./+=-]{8,}/,
   },
   { name: "raw-auth-link", pattern: /token_hash=|auth\/v1\/verify/i },
   { name: "non-example-email", pattern: /[A-Z0-9._%+-]+@(?!example\.test\b)[A-Z0-9.-]+\.[A-Z]{2,}/i },

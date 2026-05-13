@@ -43,7 +43,9 @@ function redactToken(value: string, token: string) {
 
 function easyshipSmokeHint(status: number) {
   if (status === 400) return "Review the synthetic rates payload against the current Easyship sandbox schema.";
-  if (status === 401 || status === 403) return "Verify the sandbox token, sandbox scopes, and that the token matches this Easyship API integration.";
+  if (status === 401 || status === 403) {
+    return "Verify the sandbox Bearer token has public.rate:read scope and belongs to the same 2024-09 Easyship API integration.";
+  }
   if (status === 404) return "Verify the Easyship sandbox base URL and API version path.";
   if (status >= 500) return "Retry later or check Easyship sandbox API status; no shipment, label, export, or tracking action was attempted.";
   return "Review Easyship sandbox response details without exposing token values.";

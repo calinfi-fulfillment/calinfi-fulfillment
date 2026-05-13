@@ -1,7 +1,7 @@
 "use client";
 
 import { CheckCircle2, ClipboardCheck, Columns3, Filter, Search, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { type KeyboardEvent, useMemo, useState } from "react";
 
 import { StatusBadge } from "@/components/status-badge";
 import { formatColumnLabel, formatOpsValue } from "@/lib/ops-ui/labels";
@@ -81,7 +81,7 @@ export function DataTable<T extends Record<string, string>>({ columns, rows }: D
     });
   }, [activeFilter, filterOptions, indexedRows, query]);
 
-  const selectedRow = indexedRows.find(({ id }) => id === selectedId) ?? filteredRows[0] ?? indexedRows[0] ?? null;
+  const selectedRow = filteredRows.find(({ id }) => id === selectedId) ?? filteredRows[0] ?? null;
   const selectedCount = selectedRow ? 1 : 0;
 
   function toggleColumn(column: string) {
@@ -97,6 +97,13 @@ export function DataTable<T extends Record<string, string>>({ columns, rows }: D
   function stageAction(action: string) {
     const target = selectedRow ? formatOpsValue("sourceOrderKey", selectedRow.id) : "filtrelenen liste";
     setLocalEvent(`${target} için "${action}" hazırlandı`);
+  }
+
+  function selectRowFromKeyboard(event: KeyboardEvent<HTMLTableRowElement>, id: string) {
+    if (event.key !== "Enter" && event.key !== " ") return;
+
+    event.preventDefault();
+    setSelectedId(id);
   }
 
   return (
@@ -154,7 +161,7 @@ export function DataTable<T extends Record<string, string>>({ columns, rows }: D
         </div>
       </details>
 
-      <div className="table-status-line">
+      <div className="table-status-line" aria-live="polite">
         <span>{filteredRows.length} kayıt</span>
         <span>{selectedCount} seçili</span>
         <span>{localEvent}</span>
@@ -172,7 +179,14 @@ export function DataTable<T extends Record<string, string>>({ columns, rows }: D
           </thead>
           <tbody>
             {filteredRows.map(({ id, row }) => (
-              <tr data-selected={id === selectedRow?.id ? "true" : "false"} key={id} onClick={() => setSelectedId(id)}>
+              <tr
+                aria-selected={id === selectedRow?.id}
+                data-selected={id === selectedRow?.id ? "true" : "false"}
+                key={id}
+                onClick={() => setSelectedId(id)}
+                onKeyDown={(event) => selectRowFromKeyboard(event, id)}
+                tabIndex={0}
+              >
                 <td>
                   <input
                     aria-label={`${formatOpsValue("sourceOrderKey", id)} seç`}

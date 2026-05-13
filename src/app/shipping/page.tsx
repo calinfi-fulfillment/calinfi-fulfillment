@@ -1,4 +1,5 @@
 import { AppShell } from "@/components/app-shell";
+import { NetworkReadiness } from "@/components/network-readiness";
 import { ShippingConsole } from "@/components/shipping-console";
 
 export default function ShippingPage() {
@@ -10,6 +11,7 @@ export default function ShippingPage() {
       steps={["Siparişi seç", "Paket bilgisini kontrol et", "Fiyatı karşılaştır", "Etiketi canlıya basma"]}
     >
       <ShippingConsole />
+      <NetworkReadiness />
     </AppShell>
   );
 }

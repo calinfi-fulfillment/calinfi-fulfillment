@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8" /><title>ODUN Fulfillment Kullanım Kılavuzu</title>
+<style>
+@page { size: A4 landscape; margin: 12mm 13mm 14mm; }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { font-family: Arial, Helvetica, sans-serif; color: #17242a; background: #fff; font-size: 10.8pt; line-height: 1.42; }
+h1 { margin: 0 0 12px; padding: 22px 28px; border-radius: 12px; background: linear-gradient(135deg, #174f58, #2f7f87); color: #fff; font-size: 29pt; line-height: 1.08; letter-spacing: 0; break-after: avoid; }
+h1 + p { margin: 0 0 18px; padding: 12px 16px; border: 1px solid #b8dbd6; border-radius: 10px; background: #eef9f7; color: #25454c; font-size: 12pt; }
+h2 { break-before: page; margin: 0 0 10px; color: #174f58; font-size: 19pt; line-height: 1.15; border-bottom: 2px solid #b8dbd6; padding-bottom: 6px; }
+h2:first-of-type { break-before: auto; }
+h3 { color: #263940; font-size: 13pt; margin: 14px 0 6px; }
+p { margin: 0 0 8px; }
+ul, ol { margin: 5px 0 10px 22px; padding: 0; }
+li { margin: 3px 0; }
+strong { color: #1d3137; }
+code { font-family: "SFMono-Regular", Consolas, monospace; font-size: 9.4pt; background: #f2f5f5; padding: 1px 4px; border-radius: 4px; }
+img { display: block; width: 100%; max-height: 128mm; object-fit: contain; object-position: top center; border: 1px solid #c7d2d4; border-radius: 9px; background: #f8fbfb; margin: 8px 0 13px; break-inside: avoid; }
+p:has(img) { margin: 4px 0 12px; padding: 8px; background: #f4f8f8; border: 1px solid #d7e2e3; border-radius: 12px; break-inside: avoid; }
+blockquote { margin: 10px 0; padding: 10px 13px; border-left: 5px solid #2f7f87; background: #eef9f7; border-radius: 8px; }
+hr { border: 0; border-top: 1px solid #d6e0e1; margin: 14px 0; }
+.guide-shell { max-width: 100%; }
+.guide-shell > p:first-of-type + p { padding: 10px 12px; background: #fff4e6; border: 1px solid #f0c08e; border-radius: 9px; font-weight: 700; color: #53300f; }
+a { color: #174f58; text-decoration: none; }
+</style></head><body><main class="guide-shell"><h1>ODUN Fulfillment Kullanım Kılavuzu</h1>
+<p><strong>Ekran görüntülü operatör rehberi</strong><br>Yerel/staging önizleme ekranlarından hazırlanmıştır.</p>
+<p>Bu kılavuz ODUN Fulfillment panelini kullanan founder/admin operatörü için hazırlanmıştır. Ekran görüntüleri yerel/staging önizleme ortamından alınmıştır ve sentetik test verisi gösterir.</p>
+<p>Önemli güvenlik kuralı: Bu uygulamada canlı PM verisine dokunma, canlı etiket basma, canlı kargo oluşturma, canlı provider çağrısı, dışa aktarım ve takip aksiyonları owner onayı olmadan kapalıdır.</p>
+<h2>1. Genel Gezinme</h2>
+<p>Uygulamanın sol menüsü ana iş akışını gösterir:</p>
+<ul>
+<li>Kontrol Paneli: Bugünkü genel durum ve sıradaki güvenli aksiyonlar.</li>
+<li>Kargo Merkezi: Sipariş seçme, paket kontrolü, fiyat karşılaştırma ve etiket önizleme alanı.</li>
+<li>Siparişler: Sipariş readiness tablosu.</li>
+<li>Kargo Ücreti: Kargo rotası, fiyat ve manual DDP hazırlığı.</li>
+<li>Ödemeler: Ödeme event kontrolü ve Stripe test hazırlığı.</li>
+<li>Kargoya Hazır: Handoff/export önizleme alanı.</li>
+<li>Sorunlar: Blokaj ve exception triage.</li>
+<li>Raporlar: Operasyon özetleri.</li>
+</ul>
+<h2>2. Kontrol Paneli</h2>
+<p><img src="./assets/01-kontrol-paneli.png" alt="Kontrol Paneli"></p>
+<p>Kontrol Paneli uygulamanın başlangıç ekranıdır. Burada amaç, operatörün ilk 5 saniyede neye bakacağını anlamasıdır.</p>
+<p>Adımlar:</p>
+<ol>
+<li>Üstteki güvenlik şeridini kontrol edin. Canlı aksiyonların kapalı olduğunu doğrulayın.</li>
+<li>Özet kartlarından hazır, bloklu, ödeme bekleyen ve handoff’a yaklaşan sipariş sayılarını okuyun.</li>
+<li>&quot;Bugün ne yapacağız?&quot; alanındaki sıradaki güvenli işleri takip edin.</li>
+<li>Staging ve lokal mod panellerinde sistemin canlı PM/Supabase sınırını ihlal etmediğini kontrol edin.</li>
+<li>Kargo hazırlığına geçmek için sol menüden Kargo Merkezi veya Kargo Ücreti ekranını açın.</li>
+</ol>
+<p>Bu ekranda karar verilir; canlı işlem yapılmaz.</p>
+<h2>3. Kargo Merkezi</h2>
+<p><img src="./assets/02-kargo-merkezi.png" alt="Kargo Merkezi"></p>
+<p>Kargo Merkezi, Easyship benzeri ama ODUN’a özel kargo hazırlık ekranıdır. Gerçek Easyship arayüzü kopyalanmaz; amaç aynı tür operasyon netliğini sağlamaktır.</p>
+<p>Ana akış:</p>
+<ol>
+<li>Siparişi seçin.</li>
+<li>Paket bilgisini kontrol edin.</li>
+<li>Sandbox veya manuel fiyatı karşılaştırın.</li>
+<li>Etiket durumunu kontrol edin.</li>
+</ol>
+<p>Ekrandaki önemli alanlar:</p>
+<ul>
+<li>Canlı kargo aksiyonları kapalı uyarısı: Etiket, gönderi, takip ve provider mutation kapalıdır.</li>
+<li>Fiyat alınabilir / Etiket bekler / Takipte / Kontrol gerekli kartları: Operasyon kuyruğunun durumunu gösterir.</li>
+<li>Sipariş, Paket, Fiyat, Etiket adımları: Operatöre sırayı gösterir.</li>
+<li>Sağdaki güvenli akış kartı: Canlı PM verisine dokunmama, önce sandbox fiyat deneme ve owner onayı olmadan partner’e göndermeme kurallarını hatırlatır.</li>
+<li>SFC + Easyship ağı: Çin hub, US/EU freight, Easyship last-mile, SFC read-only smoke ve product/customs durumlarını gösterir.</li>
+</ul>
+<p>Bu ekranda &quot;Sandbox fiyatı dene&quot; ve &quot;Güvenli özet hazırla&quot; gibi local/staging aksiyonlar kullanılabilir. &quot;Canlı etiket bas&quot; owner onayı olmadan kapalı kalır.</p>
+<h2>4. Siparişler</h2>
+<p><img src="./assets/03-siparisler.png" alt="Siparişler"></p>
+<p>Siparişler ekranı hangi siparişin kargoya hazırlanabileceğini, hangisinin bloklu olduğunu gösterir.</p>
+<p>Nasıl kullanılır:</p>
+<ol>
+<li>Arama kutusundan sipariş, ürün veya durum arayın.</li>
+<li>Filtre menüsünden tüm kayıtlar, hazırlar veya bloklular gibi görünümü daraltın.</li>
+<li>Tablo satırındaki radio seçim ile bir siparişi seçin.</li>
+<li>Seçili kayıt alanında kargo yolu, paket, ödeme ve etiket durumunu inceleyin.</li>
+<li>Blokaj varsa Siparişler ekranından aksiyon almak yerine ilgili detay ekranına geçin: fiyat için Kargo Ücreti, ödeme için Ödemeler, handoff için Kargoya Hazır.</li>
+</ol>
+<p>Bu ekran karar ve inceleme ekranıdır. Canlı provider veya export aksiyonu çalıştırmaz.</p>
+<h2>5. Kargo Ücreti</h2>
+<p><img src="./assets/04-kargo-ucreti.png" alt="Kargo Ücreti"></p>
+<p>Kargo Ücreti ekranı siparişe uygun rota ve fiyat hazırlığını yönetir.</p>
+<p>Ana kullanım:</p>
+<ol>
+<li>Soldaki tabloda siparişi seçin.</li>
+<li>Kargo yolu ve modunu kontrol edin: Bölgesel depo, Çin/HK direkt DDP veya manuel özel yol.</li>
+<li>&quot;Kontrol et&quot; ile local doğrulama mantığını çalıştırın.</li>
+<li>&quot;Önizle&quot; ile güvenli fiyat önizlemesini hazırlayın.</li>
+<li>Manual DDP gerekiyorsa sağ panelde firma teklif kodu, temel tutar, para birimi ve güvenlik payı alanlarını kontrol edin.</li>
+</ol>
+<p>Bu ekranda SFC + Easyship network paneli de görünür:</p>
+<ul>
+<li>US/EU siparişleri için SFC Çin’den bölgesel depoya freight ve Easyship last-mile planlanır.</li>
+<li>Asya DDP için SFC direct DDP rotası kullanılır.</li>
+<li>SFC read-only smoke kartı, gerçek SFC çağrısı yapılmadan read-only planın hazır olup olmadığını gösterir.</li>
+<li>Product/customs kartı HS code, origin, değer ve stok gibi blokajları özetler.</li>
+</ul>
+<p>Canlı rate, label veya shipment çağrısı bu ekranda owner onayı olmadan yapılmaz.</p>
+<h2>6. Ödemeler</h2>
+<p><img src="./assets/05-odemeler.png" alt="Ödemeler"></p>
+<p>Ödemeler ekranı ödeme event’lerinin sipariş ve fiyat snapshot’ıyla uyumlu olup olmadığını kontrol eder.</p>
+<p>Nasıl okunur:</p>
+<ol>
+<li>Payment event tablosunda event durumunu seçin.</li>
+<li>Amount/currency/quote/order match kontrollerini okuyun.</li>
+<li>Mismatch varsa sipariş lock edilmez; ödeme kontrolü gerekli durumuna düşer.</li>
+<li>Stripe test panelinde test checkout hazırlık durumunu inceleyin.</li>
+<li>Canlı Stripe modu kapalı kalmalıdır.</li>
+</ol>
+<p>Başarılı ödeme event’i ancak sentetik/test akışında <code>locked_for_fulfillment</code> durumuna gider. Canlı Stripe veya gerçek müşteri tahsilatı bu panelden açılmaz.</p>
+<h2>7. Kargoya Hazır</h2>
+<p><img src="./assets/06-kargoya-hazir.png" alt="Kargoya Hazır"></p>
+<p>Kargoya Hazır ekranı export/handoff önizlemesidir. Yalnızca ödeme kilidi ve readiness şartlarını geçen siparişler handoff’a yaklaşır.</p>
+<p>Adımlar:</p>
+<ol>
+<li>Handoff tablosunda hazır siparişleri seçin.</li>
+<li>Export preview alanında CSV/JSON gibi dosya formatı önizlemesini kontrol edin.</li>
+<li>Provider readiness panelinde mock handoff, mock tracking ve Easyship plan durumunu okuyun.</li>
+<li>Partner API push ve gerçek export bayraklarının kapalı olduğunu doğrulayın.</li>
+</ol>
+<p>Bu ekranda gerçek dosya export’u veya partner API push owner onayı olmadan yapılmaz.</p>
+<h2>8. Sorunlar</h2>
+<p><img src="./assets/07-sorunlar.png" alt="Sorunlar"></p>
+<p>Sorunlar ekranı operasyon blokajlarını toplar.</p>
+<p>Kullanım sırası:</p>
+<ol>
+<li>Severity sütununa bakın: blocker en yüksek önceliktir.</li>
+<li>Sorun kodunu okuyun: eksik ürün, ödeme uyuşmazlığı, gümrük eksikleri gibi.</li>
+<li>Owner veya sorumlu alanına göre kimin aksiyon alacağını belirleyin.</li>
+<li>Sorun çözülmeden handoff/export veya label akışına ilerlemeyin.</li>
+</ol>
+<p>Bu ekran bir triage masasıdır; sorunu görünür yapar ama canlı sistemlerde değişiklik yapmaz.</p>
+<h2>9. Raporlar</h2>
+<p><img src="./assets/08-raporlar.png" alt="Raporlar"></p>
+<p>Raporlar ekranı operasyon sağlığını PII-safe aggregate olarak gösterir.</p>
+<p>Burada bakılacaklar:</p>
+<ol>
+<li>Hazır, bloklu, ödeme bekleyen ve handoff’a hazır sipariş sayılarını okuyun.</li>
+<li>Route veya partner performans özetlerini kontrol edin.</li>
+<li>Exception aging alanında açık sorunların ne kadar beklediğini izleyin.</li>
+<li>Rapor çıktısında isim, adres, telefon, e-posta veya token gibi PII olmamalıdır.</li>
+</ol>
+<p>Bu ekran yönetim özeti içindir; müşteri satırı veya hassas veri göstermez.</p>
+<h2>10. Günlük Operasyon Sırası</h2>
+<p>Önerilen günlük kullanım akışı:</p>
+<ol>
+<li>Kontrol Paneli ile genel durumu okuyun.</li>
+<li>Siparişler ekranında hazır ve bloklu siparişleri ayırın.</li>
+<li>Kargo Ücreti ekranında route/fiyat/manual DDP hazırlığını tamamlayın.</li>
+<li>Ödemeler ekranında payment lock durumunu doğrulayın.</li>
+<li>Kargo Merkezi ekranında paket, fiyat ve etiket hazırlığını tek ekranda kontrol edin.</li>
+<li>Kargoya Hazır ekranında handoff preview’i inceleyin.</li>
+<li>Sorunlar ekranında kalan blokajları kapatın veya owner’a taşıyın.</li>
+<li>Raporlar ekranında operasyon özetini kontrol edin.</li>
+</ol>
+<h2>11. Güvenlik ve Onay Kuralları</h2>
+<p>Owner onayı olmadan yapılmaması gerekenler:</p>
+<ul>
+<li>PM production verisine yazmak.</li>
+<li>Stripe live mode kullanmak.</li>
+<li>Easyship canlı label, shipment, export veya tracking oluşturmak.</li>
+<li>SFC order/ASN mutation yapmak.</li>
+<li>Partner API push açmak.</li>
+<li>Service role key, token, auth link veya gerçek backer PII yazmak.</li>
+</ul>
+<p>Güvenli olanlar:</p>
+<ul>
+<li>Sentetik/local fixture ile test.</li>
+<li>Read-only plan hazırlığı.</li>
+<li>Redacted request preview.</li>
+<li>Aggregate rapor.</li>
+<li>Mock provider handoff.</li>
+<li>Sandbox/test mode hazırlığı.</li>
+</ul>
+<h2>12. Durum Rozetleri</h2>
+<p>Sık görülen rozetler:</p>
+<ul>
+<li>Hazır: İş local/test akışında devam edebilir.</li>
+<li>Kontrol gerekli: Operatör veya owner incelemesi gerekir.</li>
+<li>Blokaj: İlerlemek için sorun çözülmelidir.</li>
+<li>Kapalı: Canlı aksiyon güvenlik nedeniyle devre dışıdır.</li>
+<li>Güvenli önizleme: Sadece preview veya synthetic data kullanılır.</li>
+<li>SFC/Easyship/Stripe hazır: Gerçek çağrı anlamına gelmez; çoğu zaman sadece plan veya test readiness anlamına gelir.</li>
+</ul>
+<h2>13. Canlıya Geçmeden Önce</h2>
+<p>Canlı pilot veya production için ayrıca şunlar tamamlanmalıdır:</p>
+<ul>
+<li>PM production read-only aggregate baseline.</li>
+<li>Stripe test env gerçek doğrulaması.</li>
+<li>Easyship sandbox <code>/rates</code> smoke.</li>
+<li>SFC read-only gerçek smoke.</li>
+<li>Sınır Bekçisi pre-pilot audit.</li>
+<li>Final Sınır Bekçisi boundary audit.</li>
+<li>Owner go/no-go kararı.</li>
+</ul>
+<p>Bu kılavuz uygulamanın kullanımını anlatır; canlı aksiyonlar için onay prosedürünün yerine geçmez.</p>
+</main></body></html>

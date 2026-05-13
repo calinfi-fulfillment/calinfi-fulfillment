@@ -1,6 +1,6 @@
 # ODUN Fulfillment V1 Project Checklist
 
-Last updated: 2026-05-12
+Last updated: 2026-05-13
 
 ## Kullanım Kuralı
 
@@ -11,6 +11,47 @@ Bu dosya ODUN Fulfillment V1 için canonical proje checklist'idir. Her implement
 - Hiçbir madde test, build, script, static inspection veya açık verification kanıtı olmadan tamamlandı sayılmaz.
 - Live Supabase, Stripe, provider API, export, deploy veya migration aksiyonları owner onayı olmadan yapılmaz.
 - Secrets, tokens, OTP, raw auth links veya PII-heavy örnekler bu repo/dokümanlara yazılmaz.
+
+## Final Completion Plan
+
+Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-24 yerel/staging ürün yüzeyi ve güvenlik hazırlığı olarak tamamlanmış kabul edilir; kalan işler canlıya geçiş kapılarıdır.
+
+### A. Repo / PR Paketleme
+
+- [ ] Son local değişiklikler commitlendi. BLOCKED: current working tree has uncommitted SFC/Easyship/UI/user-guide changes; run full regression before commit.
+- [ ] Branch `codex/phase-13-staging` PR #1'e push edildi. BLOCKED: commit sonrası push gerekiyor.
+- [ ] PR #1 açıklaması güncel final scope, verification, blocked live gates ve no-live-action notlarıyla yenilendi. BLOCKED: commit/push sonrası yapılacak.
+- [ ] Final regression paketi PR üzerinde geçti. BLOCKED: local equivalent passed on 2026-05-13 (`npm test`, `typecheck`, `lint`, `build`, `test:no-secrets`, `check:completion-readiness`), but PR checks require commit/push or Vercel Git resolution.
+
+### B. Staging Pilot Gate
+
+- [ ] Vercel Git integration confirmed. BLOCKED: account mismatch; direct Git connection was rejected, so automatic PR previews require Vercel GitHub app/account setup.
+- [ ] Protected Vercel preview final smoke passed for `/api/health`, `/`, `/shipping`, `/quotes`, `/payments`, `/handoffs`, `/reports`. BLOCKED: requires updated preview deployment after latest local changes.
+- [ ] PM production read-only aggregate baseline alındı. BLOCKED: owner-approved PM production read-only aggregate scope required; no raw PII rows.
+- [ ] Stripe test mode gerçek env doğrulandı. BLOCKED: owner-approved Stripe test account/env setup required.
+- [ ] Easyship sandbox `/rates` smoke geçti. BLOCKED: owner confirmed sandbox path; 2026-05-13 run reached sandbox `/2024-09/rates` but returned HTTP 401, so token must have `public.rate:read` scope for the same 2024-09 API integration.
+- [ ] SFC read-only smoke geçti. BLOCKED: owner approved non-mutating provider calls; valid SFC read-only credentials/env are still required.
+- [ ] Sınır Bekçisi pre-pilot audit geçti. BLOCKED: requires PM aggregate baseline, Stripe/Easyship/SFC evidence, staging evidence, and owner-approved audit scope.
+- [ ] 1-2 allowlisted staging pilot order run completed. BLOCKED: requires pre-pilot audit pass and explicit owner pilot approval.
+
+### C. Production Launch Gate
+
+- [ ] Production environment configured. BLOCKED: production Supabase/env/Vercel/custom domain/secrets not configured or approved.
+- [ ] Production flags reviewed and only approved flags enabled. BLOCKED: requires owner launch scope; live provider/export/payment flags remain default `false`.
+- [ ] Backup/snapshot completed immediately before launch. BLOCKED: launch timing and target systems required.
+- [ ] Rollback/flag-off drill confirmed for production. BLOCKED: production env required.
+- [ ] Final Sınır Bekçisi boundary audit geçti. BLOCKED: requires staging pilot evidence, production env review, and final go/no-go context.
+- [ ] Owner go/no-go kararı alındı. BLOCKED: explicit owner launch decision required.
+- [ ] Production smoke passed after launch. BLOCKED: requires owner go/no-go and approved deployment.
+
+### D. Final Acceptance Criteria
+
+- [ ] All `Final Completion Plan` items are complete or explicitly deferred by owner.
+- [ ] `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run test:no-secrets` pass on the final commit. BLOCKED: passed locally on 2026-05-13, but final commit is not created yet.
+- [x] Fulfillment remains disconnected from PM Supabase except approved, read-only PM aggregate checks. Verified by `npm run test:pm-supabase-guard` and `npm run check:completion-readiness`.
+- [x] No raw backer PII, secrets, OTPs, auth links, service-role keys, Stripe live keys, Easyship tokens, or SFC credentials are committed. Verified by `npm run test:no-secrets`.
+- [x] Live label, shipment, tracking, export, partner push, SFC mutation, and Stripe live payment are impossible unless explicitly approved flags/credentials are present. Verified by `npm run test:live-flags`, `npm run test:sfc-network`, `npm run test:easyship-adapter`, and `npm run check:completion-readiness`.
+- [x] Operator docs are complete: Markdown guide, PDF guide, staging runbooks, rollback runbook, backup runbook, SFC/Easyship network plan. Verified by `npm run check:completion-readiness`.
 
 ## 0. Safety & Governance
 
@@ -186,6 +227,11 @@ Bu dosya ODUN Fulfillment V1 için canonical proje checklist'idir. Her implement
 - Stripe test Checkout route, restricted test-key guard, Checkout metadata/idempotency builder, and Payments readiness panel were added without using or storing pasted secrets; verified by `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run test:no-secrets`.
 - Stripe Test Pilot checklist, synthetic Checkout-to-webhook pilot, and raw Stripe webhook signature endpoint were added without live Stripe calls; verified by focused `test:stripe-webhook`, `test:stripe-test-pilot`, `typecheck`, `lint`, and `test:no-secrets`.
 - Easyship API dashboard was inspected without storing the visible token, and sandbox-safe request planning was added for rates/shipments with live label/export disabled; verified by `npm run test:easyship-adapter`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run test:no-secrets`.
+- Takeover continuity fix added the missing `scripts/sfc-network-regression.ts` and wired Ops UI coverage for the SFC + Easyship network panel; verified by `npm run test:sfc-network`, `npm run test:ops-ui`, `npm run test:easyship-adapter`, `npm run test:no-secrets`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npm test`. No Easyship/SFC external request, label, shipment, export, tracking, deploy, migration, or live mutation was run.
+- UX/UI specialist polish pass tightened the app shell, navigation, table density, shipping console hierarchy, safety banner prominence, and keyboard row selection; verified by `npm run test:ops-ui`, `npm run typecheck`, `npm run lint`, `npm run build`, `npm run test:no-secrets`, and local `/shipping` plus `/quotes` HTTP 200 smoke. No live provider call, label, export, tracking, migration, deploy, secret, or PII example was added.
+- SFC read-only smoke planning pass added a redacted local plan helper, `smoke:sfc-read-only-plan`, and an owner-scope runbook; verified by `npm run test:sfc-network`, `npm run typecheck`, `npm run lint`, and `npm run test:no-secrets`. No SFC external request, mutation, ASN, order creation, export, label, tracking, deploy, migration, secret, or PII example was added.
+- Non-mutation provider smoke scope was accepted on 2026-05-13. SFC read-only API execution command `smoke:sfc-read-only-api` was added for `getWarehouse`, `getShippingMethod`, `getStock`, and `getRate`/`getRateByMode` only; current local env has no SFC credentials, so execution is blocked before any SFC request. Easyship sandbox `/rates` was attempted with shipment/label/tracking disabled and returned HTTP 401 from the sandbox endpoint; token/scope correction is still required.
+- Completion readiness automation added `check:completion-readiness` / `test:completion-readiness`; local package readiness is `true`, production launch readiness is `false` with explicit blockers for commit/push, preview redeploy, PM baseline, Stripe test env, Easyship 401, SFC credentials, pre-pilot audit, and production go/no-go. Verified by `npm run check:completion-readiness`, `npm run typecheck`, and `npm run lint`.
 
 ## 13. Staging Pilot
 
@@ -255,7 +301,7 @@ Bu dosya ODUN Fulfillment V1 için canonical proje checklist'idir. Her implement
 - [x] `.env.local` Easyship sandbox env user-side configured. Verified by smoke readiness reaching the Easyship sandbox request step without printing token values.
 - [x] Sandbox token was not printed or committed. Verified by redacted smoke output and `npm run test:no-secrets`.
 - [x] `smoke:easyship-sandbox-rates` script eklendi. Verified by `npm run smoke:easyship-sandbox-rates`.
-- [ ] Sandbox `/rates` smoke geçti. BLOCKED: Easyship sandbox returned HTTP 401 Unauthorized from `/2024-09/rates`; verify the sandbox token, Rates scope, and that `.env.local` uses the token from the same Easyship API integration.
+- [ ] Sandbox `/rates` smoke geçti. BLOCKED: owner confirmed Easyship sandbox is the test path; 2026-05-13 run returned HTTP 401 Unauthorized from `/2024-09/rates`; verify the sandbox Bearer token has `public.rate:read` scope and that `.env.local` uses the token from the same 2024-09 Easyship API integration.
 - [x] Shipment/label/export/tracking disabled kaldı. Verified by smoke script forced guards and no shipment/label/tracking endpoint calls.
 - [x] `test:no-secrets`, `typecheck`, `lint`, `build` geçti. Verified by `npm run test:no-secrets`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npm test`.
 
@@ -290,6 +336,72 @@ Bu dosya ODUN Fulfillment V1 için canonical proje checklist'idir. Her implement
 - [x] `test:ops-ui`, `typecheck`, `lint`, `build`, `test:no-secrets`, `npm test` geçti. Verified by focused and full regression.
 - [x] Local smoke for `/`, `/shipping`, `/quotes`, `/handoffs` passed. Verified by HTTP 200 smoke.
 
+## 20. Stitch Import Application Pass
+
+- [x] Stitch zip içeriği incelendi. Verified by `/Users/ersin/Downloads/stitch_untitled_minimalist_project.zip` extraction review.
+- [x] Stitch design tokens app shell'e uyarlandı: light surface, teal primary, Inter stack, 8px radius. Verified by `src/app/globals.css`.
+- [x] Sidebar Stitch konseptine göre açık renk güvenli operasyon menüsüne dönüştürüldü. Verified by `src/components/app-shell.tsx` and `src/app/globals.css`.
+- [x] Kargo Merkezi safety banner, geniş spacing ve kart padding düzeniyle yeniden uygulandı. Verified by `src/components/shipping-console.tsx`.
+- [x] Ana grid ve Kargo Merkezi responsive davranışı taşma/üst üste binme riskine karşı doğrulandı. Verified by responsive CSS and local smoke.
+- [x] `test:ops-ui`, `typecheck`, `lint`, `build`, `test:no-secrets`, `npm test` geçti. Verified after Stitch import pass.
+- [x] Local smoke for `/`, `/shipping`, `/quotes`, `/handoffs` passed. Verified by HTTP 200 smoke on `localhost:3105`.
+
+## 21. SFC China Hub + Easyship Regional Network Plan
+
+- [x] SFC China Hub canonical role documented. Verified by `docs/architecture/SFC_EASYSHIP_NETWORK_PLAN.md`.
+- [x] Easyship US/EU regional last-mile role documented. Verified by `docs/architecture/SFC_EASYSHIP_NETWORK_PLAN.md`.
+- [x] Asia direct DDP route family planned as SFC-owned direct shipment. Verified by route family table.
+- [x] US bulk freight + Easyship last-mile route family planned. Verified by route family table.
+- [x] EU bulk freight + Easyship last-mile route family planned. Verified by route family table.
+- [x] Bulk freight landed-cost allocation model planned. Verified by cost model section.
+- [x] Backer PII provider boundary documented. Verified by safety rules; US/EU bulk freight should not send final backer addresses to SFC.
+- [x] SFC/Easyship implementation phase checklist added. Verified by implementation phases section.
+- [x] SFC read-only SOAP planners implemented. Verified by `src/lib/sfc/request.ts` and `npm run test:sfc-network`.
+- [x] SFC product/customs readiness mapping implemented. Verified by `src/lib/sfc/product.ts` and `npm run test:sfc-network`.
+- [x] Easyship US/EU regional quote planner implemented. Verified by `src/lib/easyship/regional.ts` and `npm run test:sfc-network`.
+- [x] Bulk freight landed-cost preview implemented. Verified by `src/lib/network-plan/landed-cost.ts` and `npm run test:sfc-network`.
+- [x] Bulk freight batch manifest planner implemented. Verified by `src/lib/network-plan/freight-batch.ts` and `npm run test:sfc-network`.
+- [x] SFC China Hub / Product Customs / Freight Batches / Easyship Last-Mile UI implemented. Verified by `src/components/network-readiness.tsx`, `/shipping`, `/quotes`, and `npm run test:ops-ui`.
+- [x] SFC mutation previews stay redacted and disabled. Verified by `buildSfcCreateOrderPreviewPlan`, `buildSfcCreateAsnPreviewPlan`, and `npm run test:sfc-network`.
+- [x] Product/customs sync preview stays local-only and PII-free. Verified by `externalActions: none`, synthetic SFC product sync regression, and `npm run test:no-secrets`.
+- [x] Freight batch manifest stays PII-free. Verified by `containsBackerPii: false`, source-order/SKU-only manifest regression, and `npm run test:sfc-network`.
+- [x] Local-only network phase checks passed. Verified by `npm run test:sfc-network`, `npm run test:ops-ui`, `npm run typecheck`, and `npm run lint`.
+- [ ] Real SFC/Easyship API smoke passed. BLOCKED: owner approved non-mutating provider calls; SFC requires valid read-only credentials/env, and Easyship sandbox token currently returns HTTP 401.
+
+## 22. UX/UI Specialist Ops Polish
+
+- [x] UX/UI worker review completed. Verified by applied patch from worker `Wegener` and maintainer review.
+- [x] App shell/nav density improved for operations scanning. Verified by `src/components/app-shell.tsx`, `src/app/globals.css`, and `npm run test:ops-ui`.
+- [x] Shipping console safety state made more prominent. Verified by `ShippingConsole` safety banner and local `/shipping` HTTP 200 smoke.
+- [x] Interactive table accessibility improved. Verified by `DataTable` keyboard row selection, `aria-live` status line, and `npm run test:ops-ui`.
+- [x] Filtered table selection no longer points at hidden rows. Verified by `src/components/data-table.tsx` source review and `npm run test:ops-ui`.
+- [x] Live/provider/label/export/payment disabled messaging remained visible. Verified by source inspection and `npm run test:ops-ui`.
+- [x] UX/UI polish checks passed. Verified by `npm run test:ops-ui`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run test:no-secrets`.
+- [x] Local smoke for `/shipping` and `/quotes` passed. Verified by HTTP 200 smoke on the preview server.
+
+## 23. SFC Read-only Smoke Planning
+
+- [x] SFC read-only smoke runbook eklendi. Verified by `docs/runbooks/SFC_READ_ONLY_SMOKE.md`.
+- [x] SFC read-only smoke plan helper eklendi. Verified by `createSfcReadOnlySmokePlan` and `npm run test:sfc-network`.
+- [x] Smoke plan sadece read-only SOAP aksiyonları hazırlar. Verified by `getWarehouse`, `getShippingMethod`, `getStock`, and `getRate`/`getRateByMode` regression.
+- [x] Smoke plan credential değerlerini redacted tutar. Verified by synthetic credential regression and `npm run test:no-secrets`.
+- [x] Local planning command eklendi. Verified by `smoke:sfc-read-only-plan` script in `package.json`.
+- [x] Kargo Merkezi UI smoke plan durumunu gösterir. Verified by `NetworkReadiness` `sfc-read-only-smoke-plan` card and `npm run test:ops-ui`.
+- [x] SFC mutation flag guardı smoke plan içinde bloklu kaldı. Verified by `createSfcReadiness` regression.
+- [x] SFC read-only API execution command eklendi. Verified by `smoke:sfc-read-only-api`, `hydrateSfcRequestBodyForExecution`, response summary redaction regression, and `npm run test:sfc-network`.
+- [x] SFC read-only API output raw SOAP body basmaz. Verified by response summary fields: status, content type, byte size, SHA-256, SOAP fault flag, and credential echo flag only.
+- [ ] Real SFC read-only smoke passed. BLOCKED: owner approved non-mutating provider calls, but valid SFC credentials/env are not configured in `.env.local`.
+
+## 24. Completion Readiness Evidence
+
+- [x] Completion readiness checker eklendi. Verified by `scripts/completion-readiness.ts` and `check:completion-readiness`.
+- [x] Completion readiness checker `npm test` içine bağlandı. Verified by `test:completion-readiness` in `package.json`.
+- [x] Operator doküman seti varlığı otomatik doğrulanıyor. Verified by 13 required docs plus 8 guide screenshots in `npm run check:completion-readiness`.
+- [x] PM Supabase boundary otomatik doğrulanıyor. Verified by `pm-supabase-boundary` check in `npm run check:completion-readiness`.
+- [x] Live mutation/provider safety flags otomatik doğrulanıyor. Verified by `live-mutation-flags-disabled`, `easyship-non-mutation-flags`, `sfc-mutations-disabled`, and `sfc-read-only-plan-safe` checks.
+- [x] Local package readiness true. Verified by `npm run check:completion-readiness` returning `okForLocalPackage: true`.
+- [ ] Production launch readiness true. BLOCKED: `npm run check:completion-readiness` reports `okForProductionLaunch: false` until commit/push, preview redeploy smoke, PM baseline, Stripe test env, Easyship HTTP 200 sandbox `/rates`, SFC read-only credentials/smoke, pre-pilot audit, and owner go/no-go are complete.
+
 ## Audit Gates
 
 Sınır Bekçisi veya eşdeğer boundary audit aşağıdaki noktalarda çalıştırılmalı:
@@ -304,4 +416,4 @@ Sınır Bekçisi veya eşdeğer boundary audit aşağıdaki noktalarda çalışt
 
 ## Completion Rule
 
-Nihai uygulama hazır sayılması için Phase 0-14 tamamlanmış, tüm regression'lar geçmiş, PM canlı Phase 1 akışı bozulmamış, Fulfillment PM Supabase'e bağlanmamış ve owner go/no-go onayı alınmış olmalı.
+Nihai uygulama hazır sayılması için Phase 0-24 tamamlanmış, `Final Completion Plan` maddeleri tamamlanmış veya owner tarafından açıkça defer edilmiş, tüm regression'lar geçmiş, PM canlı Phase 1 akışı bozulmamış, Fulfillment PM Supabase'e bağlanmamış, canlı provider/payment/export/mutation sınırları owner onayı olmadan kapalı kalmış ve owner go/no-go onayı alınmış olmalı.

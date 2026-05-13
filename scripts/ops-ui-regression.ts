@@ -40,6 +40,7 @@ for (const component of [
   "src/components/handoff-workbench.tsx",
   "src/components/local-staging-mode-readiness.tsx",
   "src/components/manual-ddp-quote.tsx",
+  "src/components/network-readiness.tsx",
   "src/components/orders-workbench.tsx",
   "src/components/ops-command-center.tsx",
   "src/components/payment-event-workbench.tsx",
@@ -60,6 +61,7 @@ const quotesSource = readFileSync("src/app/quotes/page.tsx", "utf8");
 const reportsSource = readFileSync("src/components/reports-dashboard.tsx", "utf8");
 const stagingReadinessSource = readFileSync("src/components/staging-pilot-readiness.tsx", "utf8");
 const localStagingSource = readFileSync("src/components/local-staging-mode-readiness.tsx", "utf8");
+const networkReadinessSource = readFileSync("src/components/network-readiness.tsx", "utf8");
 const providerReadinessSource = readFileSync("src/components/provider-api-readiness.tsx", "utf8");
 const stripeCheckoutReadinessSource = readFileSync("src/components/stripe-checkout-readiness.tsx", "utf8");
 const appShellSource = readFileSync("src/components/app-shell.tsx", "utf8");
@@ -81,6 +83,7 @@ assert.match(shippingConsoleSource, /Easyship tarzı kargo akışı/);
 assert.match(shippingConsoleSource, /Canlı etiket bas/);
 assert.match(shippingConsoleSource, /Canlı etiket, canlı gönderi ve canlı takip hâlâ kapalıdır/);
 assert.match(shippingPageSource, /Kargo merkezi/);
+assert.match(shippingPageSource, /NetworkReadiness/);
 assert.match(stitchPromptSource, /ODUN Fulfillment V1/);
 assert.match(stitchPromptSource, /PM verisi korunuyor/);
 assert.match(cockpitSource, /OpsCommandCenter/);
@@ -93,6 +96,7 @@ assert.match(paymentsSource, /PaymentEventWorkbench/);
 assert.match(paymentsSource, /StripeCheckoutReadinessPanel/);
 assert.match(paymentsSource, /Ödeme kontrolü/);
 assert.match(quotesSource, /ManualDdpQuote/);
+assert.match(quotesSource, /NetworkReadiness/);
 assert.match(quotesSource, /ProviderApiReadiness/);
 assert.match(quotesSource, /Kargo ücreti çıkar/);
 assert.match(handoffsSource, /Kargoya teslim hazırlığı/);
@@ -104,6 +108,23 @@ assert.match(stagingReadinessSource, /Test Supabase bağla/);
 assert.match(stagingReadinessSource, /Firmaya canlı gönder/);
 assert.match(localStagingSource, /data-testid="vercel-bypass-readiness"/);
 assert.match(localStagingSource, /Yerel test modu/);
+assert.match(networkReadinessSource, /data-testid="network-readiness"/);
+assert.match(networkReadinessSource, /data-testid="sfc-hub-preview"/);
+assert.match(networkReadinessSource, /data-testid="sfc-read-only-smoke-plan"/);
+assert.match(networkReadinessSource, /data-testid="sfc-product-customs-preview"/);
+assert.match(networkReadinessSource, /data-testid="freight-batch-preview"/);
+assert.match(networkReadinessSource, /data-testid="easyship-last-mile-preview"/);
+assert.match(networkReadinessSource, /SFC \+ Easyship ağı/);
+assert.match(networkReadinessSource, /SFC China Hub/);
+assert.match(networkReadinessSource, /SFC read-only smoke/);
+assert.match(networkReadinessSource, /createSfcReadOnlySmokePlan/);
+assert.match(networkReadinessSource, /Product\/customs/);
+assert.match(networkReadinessSource, /Freight batch/);
+assert.match(networkReadinessSource, /Easyship last-mile/);
+assert.match(networkReadinessSource, /SFC stock\/customs payload PII ve secret içermez/);
+assert.match(networkReadinessSource, /US\/EU freight manifestinde final backer adresi yoktur/);
+assert.match(networkReadinessSource, /createFreightBatchPlan/);
+assert.match(networkReadinessSource, /Canlı sağlayıcıya gönder/);
 assert.match(providerReadinessSource, /Maket fiyat/);
 assert.match(providerReadinessSource, /Maket teslim/);
 assert.match(providerReadinessSource, /Maket takip/);

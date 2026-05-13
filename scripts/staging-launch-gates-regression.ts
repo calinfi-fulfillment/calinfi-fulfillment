@@ -10,6 +10,7 @@ const requiredDocs = [
   "docs/runbooks/ROLLBACK_FLAGS.md",
   "docs/runbooks/BACKUP_SNAPSHOT.md",
   "docs/runbooks/LAUNCH_READINESS.md",
+  "docs/runbooks/SFC_READ_ONLY_SMOKE.md",
 ];
 
 for (const docPath of requiredDocs) {
@@ -25,6 +26,8 @@ const envExample = readFileSync(".env.example", "utf8");
 assert.match(envExample, /STRIPE_MODE=test/);
 assert.match(envExample, /PM_SUPABASE_BLOCKED_PROJECT_REF=cjygwbfjekhhvwlyujyj/);
 assert.match(envExample, /FULFILLMENT_ENABLE_PARTNER_API_PUSH=false/);
+assert.match(envExample, /SFC_ENABLE_READ_ONLY_API=false/);
+assert.match(envExample, /SFC_ENABLE_MUTATIONS=false/);
 assert.equal(areLiveMutationFlagsDisabled({}), true);
 assert.equal(isPledgeManagerSupabaseUrl("https://cjygwbfjekhhvwlyujyj.supabase.co"), true);
 
