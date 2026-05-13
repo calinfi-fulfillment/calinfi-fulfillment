@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 
 import { createEasyshipReadiness } from "../src/lib/easyship";
@@ -57,6 +58,14 @@ function envValue(key: string) {
   return String(process.env[key] ?? "").trim();
 }
 
+function gitOutput(args: string[]) {
+  try {
+    return execFileSync("git", args, { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+  } catch {
+    return "";
+  }
+}
+
 const scripts = packageScripts();
 const docChecks: Check[] = requiredDocs.map((path) => ({
   name: `doc:${path}`,
@@ -78,6 +87,10 @@ const pmSupabaseSafe = !isPledgeManagerSupabaseUrl(envValue("NEXT_PUBLIC_SUPABAS
 const easyshipShipmentSafe = envValue("EASYSHIP_ENABLE_SHIPMENTS") !== "true";
 const easyshipTrackingSafe = envValue("EASYSHIP_ENABLE_TRACKING") !== "true";
 const sfcMutationSafe = envValue("SFC_ENABLE_MUTATIONS") !== "true";
+const gitStatus = gitOutput(["status", "--porcelain"]);
+const gitBranch = gitOutput(["branch", "--show-current"]);
+const gitUpstream = gitOutput(["rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}"]);
+const gitAheadCount = Number(gitOutput(["rev-list", "--count", "@{u}..HEAD"]) || "0");
 
 const checks: Check[] = [
   ...docChecks,
@@ -120,7 +133,12 @@ const checks: Check[] = [
 ];
 
 const launchBlockers = [
-  "Local changes still need an intentional commit and PR push.",
+  ...(gitStatus ? ["Local changes still need an intentional commit."] : []),
+  ...(!gitUpstream
+    ? ["Current branch has no upstream remote tracking branch."]
+    : gitAheadCount > 0
+      ? [`Current branch ${gitBranch || "(unknown)"} is ${gitAheadCount} commit(s) ahead of ${gitUpstream}; push is still required.`]
+      : []),
   "Vercel Git integration/account alignment is not confirmed.",
   "Protected preview smoke must be rerun after the latest changes are deployed.",
   "PM production read-only aggregate baseline still requires approved scope.",
@@ -162,6 +180,12 @@ console.log(
       docs: {
         requiredCount: requiredDocs.length,
         screenshotCount: guideScreenshotCount,
+      },
+      git: {
+        branch: gitBranch || "unknown",
+        upstream: gitUpstream || "missing",
+        clean: !gitStatus,
+        aheadCount: Number.isFinite(gitAheadCount) ? gitAheadCount : null,
       },
       launchBlockers,
       externalActions: "none",

@@ -18,10 +18,10 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-24 yerel/s
 
 ### A. Repo / PR Paketleme
 
-- [ ] Son local değişiklikler commitlendi. BLOCKED: current working tree has uncommitted SFC/Easyship/UI/user-guide changes; run full regression before commit.
-- [ ] Branch `codex/phase-13-staging` PR #1'e push edildi. BLOCKED: commit sonrası push gerekiyor.
-- [ ] PR #1 açıklaması güncel final scope, verification, blocked live gates ve no-live-action notlarıyla yenilendi. BLOCKED: commit/push sonrası yapılacak.
-- [ ] Final regression paketi PR üzerinde geçti. BLOCKED: local equivalent passed on 2026-05-13 (`npm test`, `typecheck`, `lint`, `build`, `test:no-secrets`, `check:completion-readiness`), but PR checks require commit/push or Vercel Git resolution.
+- [x] Son local değişiklikler commitlendi. Verified by package commit on `codex/phase-13-staging` after full local regression.
+- [x] Branch `codex/phase-13-staging` PR #1'e push edildi. Verified by `git push -u origin codex/phase-13-staging`.
+- [x] PR #1 açıklaması güncel final scope, verification, blocked live gates ve no-live-action notlarıyla yenilendi. Verified by `gh pr edit 1`.
+- [x] Final regression paketi PR üzerinde/local equivalent olarak geçti. Verified by 2026-05-13 `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, `npm run test:no-secrets`, and `npm run check:completion-readiness`. Note: automatic Vercel PR previews still require Vercel Git integration resolution.
 
 ### B. Staging Pilot Gate
 
@@ -47,7 +47,7 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-24 yerel/s
 ### D. Final Acceptance Criteria
 
 - [ ] All `Final Completion Plan` items are complete or explicitly deferred by owner.
-- [ ] `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run test:no-secrets` pass on the final commit. BLOCKED: passed locally on 2026-05-13, but final commit is not created yet.
+- [x] `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run test:no-secrets` pass on the final package. Verified by 2026-05-13 local regression before PR push.
 - [x] Fulfillment remains disconnected from PM Supabase except approved, read-only PM aggregate checks. Verified by `npm run test:pm-supabase-guard` and `npm run check:completion-readiness`.
 - [x] No raw backer PII, secrets, OTPs, auth links, service-role keys, Stripe live keys, Easyship tokens, or SFC credentials are committed. Verified by `npm run test:no-secrets`.
 - [x] Live label, shipment, tracking, export, partner push, SFC mutation, and Stripe live payment are impossible unless explicitly approved flags/credentials are present. Verified by `npm run test:live-flags`, `npm run test:sfc-network`, `npm run test:easyship-adapter`, and `npm run check:completion-readiness`.
@@ -400,7 +400,7 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-24 yerel/s
 - [x] PM Supabase boundary otomatik doğrulanıyor. Verified by `pm-supabase-boundary` check in `npm run check:completion-readiness`.
 - [x] Live mutation/provider safety flags otomatik doğrulanıyor. Verified by `live-mutation-flags-disabled`, `easyship-non-mutation-flags`, `sfc-mutations-disabled`, and `sfc-read-only-plan-safe` checks.
 - [x] Local package readiness true. Verified by `npm run check:completion-readiness` returning `okForLocalPackage: true`.
-- [ ] Production launch readiness true. BLOCKED: `npm run check:completion-readiness` reports `okForProductionLaunch: false` until commit/push, preview redeploy smoke, PM baseline, Stripe test env, Easyship HTTP 200 sandbox `/rates`, SFC read-only credentials/smoke, pre-pilot audit, and owner go/no-go are complete.
+- [ ] Production launch readiness true. BLOCKED: `npm run check:completion-readiness` reports `okForProductionLaunch: false` until preview redeploy smoke, PM baseline, Stripe test env, Easyship HTTP 200 sandbox `/rates`, SFC read-only credentials/smoke, pre-pilot audit, and owner go/no-go are complete.
 
 ## Audit Gates
 
