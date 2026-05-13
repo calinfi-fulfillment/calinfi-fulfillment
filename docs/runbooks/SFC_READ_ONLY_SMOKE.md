@@ -26,6 +26,7 @@ SFC_WSDL_URL=http://fulfill.sfcservice.com/default/svc/wsdl
 SFC_CUSTOMER_ID=
 SFC_APP_TOKEN=
 SFC_APP_KEY=
+SFC_CERT_ROTATED_CONFIRMED=false
 SFC_ENABLE_READ_ONLY_API=true
 SFC_ENABLE_MUTATIONS=false
 SFC_SMOKE_WAREHOUSE_ID=1
@@ -38,6 +39,18 @@ SFC_SMOKE_SHIPPING_METHOD_CODE=
 ```
 
 Do not paste credentials into docs, tickets, screenshots, or source files. If a credential value was ever shared through a non-secret channel, rotate it in SFC before using it for a production or pilot smoke.
+
+## Env Doctor
+
+```bash
+npm run check:sfc-read-only-env
+```
+
+Expected safe behavior:
+
+- Prints only presence/length checks, not credential values.
+- Confirms `SFC_MODE=read_only`, read-only flag, mutation flag, warehouse ID, stock SKU, rate action, and known WSDL host.
+- Requires `SFC_CERT_ROTATED_CONFIRMED=true` before reporting that the real read-only API smoke is safe to run.
 
 ## Planning Command
 

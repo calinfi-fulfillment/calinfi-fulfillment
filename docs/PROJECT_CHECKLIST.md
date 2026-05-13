@@ -234,6 +234,7 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/s
 - Completion readiness automation added `check:completion-readiness` / `test:completion-readiness`; local package readiness is `true`, production launch readiness is `false` with explicit blockers for commit/push, preview redeploy, PM baseline, Stripe test env, Easyship 401, SFC credentials, pre-pilot audit, and production go/no-go. Verified by `npm run check:completion-readiness`, `npm run typecheck`, and `npm run lint`.
 - SFC negotiation brief pass added the owner-facing SFC requirements runbook, reusable agreement brief model, and Kargo Merkezi agreement panel so SFC can provide the exact read-only credentials/warehouse/method-code inputs needed to finish today. Verified by `npm run test:sfc-network`, `npm run test:ops-ui`, and `npm run test:staging-launch-gates`.
 - SFC API 3.0 PDF and PHP sample alignment pass updated SKU stock smoke to `getStockBySKU`, keeps stock warehouse ID in `HeaderRequest` per sample code, and adds `getRates` as an allowed read-only estimate action. No credential value was copied into repo docs or source.
+- SFC read-only env doctor was added so the real API smoke can be checked without printing credentials. It validates mode, WSDL host, credential presence/length only, read-only/mutation flags, warehouse ID, stock SKU, rate action, and certificate rotation/review confirmation.
 
 ## 13. Staging Pilot
 
@@ -392,6 +393,7 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/s
 - [x] SFC mutation flag guardı smoke plan içinde bloklu kaldı. Verified by `createSfcReadiness` regression.
 - [x] SFC read-only API execution command eklendi. Verified by `smoke:sfc-read-only-api`, `hydrateSfcRequestBodyForExecution`, response summary redaction regression, and `npm run test:sfc-network`.
 - [x] SFC read-only API output raw SOAP body basmaz. Verified by response summary fields: status, content type, byte size, SHA-256, SOAP fault flag, and credential echo flag only.
+- [x] SFC read-only env doctor eklendi. Verified by `check:sfc-read-only-env` script and no credential value output.
 - [ ] Real SFC read-only smoke passed. BLOCKED: owner approved non-mutating provider calls and provided credential values, but credentials are not securely configured in ignored local env yet and warehouse/method details still need confirmation.
 
 ## 24. Completion Readiness Evidence
@@ -413,6 +415,7 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/s
 - [x] Kargo Merkezi içine SFC anlaşma paneli eklendi. Verified by `SfcAgreementBriefPanel` and `npm run test:ops-ui`.
 - [x] SFC resmi kaynak linkleri dokümana eklendi. Verified by `docs/runbooks/SFC_NEGOTIATION_BRIEF.md`.
 - [x] SFC read-only credential seti teslim alındı. Verified by owner-provided API user/token/key; values were not echoed or stored in repo.
+- [ ] SFC API certificate rotate/review confirmed. BLOCKED: because credential values crossed a non-secret channel, set `SFC_CERT_ROTATED_CONFIRMED=true` only after rotation or explicit owner approval.
 - [ ] SFC warehouse ve DDP method-code detayları doğrulandı. BLOCKED: SFC must confirm canonical ODUN warehouse ID and approved Asia DDP shipping method code(s).
 
 ## 26. SFC API Sample Alignment
@@ -420,6 +423,7 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/s
 - [x] SFC API 3.0 PDF alanları incelendi. Verified by local PDF review for HeaderRequest, `getStockBySKU`, `getWarehouse`, `getShippingMethod`, `getRate`, `getRateByMode`, `getRates`, and `getStock`.
 - [x] PHP stock sample ile planner hizalandı. Verified by `buildSfcStockPlan` using `getStockBySKU` and HeaderRequest-level warehouse ID.
 - [x] PHP shipping fee estimate sample desteklendi. Verified by `buildSfcRatesEstimatePlan` using read-only `getRates`.
+- [x] Real smoke öncesi env gate eklendi. Verified by `npm run check:sfc-read-only-env`.
 - [ ] Gerçek SFC read-only smoke çalıştı. BLOCKED: secure ignored env configuration, warehouse ID, and DDP method code confirmation are still needed before running `smoke:sfc-read-only-api`.
 
 ## Audit Gates

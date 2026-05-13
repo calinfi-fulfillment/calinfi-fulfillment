@@ -35,6 +35,7 @@ const requiredScripts = [
   "build",
   "lint",
   "typecheck",
+  "check:sfc-read-only-env",
   "test",
   "test:no-secrets",
   "test:sfc-network",
@@ -88,6 +89,7 @@ const pmSupabaseSafe = !isPledgeManagerSupabaseUrl(envValue("NEXT_PUBLIC_SUPABAS
 const easyshipShipmentSafe = envValue("EASYSHIP_ENABLE_SHIPMENTS") !== "true";
 const easyshipTrackingSafe = envValue("EASYSHIP_ENABLE_TRACKING") !== "true";
 const sfcMutationSafe = envValue("SFC_ENABLE_MUTATIONS") !== "true";
+const sfcCertificateReviewed = envValue("SFC_CERT_ROTATED_CONFIRMED") === "true";
 const gitStatus = gitOutput(["status", "--porcelain"]);
 const gitBranch = gitOutput(["branch", "--show-current"]);
 const gitUpstream = gitOutput(["rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}"]);
@@ -150,6 +152,7 @@ const launchBlockers = [
   sfcSmokePlan.ok
     ? "SFC read-only plan is ready, but real read-only API smoke still needs HTTP 200 evidence."
     : `SFC read-only smoke is ${sfcSmokePlan.code}; valid read-only credentials/env are still required.`,
+  ...(!sfcCertificateReviewed ? ["SFC certificate rotation/review confirmation is still required before pilot/prod smoke."] : []),
   "Formal pre-pilot Sınır Bekçisi audit is still pending.",
   "Production environment, backup timing, final audit, owner go/no-go, and production smoke are still pending.",
 ];

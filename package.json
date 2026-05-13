@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "check:completion-readiness": "tsx scripts/completion-readiness.ts",
     "check:preflight": "tsx scripts/preflight.ts",
+    "check:sfc-read-only-env": "tsx scripts/sfc-read-only-env-check.ts",
     "check:staging-prep": "tsx scripts/staging-prep.ts",
     "check:staging-schema-public": "tsx scripts/staging-schema-public-regression.ts",
     "smoke:easyship-sandbox-rates": "tsx scripts/easyship-sandbox-rates-smoke.ts",
