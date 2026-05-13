@@ -26,6 +26,7 @@ const requiredDocs = [
   "docs/runbooks/BACKUP_SNAPSHOT.md",
   "docs/runbooks/LAUNCH_READINESS.md",
   "docs/runbooks/SFC_READ_ONLY_SMOKE.md",
+  "docs/runbooks/SFC_NEGOTIATION_BRIEF.md",
   "docs/architecture/SFC_EASYSHIP_NETWORK_PLAN.md",
   "docs/audits/2026-05-11_LOCAL_BOUNDARY_AUDIT.md",
 ];

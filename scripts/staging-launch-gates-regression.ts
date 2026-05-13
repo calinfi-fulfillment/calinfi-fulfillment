@@ -11,6 +11,7 @@ const requiredDocs = [
   "docs/runbooks/BACKUP_SNAPSHOT.md",
   "docs/runbooks/LAUNCH_READINESS.md",
   "docs/runbooks/SFC_READ_ONLY_SMOKE.md",
+  "docs/runbooks/SFC_NEGOTIATION_BRIEF.md",
 ];
 
 for (const docPath of requiredDocs) {

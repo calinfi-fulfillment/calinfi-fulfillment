@@ -14,7 +14,7 @@ Bu dosya ODUN Fulfillment V1 için canonical proje checklist'idir. Her implement
 
 ## Final Completion Plan
 
-Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-24 yerel/staging ürün yüzeyi ve güvenlik hazırlığı olarak tamamlanmış kabul edilir; kalan işler canlıya geçiş kapılarıdır.
+Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/staging ürün yüzeyi ve güvenlik hazırlığı olarak tamamlanmış kabul edilir; kalan işler canlıya geçiş kapılarıdır.
 
 ### A. Repo / PR Paketleme
 
@@ -232,6 +232,7 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-24 yerel/s
 - SFC read-only smoke planning pass added a redacted local plan helper, `smoke:sfc-read-only-plan`, and an owner-scope runbook; verified by `npm run test:sfc-network`, `npm run typecheck`, `npm run lint`, and `npm run test:no-secrets`. No SFC external request, mutation, ASN, order creation, export, label, tracking, deploy, migration, secret, or PII example was added.
 - Non-mutation provider smoke scope was accepted on 2026-05-13. SFC read-only API execution command `smoke:sfc-read-only-api` was added for `getWarehouse`, `getShippingMethod`, `getStock`, and `getRate`/`getRateByMode` only; current local env has no SFC credentials, so execution is blocked before any SFC request. Easyship sandbox `/rates` was attempted with shipment/label/tracking disabled and returned HTTP 401 from the sandbox endpoint; token/scope correction is still required.
 - Completion readiness automation added `check:completion-readiness` / `test:completion-readiness`; local package readiness is `true`, production launch readiness is `false` with explicit blockers for commit/push, preview redeploy, PM baseline, Stripe test env, Easyship 401, SFC credentials, pre-pilot audit, and production go/no-go. Verified by `npm run check:completion-readiness`, `npm run typecheck`, and `npm run lint`.
+- SFC negotiation brief pass added the owner-facing SFC requirements runbook, reusable agreement brief model, and Kargo Merkezi agreement panel so SFC can provide the exact read-only credentials/warehouse/method-code inputs needed to finish today. Verified by `npm run test:sfc-network`, `npm run test:ops-ui`, and `npm run test:staging-launch-gates`.
 
 ## 13. Staging Pilot
 
@@ -402,6 +403,16 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-24 yerel/s
 - [x] Local package readiness true. Verified by `npm run check:completion-readiness` returning `okForLocalPackage: true`.
 - [ ] Production launch readiness true. BLOCKED: `npm run check:completion-readiness` reports `okForProductionLaunch: false` until preview redeploy smoke, PM baseline, Stripe test env, Easyship HTTP 200 sandbox `/rates`, SFC read-only credentials/smoke, pre-pilot audit, and owner go/no-go are complete.
 
+## 25. SFC Same-day Agreement Brief
+
+- [x] SFC same-day negotiation brief eklendi. Verified by `docs/runbooks/SFC_NEGOTIATION_BRIEF.md`.
+- [x] SFC'den istenecek read-only aksiyonlar tek yerde toplandı. Verified by `createSfcAgreementBrief` read-only action regression.
+- [x] SFC credential, warehouse, stock, rate ve DDP method-code kabul kriterleri yazıldı. Verified by brief required item regression.
+- [x] Mutation pilot sınırı ayrı tutuldu. Verified by `createOrder`, `createASN`, and product mutation boundary checks.
+- [x] Kargo Merkezi içine SFC anlaşma paneli eklendi. Verified by `SfcAgreementBriefPanel` and `npm run test:ops-ui`.
+- [x] SFC resmi kaynak linkleri dokümana eklendi. Verified by `docs/runbooks/SFC_NEGOTIATION_BRIEF.md`.
+- [ ] SFC read-only credential teslim alındı. BLOCKED: requires SFC to provide customerId/appToken/appKey and confirmed warehouse/method details.
+
 ## Audit Gates
 
 Sınır Bekçisi veya eşdeğer boundary audit aşağıdaki noktalarda çalıştırılmalı:
@@ -416,4 +427,4 @@ Sınır Bekçisi veya eşdeğer boundary audit aşağıdaki noktalarda çalışt
 
 ## Completion Rule
 
-Nihai uygulama hazır sayılması için Phase 0-24 tamamlanmış, `Final Completion Plan` maddeleri tamamlanmış veya owner tarafından açıkça defer edilmiş, tüm regression'lar geçmiş, PM canlı Phase 1 akışı bozulmamış, Fulfillment PM Supabase'e bağlanmamış, canlı provider/payment/export/mutation sınırları owner onayı olmadan kapalı kalmış ve owner go/no-go onayı alınmış olmalı.
+Nihai uygulama hazır sayılması için Phase 0-25 tamamlanmış, `Final Completion Plan` maddeleri tamamlanmış veya owner tarafından açıkça defer edilmiş, tüm regression'lar geçmiş, PM canlı Phase 1 akışı bozulmamış, Fulfillment PM Supabase'e bağlanmamış, canlı provider/payment/export/mutation sınırları owner onayı olmadan kapalı kalmış ve owner go/no-go onayı alınmış olmalı.

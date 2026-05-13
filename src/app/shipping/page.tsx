@@ -1,6 +1,7 @@
 import { AppShell } from "@/components/app-shell";
 import { NetworkReadiness } from "@/components/network-readiness";
 import { ShippingConsole } from "@/components/shipping-console";
+import { SfcAgreementBriefPanel } from "@/components/sfc-agreement-brief";
 
 export default function ShippingPage() {
   return (
@@ -12,6 +13,7 @@ export default function ShippingPage() {
     >
       <ShippingConsole />
       <NetworkReadiness />
+      <SfcAgreementBriefPanel />
     </AppShell>
   );
 }

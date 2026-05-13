@@ -11,6 +11,7 @@ import {
   buildSfcRatePlan,
   buildSfcStockPlan,
   hydrateSfcRequestBodyForExecution,
+  createSfcAgreementBrief,
   createSfcReadOnlySmokePlan,
   createSfcProductSyncLine,
   createSfcProductSyncPreview,
@@ -48,6 +49,13 @@ assert.equal(manualRoute.routeFamily, "MANUAL_SPECIAL");
 assert.equal(manualRoute.freightLegProvider, "manual");
 assert.equal(manualRoute.lastMileProvider, "manual");
 assert.equal(manualRoute.sendsBackerPiiToSfc, false);
+
+const agreementBrief = createSfcAgreementBrief();
+assert.deepEqual(agreementBrief.readOnlyActions, ["getWarehouse", "getShippingMethod", "getStock", "getRate", "getRateByMode"]);
+assert.equal(agreementBrief.requiredItems.some((item) => item.id === "credentials"), true);
+assert.equal(agreementBrief.requiredItems.some((item) => item.id === "mutations" && item.status === "later"), true);
+assert.equal(agreementBrief.mutationBoundary.some((item) => item.includes("createOrder")), true);
+assert.equal(JSON.stringify(agreementBrief).includes("SFC_APP_TOKEN="), false);
 
 const landedCost = createLandedCostPreview({
   routeFamily: "SFC_TO_US_FREIGHT_EASYSHIP",

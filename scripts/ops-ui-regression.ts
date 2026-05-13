@@ -46,6 +46,7 @@ for (const component of [
   "src/components/payment-event-workbench.tsx",
   "src/components/provider-api-readiness.tsx",
   "src/components/reports-dashboard.tsx",
+  "src/components/sfc-agreement-brief.tsx",
   "src/components/staging-pilot-readiness.tsx",
   "src/components/stripe-checkout-readiness.tsx",
 ]) {
@@ -63,6 +64,7 @@ const stagingReadinessSource = readFileSync("src/components/staging-pilot-readin
 const localStagingSource = readFileSync("src/components/local-staging-mode-readiness.tsx", "utf8");
 const networkReadinessSource = readFileSync("src/components/network-readiness.tsx", "utf8");
 const providerReadinessSource = readFileSync("src/components/provider-api-readiness.tsx", "utf8");
+const sfcAgreementBriefSource = readFileSync("src/components/sfc-agreement-brief.tsx", "utf8");
 const stripeCheckoutReadinessSource = readFileSync("src/components/stripe-checkout-readiness.tsx", "utf8");
 const appShellSource = readFileSync("src/components/app-shell.tsx", "utf8");
 const labelsSource = readFileSync("src/lib/ops-ui/labels.ts", "utf8");
@@ -84,6 +86,7 @@ assert.match(shippingConsoleSource, /Canlı etiket bas/);
 assert.match(shippingConsoleSource, /Canlı etiket, canlı gönderi ve canlı takip hâlâ kapalıdır/);
 assert.match(shippingPageSource, /Kargo merkezi/);
 assert.match(shippingPageSource, /NetworkReadiness/);
+assert.match(shippingPageSource, /SfcAgreementBriefPanel/);
 assert.match(stitchPromptSource, /ODUN Fulfillment V1/);
 assert.match(stitchPromptSource, /PM verisi korunuyor/);
 assert.match(cockpitSource, /OpsCommandCenter/);
@@ -125,6 +128,14 @@ assert.match(networkReadinessSource, /SFC stock\/customs payload PII ve secret i
 assert.match(networkReadinessSource, /US\/EU freight manifestinde final backer adresi yoktur/);
 assert.match(networkReadinessSource, /createFreightBatchPlan/);
 assert.match(networkReadinessSource, /Canlı sağlayıcıya gönder/);
+assert.match(sfcAgreementBriefSource, /data-testid="sfc-agreement-brief"/);
+assert.match(sfcAgreementBriefSource, /Bugün SFC&apos;den ne istemeliyiz/);
+assert.match(sfcAgreementBriefSource, /data-testid=\{`sfc-agreement-\$\{item\.id\}`\}/);
+assert.match(sfcAgreementBriefSource, /"api-access": ClipboardCheck/);
+assert.match(sfcAgreementBriefSource, /credentials: KeyRound/);
+assert.match(sfcAgreementBriefSource, /warehouse: Warehouse/);
+assert.match(sfcAgreementBriefSource, /data-testid="sfc-agreement-boundary"/);
+assert.match(sfcAgreementBriefSource, /createSfcAgreementBrief/);
 assert.match(providerReadinessSource, /Maket fiyat/);
 assert.match(providerReadinessSource, /Maket teslim/);
 assert.match(providerReadinessSource, /Maket takip/);

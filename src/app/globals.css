@@ -836,6 +836,20 @@ td input[type="radio"] {
   padding: 12px;
 }
 
+.button-card {
+  background: var(--card);
+  color: inherit;
+  cursor: pointer;
+  min-height: 120px;
+  text-align: left;
+  width: 100%;
+}
+
+.button-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 8px 22px rgba(20, 83, 74, 0.08);
+}
+
 .network-card > div:first-child {
   align-items: center;
   display: flex;
