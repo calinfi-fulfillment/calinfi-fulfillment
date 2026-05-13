@@ -13,7 +13,7 @@ Owner approved non-mutating provider checks on 2026-05-13. This runbook allows o
 - Confirm the SFC account and warehouse are safe for read-only checks.
 - Configure credentials only in ignored local environment storage.
 - Keep `SFC_ENABLE_MUTATIONS=false`.
-- Use only read-only actions: `getWarehouse`, `getShippingMethod`, `getStock`, and `getRate`.
+- Use only read-only actions: `getWarehouse`, `getShippingMethod`, `getStockBySKU`, and `getRate`/`getRateByMode`/`getRates`.
 - Do not print raw SFC SOAP request/response bodies in notes, tickets, screenshots, or logs.
 
 ## Local Setup
@@ -31,10 +31,13 @@ SFC_ENABLE_MUTATIONS=false
 SFC_SMOKE_WAREHOUSE_ID=1
 SFC_SMOKE_STOCK_SKU=CLF-ODN-CORE
 SFC_SMOKE_COUNTRY=HK
+SFC_SMOKE_STATE=
+SFC_SMOKE_DIVISION_ID=
+SFC_SMOKE_ZIP_CODE=
 SFC_SMOKE_SHIPPING_METHOD_CODE=
 ```
 
-Do not paste credentials into docs, tickets, screenshots, or source files.
+Do not paste credentials into docs, tickets, screenshots, or source files. If a credential value was ever shared through a non-secret channel, rotate it in SFC before using it for a production or pilot smoke.
 
 ## Planning Command
 
@@ -59,7 +62,7 @@ npm run smoke:sfc-read-only-api
 
 Expected safe behavior:
 
-- Executes only `getWarehouse`, `getShippingMethod`, `getStock`, and `getRate`/`getRateByMode`.
+- Executes only `getWarehouse`, `getShippingMethod`, `getStockBySKU`, and read-only rate lookup actions.
 - Sends configured SFC credentials only inside the SOAP request body.
 - Does not print raw request bodies, raw response bodies, credentials, or PII.
 - Prints only action names, HTTP status, content type, response byte size, response SHA-256, SOAP fault flag, and credential echo flag.

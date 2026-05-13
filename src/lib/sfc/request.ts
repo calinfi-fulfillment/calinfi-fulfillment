@@ -3,7 +3,16 @@ import { z } from "zod";
 import type { SafetyEnv } from "../safety";
 import { sfcWsdlUrl } from "./config";
 
-export type SfcSoapAction = "getWarehouse" | "getShippingMethod" | "getRate" | "getRateByMode" | "getStock" | "createOrder" | "createASN";
+export type SfcSoapAction =
+  | "getWarehouse"
+  | "getShippingMethod"
+  | "getRate"
+  | "getRateByMode"
+  | "getRates"
+  | "getStock"
+  | "getStockBySKU"
+  | "createOrder"
+  | "createASN";
 
 export type SfcSoapRequestPlan = {
   provider: "sendfromchina";
@@ -30,13 +39,25 @@ export const SfcRateRequestSchema = z.object({
 export type SfcRateRequest = z.infer<typeof SfcRateRequestSchema>;
 
 export const SfcStockRequestSchema = z.object({
-  sku: z.string().min(1).optional(),
+  sku: z.string().min(1),
   warehouseId: z.number().int().positive().optional(),
-  page: z.number().int().positive().default(1),
-  pageSize: z.number().int().positive().max(100).default(20),
 });
 
 export type SfcStockRequest = z.infer<typeof SfcStockRequestSchema>;
+
+export const SfcRatesEstimateRequestSchema = z.object({
+  country: z.string().min(2),
+  weightKg: z.number().positive(),
+  state: z.string().min(1).optional(),
+  lengthCm: z.number().positive().optional(),
+  widthCm: z.number().positive().optional(),
+  heightCm: z.number().positive().optional(),
+  priceType: z.enum(["1", "2"]).default("1"),
+  divisionId: z.string().min(1).optional(),
+  zipCode: z.string().min(1).optional(),
+});
+
+export type SfcRatesEstimateRequest = z.infer<typeof SfcRatesEstimateRequestSchema>;
 
 export const SfcOrderPreviewSchema = z.object({
   referenceNo: z.string().min(1).max(32),
@@ -83,17 +104,22 @@ function escapeXml(value: string | number | boolean | undefined) {
     .replaceAll("'", "&apos;");
 }
 
-function headerXml() {
-  return `<HeaderRequest><customerId>&lt;configured&gt;</customerId><appToken>&lt;configured&gt;</appToken><appKey>&lt;configured&gt;</appKey><langId>2</langId></HeaderRequest>`;
+function tag(name: string, value: string | number | boolean | undefined) {
+  if (value === undefined || value === "") return "";
+  return `<${name}>${escapeXml(value)}</${name}>`;
 }
 
-function envelope(action: SfcSoapAction, innerXml: string) {
+function headerXml(innerXml = "") {
+  return `<HeaderRequest><customerId>&lt;configured&gt;</customerId><appToken>&lt;configured&gt;</appToken><appKey>&lt;configured&gt;</appKey><langId>2</langId>${innerXml}</HeaderRequest>`;
+}
+
+function envelope(action: SfcSoapAction, innerXml: string, headerInnerXml = "") {
   return [
     `<?xml version="1.0" encoding="UTF-8"?>`,
     `<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cff="http://www.chinafulfill.com/CffSvc/">`,
     `<soapenv:Header/>`,
     `<soapenv:Body>`,
-    `<cff:${action}Request>${headerXml()}${innerXml}</cff:${action}Request>`,
+    `<cff:${action}Request>${headerXml(headerInnerXml)}${innerXml}</cff:${action}Request>`,
     `</soapenv:Body>`,
     `</soapenv:Envelope>`,
   ].join("");
@@ -120,24 +146,22 @@ export function buildSfcGetWarehousePlan(env?: SafetyEnv) {
 }
 
 export function buildSfcGetShippingMethodPlan(input: { warehouseId?: number }, env?: SafetyEnv) {
-  const innerXml = input.warehouseId ? `<warehouseId>${escapeXml(input.warehouseId)}</warehouseId>` : "";
+  const innerXml = tag("warehouseId", input.warehouseId);
   return plan("getShippingMethod", envelope("getShippingMethod", innerXml), false, env);
 }
 
 export function buildSfcRatePlan(input: SfcRateRequest, env?: SafetyEnv) {
   const parsed = SfcRateRequestSchema.parse(input);
   const action: SfcSoapAction = parsed.shippingMethodCode ? "getRateByMode" : "getRate";
-  const maybeShippingMethod = parsed.shippingMethodCode ? `<shippingmethod>${escapeXml(parsed.shippingMethodCode)}</shippingmethod>` : "";
-  const maybeWarehouse = parsed.warehouseId ? `<warehouseId>${escapeXml(parsed.warehouseId)}</warehouseId>` : "";
   const innerXml = [
     `<ratesRequestInfo>`,
     `<country>${escapeXml(parsed.country)}</country>`,
-    maybeShippingMethod,
+    tag("shippingmethod", parsed.shippingMethodCode),
     `<weight>${escapeXml(parsed.weightKg)}</weight>`,
-    parsed.lengthCm ? `<length>${escapeXml(parsed.lengthCm)}</length>` : "",
-    parsed.widthCm ? `<width>${escapeXml(parsed.widthCm)}</width>` : "",
-    parsed.heightCm ? `<height>${escapeXml(parsed.heightCm)}</height>` : "",
-    maybeWarehouse,
+    tag("length", parsed.lengthCm),
+    tag("width", parsed.widthCm),
+    tag("height", parsed.heightCm),
+    tag("warehouseId", parsed.warehouseId),
     `<priceType>${escapeXml(parsed.priceType)}</priceType>`,
     `</ratesRequestInfo>`,
   ].join("");
@@ -145,15 +169,31 @@ export function buildSfcRatePlan(input: SfcRateRequest, env?: SafetyEnv) {
   return plan(action, envelope(action, innerXml), false, env);
 }
 
-export function buildSfcStockPlan(input: SfcStockRequest, env?: SafetyEnv) {
-  const parsed = SfcStockRequestSchema.parse(input);
+export function buildSfcRatesEstimatePlan(input: SfcRatesEstimateRequest, env?: SafetyEnv) {
+  const parsed = SfcRatesEstimateRequestSchema.parse(input);
   const innerXml = [
-    parsed.sku ? `<sku>${escapeXml(parsed.sku)}</sku>` : "",
-    parsed.warehouseId ? `<warehouseId>${escapeXml(parsed.warehouseId)}</warehouseId>` : "",
-    `<steps><pageSize>${escapeXml(parsed.pageSize)}</pageSize><page>${escapeXml(parsed.page)}</page></steps>`,
+    `<ratesRequestInfo>`,
+    `<weight>${escapeXml(parsed.weightKg)}</weight>`,
+    tag("state", parsed.state),
+    `<country>${escapeXml(parsed.country)}</country>`,
+    tag("length", parsed.lengthCm),
+    tag("width", parsed.widthCm),
+    tag("height", parsed.heightCm),
+    `<priceType>${escapeXml(parsed.priceType)}</priceType>`,
+    tag("divisionId", parsed.divisionId),
+    tag("zipCode", parsed.zipCode),
+    `</ratesRequestInfo>`,
   ].join("");
 
-  return plan("getStock", envelope("getStock", innerXml), false, env);
+  return plan("getRates", envelope("getRates", innerXml), false, env);
+}
+
+export function buildSfcStockPlan(input: SfcStockRequest, env?: SafetyEnv) {
+  const parsed = SfcStockRequestSchema.parse(input);
+  const headerInnerXml = tag("warehouseId", parsed.warehouseId);
+  const innerXml = `<sku>${escapeXml(parsed.sku)}</sku>`;
+
+  return plan("getStockBySKU", envelope("getStockBySKU", innerXml, headerInnerXml), false, env);
 }
 
 export function buildSfcCreateOrderPreviewPlan(input: SfcOrderPreview, env?: SafetyEnv) {

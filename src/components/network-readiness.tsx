@@ -138,7 +138,7 @@ export function NetworkReadiness() {
         shippingMethodCode: routePlan.lastMileProvider === "sendfromchina" ? "SFC-DDP-PREVIEW" : undefined,
         priceType: "1",
       }),
-      buildSfcStockPlan({ sku: "CLF-ODN-CORE", warehouseId: 1, page: 1, pageSize: 20 }),
+      buildSfcStockPlan({ sku: "CLF-ODN-CORE", warehouseId: 1 }),
     ],
     [countryCode, routePlan.lastMileProvider],
   );

@@ -30,7 +30,7 @@ export function createSfcAgreementBrief(): SfcAgreementBrief {
         url: "https://fulfill.sendfromchina.com/file/Cff-API-3.0.pdf",
       },
     ],
-    readOnlyActions: ["getWarehouse", "getShippingMethod", "getStock", "getRate", "getRateByMode"],
+    readOnlyActions: ["getWarehouse", "getShippingMethod", "getStockBySKU", "getRate", "getRateByMode", "getRates"],
     requiredItems: [
       {
         id: "api-access",
@@ -56,15 +56,15 @@ export function createSfcAgreementBrief(): SfcAgreementBrief {
       {
         id: "stock",
         title: "Stok ve SKU eşleşmesi",
-        ownerAsk: "ODUN SKU kodları için stock lookup izinleri ve beklenen warehouse stock alanları.",
-        acceptance: "getStock ODUN test SKU için credential echo veya SOAP fault olmadan özetlenir.",
+        ownerAsk: "ODUN SKU kodları için getStockBySKU izni ve beklenen warehouse stock alanları.",
+        acceptance: "getStockBySKU ODUN test SKU için credential echo veya SOAP fault olmadan özetlenir.",
         status: "required",
       },
       {
         id: "rates",
         title: "DDP/rate metotları",
-        ownerAsk: "Asya DDP için approved shipping method code listesi ve rate parametreleri.",
-        acceptance: "getRate/getRateByMode ülke, ağırlık ve ölçüyle başarılı döner.",
+        ownerAsk: "Asya DDP için approved shipping method code listesi ve getRate/getRateByMode/getRates parametreleri.",
+        acceptance: "Rate smoke ülke, ağırlık ve ölçüyle başarılı döner.",
         status: "required",
       },
       {

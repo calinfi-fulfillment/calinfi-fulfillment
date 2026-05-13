@@ -15,7 +15,15 @@ export type SfcReadOnlyExecutionSummary = {
   containsCredentialEcho: boolean;
 };
 
-const READ_ONLY_ACTIONS = new Set<SfcSoapAction>(["getWarehouse", "getShippingMethod", "getRate", "getRateByMode", "getStock"]);
+const READ_ONLY_ACTIONS = new Set<SfcSoapAction>([
+  "getWarehouse",
+  "getShippingMethod",
+  "getRate",
+  "getRateByMode",
+  "getRates",
+  "getStock",
+  "getStockBySKU",
+]);
 
 function envValue(env: SafetyEnv, key: string) {
   return String(env[key] ?? "").trim();

@@ -107,7 +107,7 @@ ODUN Fulfillment:
 
 1. Document SFC + Easyship network model.
 2. Add route family/types and fixture examples.
-3. Add SFC read-only SOAP request planners: `getWarehouse`, `getShippingMethod`, `getRate`, `getStock`.
+3. Add SFC read-only SOAP request planners: `getWarehouse`, `getShippingMethod`, `getStockBySKU`, and read-only rate lookup.
 4. Add SFC product/customs readiness mapping.
 5. Add bulk freight batch planning and landed-cost allocation model.
 6. Add Easyship regional last-mile quote planner for US/EU.

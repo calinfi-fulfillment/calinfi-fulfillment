@@ -12,6 +12,9 @@ const plan = createSfcReadOnlySmokePlan({
   warehouseId: Number(process.env.SFC_SMOKE_WAREHOUSE_ID || 1),
   stockSku: process.env.SFC_SMOKE_STOCK_SKU || "CLF-ODN-CORE",
   country: process.env.SFC_SMOKE_COUNTRY || "HK",
+  state: process.env.SFC_SMOKE_STATE || undefined,
+  divisionId: process.env.SFC_SMOKE_DIVISION_ID || undefined,
+  zipCode: process.env.SFC_SMOKE_ZIP_CODE || undefined,
   shippingMethodCode: process.env.SFC_SMOKE_SHIPPING_METHOD_CODE || undefined,
 });
 

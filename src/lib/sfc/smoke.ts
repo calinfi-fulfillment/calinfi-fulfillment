@@ -1,6 +1,12 @@
 import type { SafetyEnv } from "../safety";
 import { createSfcReadiness } from "./config";
-import { buildSfcGetShippingMethodPlan, buildSfcGetWarehousePlan, buildSfcRatePlan, buildSfcStockPlan } from "./request";
+import {
+  buildSfcGetShippingMethodPlan,
+  buildSfcGetWarehousePlan,
+  buildSfcRatePlan,
+  buildSfcRatesEstimatePlan,
+  buildSfcStockPlan,
+} from "./request";
 
 export type SfcReadOnlySmokePlanInput = {
   warehouseId?: number;
@@ -10,6 +16,9 @@ export type SfcReadOnlySmokePlanInput = {
   lengthCm?: number;
   widthCm?: number;
   heightCm?: number;
+  state?: string;
+  divisionId?: string;
+  zipCode?: string;
   shippingMethodCode?: string;
 };
 
@@ -25,7 +34,11 @@ export type SfcReadOnlySmokePlan = {
     detail: string;
   }>;
   requests: ReturnType<
-    typeof buildSfcGetWarehousePlan | typeof buildSfcGetShippingMethodPlan | typeof buildSfcRatePlan | typeof buildSfcStockPlan
+    | typeof buildSfcGetWarehousePlan
+    | typeof buildSfcGetShippingMethodPlan
+    | typeof buildSfcRatePlan
+    | typeof buildSfcRatesEstimatePlan
+    | typeof buildSfcStockPlan
   >[];
   externalActions: "none";
 };
@@ -44,23 +57,40 @@ export function createSfcReadOnlySmokePlan(
 ): SfcReadOnlySmokePlan {
   const readiness = createSfcReadiness(env);
   const warehouseId = input.warehouseId ?? 1;
+  const stockSku = input.stockSku ?? "CLF-ODN-CORE";
+  const rateRequest = input.shippingMethodCode
+    ? buildSfcRatePlan(
+        {
+          country: input.country ?? "HK",
+          weightKg: input.weightKg ?? 1.2,
+          lengthCm: input.lengthCm ?? 30,
+          widthCm: input.widthCm ?? 20,
+          heightCm: input.heightCm ?? 12,
+          warehouseId,
+          shippingMethodCode: input.shippingMethodCode,
+          priceType: "1",
+        },
+        env,
+      )
+    : buildSfcRatesEstimatePlan(
+        {
+          country: input.country ?? "HK",
+          state: input.state,
+          weightKg: input.weightKg ?? 1.2,
+          lengthCm: input.lengthCm ?? 30,
+          widthCm: input.widthCm ?? 20,
+          heightCm: input.heightCm ?? 12,
+          priceType: "1",
+          divisionId: input.divisionId,
+          zipCode: input.zipCode,
+        },
+        env,
+      );
   const requests = [
     buildSfcGetWarehousePlan(env),
     buildSfcGetShippingMethodPlan({ warehouseId }, env),
-    buildSfcStockPlan({ sku: input.stockSku, warehouseId, page: 1, pageSize: 20 }, env),
-    buildSfcRatePlan(
-      {
-        country: input.country ?? "HK",
-        weightKg: input.weightKg ?? 1.2,
-        lengthCm: input.lengthCm ?? 30,
-        widthCm: input.widthCm ?? 20,
-        heightCm: input.heightCm ?? 12,
-        warehouseId,
-        shippingMethodCode: input.shippingMethodCode,
-        priceType: "1",
-      },
-      env,
-    ),
+    buildSfcStockPlan({ sku: stockSku, warehouseId }, env),
+    rateRequest,
   ];
   const onlyReadOnlyPlans = requests.every((request) => !request.mutation && request.externalActions === "none");
   const secretsRedacted = !containsConfiguredSecret(JSON.stringify(requests), env);
@@ -78,7 +108,9 @@ export function createSfcReadOnlySmokePlan(
       {
         name: "read-only-actions-only",
         ok: onlyReadOnlyPlans,
-        detail: onlyReadOnlyPlans ? "Only getWarehouse, getShippingMethod, getStock, and getRate plans are prepared." : "A mutation plan was detected.",
+        detail: onlyReadOnlyPlans
+          ? "Only getWarehouse, getShippingMethod, getStockBySKU, and read-only rate plans are prepared."
+          : "A mutation plan was detected.",
       },
       {
         name: "credentials-redacted",

@@ -9,6 +9,7 @@ import {
   buildSfcGetShippingMethodPlan,
   buildSfcGetWarehousePlan,
   buildSfcRatePlan,
+  buildSfcRatesEstimatePlan,
   buildSfcStockPlan,
   hydrateSfcRequestBodyForExecution,
   createSfcAgreementBrief,
@@ -51,7 +52,14 @@ assert.equal(manualRoute.lastMileProvider, "manual");
 assert.equal(manualRoute.sendsBackerPiiToSfc, false);
 
 const agreementBrief = createSfcAgreementBrief();
-assert.deepEqual(agreementBrief.readOnlyActions, ["getWarehouse", "getShippingMethod", "getStock", "getRate", "getRateByMode"]);
+assert.deepEqual(agreementBrief.readOnlyActions, [
+  "getWarehouse",
+  "getShippingMethod",
+  "getStockBySKU",
+  "getRate",
+  "getRateByMode",
+  "getRates",
+]);
 assert.equal(agreementBrief.requiredItems.some((item) => item.id === "credentials"), true);
 assert.equal(agreementBrief.requiredItems.some((item) => item.id === "mutations" && item.status === "later"), true);
 assert.equal(agreementBrief.mutationBoundary.some((item) => item.includes("createOrder")), true);
@@ -225,7 +233,7 @@ assert.equal(sfcSmokePlan.ok, true);
 assert.equal(sfcSmokePlan.code, "sfc_read_only_plan_ready");
 assert.deepEqual(
   sfcSmokePlan.requests.map((request) => request.action),
-  ["getWarehouse", "getShippingMethod", "getStock", "getRateByMode"],
+  ["getWarehouse", "getShippingMethod", "getStockBySKU", "getRateByMode"],
 );
 assert.equal(sfcSmokePlan.requests.every((request) => request.mutation === false), true);
 assert.equal(sfcSmokePlan.externalActions, "none");
@@ -259,9 +267,23 @@ const ratePlan = buildSfcRatePlan(
   },
   env,
 );
-const stockPlan = buildSfcStockPlan({ sku: "CLF-ODN-CORE", warehouseId: 1, page: 1, pageSize: 20 }, env);
+const rateEstimatePlan = buildSfcRatesEstimatePlan(
+  {
+    country: "HK",
+    state: "HK",
+    weightKg: 1.2,
+    lengthCm: 30,
+    widthCm: 20,
+    heightCm: 12,
+    priceType: "1",
+    divisionId: "1",
+    zipCode: "000000",
+  },
+  env,
+);
+const stockPlan = buildSfcStockPlan({ sku: "CLF-ODN-CORE", warehouseId: 1 }, env);
 
-for (const requestPlan of [warehousePlan, shippingMethodPlan, ratePlan, stockPlan]) {
+for (const requestPlan of [warehousePlan, shippingMethodPlan, ratePlan, rateEstimatePlan, stockPlan]) {
   assert.equal(requestPlan.provider, "sendfromchina");
   assert.equal(requestPlan.method, "POST");
   assert.equal(requestPlan.url, env.SFC_WSDL_URL);
@@ -273,6 +295,13 @@ for (const requestPlan of [warehousePlan, shippingMethodPlan, ratePlan, stockPla
 
 assert.equal(ratePlan.action, "getRateByMode");
 assert.match(ratePlan.body, /<shippingmethod>SFC-DDP-PREVIEW<\/shippingmethod>/);
+assert.equal(rateEstimatePlan.action, "getRates");
+assert.match(rateEstimatePlan.body, /<divisionId>1<\/divisionId>/);
+assert.match(rateEstimatePlan.body, /<zipCode>000000<\/zipCode>/);
+assert.equal(stockPlan.action, "getStockBySKU");
+assert.match(stockPlan.body, /<HeaderRequest>.*<warehouseId>1<\/warehouseId>.*<\/HeaderRequest>/);
+assert.match(stockPlan.body, /<sku>CLF-ODN-CORE<\/sku>/);
+assert.doesNotMatch(stockPlan.body, /<steps>/);
 
 const sfcExecutionEnv = {
   SFC_CUSTOMER_ID: "synthetic-customer",
