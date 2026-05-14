@@ -6,11 +6,13 @@ const checklist = readFileSync("docs/PROJECT_CHECKLIST.md", "utf8");
 assert.match(checklist, /^Last updated: 2026-05-15$/m);
 assert.match(checklist, /docs\/audits\/2026-05-15_PRE_PILOT_BOUNDARY_AUDIT\.md/);
 assert.match(checklist, /- \[x\] Stripe test-mode pilot öncesinde\./);
-assert.doesNotMatch(checklist, /real Stripe test env not connected|Stripe real test account\/env verification is still pending|Easyship 401|fresh staging Supabase and PM read-only baseline required/i);
+assert.doesNotMatch(
+  checklist,
+  /real Stripe test env not connected|Stripe real test account\/env verification is still pending|Easyship 401|fresh staging Supabase and PM read-only baseline required|preview redeploy/i,
+);
 
 const allowedOpenItems = [
   /Vercel Git integration confirmed/,
-  /Protected Vercel preview final smoke passed/,
   /PM production read-only aggregate baseline/,
   /Sınır Bekçisi pre-pilot audit geçti/,
   /1-2 allowlisted staging pilot order run completed/,

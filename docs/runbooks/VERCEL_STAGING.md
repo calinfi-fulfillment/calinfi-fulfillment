@@ -13,8 +13,8 @@ This runbook is for a separate ODUN Fulfillment V1 Vercel staging project. Do no
   - Team id: `team_2jOtOHRsgfDrveJXXNwrbnvt`
   - Team slug: `hello-75539063s-projects`
   - Framework preset: Next.js
-  - Latest ready preview deployment: `dpl_7B3Cbxp5sJoxAgjxRRrSVigCxqHV`
-  - Preview URL: https://odun-fulfillment-v1-qpqnp1r8q-hello-75539063s-projects.vercel.app
+  - Latest ready preview deployment: `dpl_59MCgMUs4zHAKVbLkv7tcsQpiYYH`
+  - Preview URL: https://odun-fulfillment-v1-d8gd7ptgr-hello-75539063s-projects.vercel.app
   - Custom domains: none
 - Local workspace is linked to this Vercel project with `.vercel/`; `.vercel/` is ignored and must not be committed.
 - Preview env was configured on the separate Fulfillment project with the non-PM Supabase public URL/key and all live/provider/export/Stripe Checkout flags disabled.
@@ -74,9 +74,8 @@ Completed preview verification:
 
 - Vercel project name is not PM/prod.
 - Preview env uses the non-PM Fulfillment Supabase project.
-- `/api/health` returned `ok: true` through protected preview access.
-- `/` rendered the Staging Pilot Readiness panel through protected preview access.
-- `/reports` rendered the reports surface through protected preview access.
+- 2026-05-15 protected preview deployment `dpl_59MCgMUs4zHAKVbLkv7tcsQpiYYH` is `READY`.
+- `/api/health`, `/`, `/shipping`, `/quotes`, `/payments`, `/handoffs`, and `/reports` returned HTTP 200 through `vercel curl`.
 - `/api/health` reported `blockedPmSupabase: false`, `liveFlagsOff: true`, public Supabase configured, and service-role Supabase not configured.
 - No production domain alias is attached.
 - No live provider, label, export, Stripe Checkout, or partner push action is enabled.
@@ -95,7 +94,7 @@ Use the Vercel dashboard path only if CLI connection keeps failing:
 - [ ] Do not attach PM or CALINFI production domains.
 - [ ] Do not enable production env, provider API, Stripe Checkout, partner push, or live exports during this step.
 - [ ] After connection, trigger or wait for a PR preview on `codex/phase-13-staging`.
-- [ ] Verify `/api/health`, `/`, and `/reports` through the preview URL.
+- [ ] Verify `/api/health`, `/`, `/shipping`, `/quotes`, `/payments`, `/handoffs`, and `/reports` through the preview URL.
 
 Post-connect CLI checks:
 
@@ -111,4 +110,4 @@ npm run test:no-secrets
 - GitHub integration is blocked by account mismatch and must be resolved before automatic PR previews or production promotion can replace manual/local staging workflows.
 - Stripe CLI test account/webhook smoke and app-specific `rk_test_` restricted-key Checkout smoke are complete; persisted Checkout flag remains disabled until explicit staged checkout approval.
 - PM production read-only aggregate baseline remains pending owner-approved audit.
-- Formal Sınır Bekçisi pre-pilot audit remains pending after GitHub integration, Stripe test setup, and PM baseline context are ready.
+- Formal Sınır Bekçisi pre-pilot audit remains pending until PM aggregate baseline and SFC certificate review are ready.

@@ -26,12 +26,12 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/s
 ### B. Staging Pilot Gate
 
 - [ ] Vercel Git integration confirmed. BLOCKED: account mismatch; direct Git connection was rejected, so automatic PR previews require Vercel GitHub app/account setup.
-- [ ] Protected Vercel preview final smoke passed for `/api/health`, `/`, `/shipping`, `/quotes`, `/payments`, `/handoffs`, `/reports`. BLOCKED: requires updated preview deployment after latest local changes.
+- [x] Protected Vercel preview final smoke passed for `/api/health`, `/`, `/shipping`, `/quotes`, `/payments`, `/handoffs`, `/reports`. Verified on 2026-05-15 by Vercel preview deployment `dpl_59MCgMUs4zHAKVbLkv7tcsQpiYYH` and `docs/evidence/VERCEL_PROTECTED_PREVIEW_SMOKE_2026-05-15.json`; direct anonymous access remains HTTP 401.
 - [ ] PM production read-only aggregate baseline alındı. BLOCKED: owner-approved PM production read-only aggregate scope required; no raw PII rows.
 - [x] Stripe test mode gerçek env doğrulandı. Verified on 2026-05-14 by CLI login, webhook secret, publishable key, app-specific `rk_test_` restricted key, no-charge test Checkout Session, and app restricted-key Checkout smoke; persisted Checkout flag remains disabled.
 - [x] Easyship sandbox `/rates` smoke geçti. Verified on 2026-05-14 with owner-provided sandbox token in ignored local env: `/2024-09/rates` returned HTTP 200 with 4 rates; shipment, label, export, and tracking remained disabled.
 - [x] SFC read-only smoke geçti. Verified on 2026-05-14 with owner-provided read-only credentials via local command env: `getWarehouse`, `getShippingMethod`, `getStockBySKU`, and `getRates` returned SOAP responses without faults, credential echo, WSDL document response, or mutation.
-- [ ] Sınır Bekçisi pre-pilot audit geçti. BLOCKED: local/staging code-boundary audit readiness is complete at `docs/audits/2026-05-15_PRE_PILOT_BOUNDARY_AUDIT.md`, but formal pass still requires protected preview final smoke, PM production aggregate baseline, and SFC certificate review.
+- [ ] Sınır Bekçisi pre-pilot audit geçti. BLOCKED: local/staging code-boundary audit readiness and protected preview smoke are complete, but formal pass still requires PM production aggregate baseline and SFC certificate review.
 - [ ] 1-2 allowlisted staging pilot order run completed. BLOCKED: requires pre-pilot audit pass and explicit owner pilot approval.
 
 ### C. Production Launch Gate
@@ -231,12 +231,13 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/s
 - UX/UI specialist polish pass tightened the app shell, navigation, table density, shipping console hierarchy, safety banner prominence, and keyboard row selection; verified by `npm run test:ops-ui`, `npm run typecheck`, `npm run lint`, `npm run build`, `npm run test:no-secrets`, and local `/shipping` plus `/quotes` HTTP 200 smoke. No live provider call, label, export, tracking, migration, deploy, secret, or PII example was added.
 - SFC read-only smoke planning pass added a redacted local plan helper, `smoke:sfc-read-only-plan`, and an owner-scope runbook; verified by `npm run test:sfc-network`, `npm run typecheck`, `npm run lint`, and `npm run test:no-secrets`. No SFC external request, mutation, ASN, order creation, export, label, tracking, deploy, migration, secret, or PII example was added.
 - Non-mutation provider smoke scope was accepted on 2026-05-13. SFC read-only API execution command `smoke:sfc-read-only-api` now posts to the real SOAP service endpoint for `getWarehouse`, `getShippingMethod`, `getStockBySKU`, and read-only rate lookup only; 2026-05-14 read-only smoke passed without faults or credential echo. Easyship sandbox `/rates` also passed on 2026-05-14 after aligning the 2024-09 payload schema.
-- Completion readiness automation added `check:completion-readiness` / `test:completion-readiness`; local package readiness is `true`, production launch readiness is `false` with explicit blockers for commit/push, preview redeploy, PM baseline, Stripe test env, SFC certificate review, pre-pilot audit, and production go/no-go. Verified by `npm run check:completion-readiness`, `npm run typecheck`, and `npm run lint`.
+- Completion readiness automation added `check:completion-readiness` / `test:completion-readiness`; local package readiness is `true`, production launch readiness is `false` with explicit blockers for commit/push, PM baseline, SFC certificate review, pre-pilot audit, and production go/no-go. Verified by `npm run check:completion-readiness`, `npm run typecheck`, and `npm run lint`.
 - SFC negotiation brief pass added the owner-facing SFC requirements runbook, reusable agreement brief model, and Kargo Merkezi agreement panel so SFC can provide the exact read-only credentials/warehouse/method-code inputs needed to finish today. Verified by `npm run test:sfc-network`, `npm run test:ops-ui`, and `npm run test:staging-launch-gates`.
 - SFC API 3.0 PDF and PHP sample alignment pass updated SKU stock smoke to `getStockBySKU`, posts stock warehouse ID at request level, and adds `getRates` as an allowed read-only estimate action. No credential value was copied into repo docs or source.
 - SFC read-only env doctor was added so the real API smoke can be checked without printing credentials. It validates mode, WSDL host, SOAP service endpoint, credential presence/length only, read-only/mutation flags, warehouse ID, stock SKU, rate action, and certificate rotation/review confirmation.
 - 2026-05-14 continuation packaging pass verified the Stripe/Easyship/SFC smoke evidence through completion readiness and reran `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run test:no-secrets`. No external provider request, deploy, migration, label, shipment, export, tracking, payment capture, SFC mutation, secret value, or PII example was added.
-- 2026-05-15 checklist closure pass added `test:pre-pilot-boundary-audit` and `test:checklist`, recorded `docs/audits/2026-05-15_PRE_PILOT_BOUNDARY_AUDIT.md`, and updated stale Stripe/Easyship/SFC audit gates. Local code-boundary readiness is true; protected preview, PM aggregate baseline, SFC certificate review, pilot approval, and production gates remain blocked.
+- 2026-05-15 checklist closure pass added `test:pre-pilot-boundary-audit` and `test:checklist`, recorded `docs/audits/2026-05-15_PRE_PILOT_BOUNDARY_AUDIT.md`, and updated stale Stripe/Easyship/SFC audit gates. Local code-boundary readiness is true; PM aggregate baseline, SFC certificate review, pilot approval, and production gates remain blocked.
+- 2026-05-15 protected preview smoke passed on Vercel deployment `dpl_59MCgMUs4zHAKVbLkv7tcsQpiYYH`: `/api/health`, `/`, `/shipping`, `/quotes`, `/payments`, `/handoffs`, and `/reports` returned HTTP 200 through `vercel curl`; anonymous direct access returned HTTP 401; health reported PM Supabase not blocked, live flags off, public Supabase configured, and service-role Supabase not configured. No production deploy, alias, live mutation, provider mutation, payment capture, label, export, or tracking action was run.
 
 ## 13. Staging Pilot
 
@@ -279,7 +280,7 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/s
 - [x] Stripe test mode doğrulandı. Verified by `smoke:stripe-restricted-key-checkout`; app-specific `rk_test_` created a test Checkout Session with `livemode=false`, while persisted Checkout flag remains disabled.
 - [ ] PM production read-only aggregate baseline alındı. BLOCKED: requires owner-approved production read-only aggregate check.
 - [x] 1-2 allowlisted pilot senaryosu planlandı. Verified by `docs/runbooks/STAGING_PILOT.md` and `npm run test:staging-launch-gates`.
-- [ ] Sınır Bekçisi pre-pilot audit geçti. BLOCKED: `npm run test:pre-pilot-boundary-audit` passes code/provider evidence, but formal audit pass still needs protected preview final smoke, PM production aggregate baseline, and SFC certificate review.
+- [ ] Sınır Bekçisi pre-pilot audit geçti. BLOCKED: `npm run test:pre-pilot-boundary-audit` passes code/provider/preview evidence, but formal audit pass still needs PM production aggregate baseline and SFC certificate review.
 
 ## 14. Launch Readiness
 
@@ -403,11 +404,11 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/s
 
 - [x] Completion readiness checker eklendi. Verified by `scripts/completion-readiness.ts` and `check:completion-readiness`.
 - [x] Completion readiness checker `npm test` içine bağlandı. Verified by `test:completion-readiness` in `package.json`.
-- [x] Operator doküman seti varlığı otomatik doğrulanıyor. Verified by 18 required docs plus 8 guide screenshots in `npm run check:completion-readiness`.
+- [x] Operator doküman seti varlığı otomatik doğrulanıyor. Verified by 19 required docs plus 8 guide screenshots in `npm run check:completion-readiness`.
 - [x] PM Supabase boundary otomatik doğrulanıyor. Verified by `pm-supabase-boundary` check in `npm run check:completion-readiness`.
 - [x] Live mutation/provider safety flags otomatik doğrulanıyor. Verified by `live-mutation-flags-disabled`, `easyship-non-mutation-flags`, `sfc-mutations-disabled`, and `sfc-read-only-plan-safe` checks.
 - [x] Local package readiness true. Verified by `npm run check:completion-readiness` returning `okForLocalPackage: true`.
-- [ ] Production launch readiness true. BLOCKED: `npm run check:completion-readiness` reports `okForProductionLaunch: false` until preview redeploy smoke, PM baseline, SFC certificate review, pre-pilot audit, and owner go/no-go are complete.
+- [ ] Production launch readiness true. BLOCKED: `npm run check:completion-readiness` reports `okForProductionLaunch: false` until PM baseline, SFC certificate review, pre-pilot audit, and owner go/no-go are complete.
 
 ## 25. SFC Same-day Agreement Brief
 
@@ -438,7 +439,8 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/s
 - [x] Checklist regression eklendi. Verified by `npm run test:checklist`; every remaining open item has an explicit `BLOCKED:` reason and obsolete Stripe/Easyship/SFC blockers are rejected.
 - [x] Full test suite yeni audit/checklist kapılarını içeriyor. Verified by `npm test` script including `test:pre-pilot-boundary-audit` and `test:checklist`.
 - [x] Stripe/Easyship/SFC evidence gates checklist içinde güncellendi. Verified by `npm run test:checklist`.
-- [x] Local code-boundary pre-pilot readiness true. Verified by `npm run test:pre-pilot-boundary-audit`; formal pilot pass remains blocked by protected preview smoke, PM production aggregate baseline, and SFC certificate review.
+- [x] Protected Vercel preview smoke evidence eklendi. Verified by `docs/evidence/VERCEL_PROTECTED_PREVIEW_SMOKE_2026-05-15.json`, `npm run check:completion-readiness`, and `npm run test:pre-pilot-boundary-audit`.
+- [x] Local code-boundary pre-pilot readiness true. Verified by `npm run test:pre-pilot-boundary-audit`; formal pilot pass remains blocked by PM production aggregate baseline and SFC certificate review.
 
 ## Audit Gates
 
@@ -449,7 +451,7 @@ Sınır Bekçisi veya eşdeğer boundary audit aşağıdaki noktalarda çalışt
 - [x] Stripe test-mode pilot öncesinde. Verified by `docs/evidence/STRIPE_CLI_CHECKOUT_2026-05-14.json`, `npm run test:pre-pilot-boundary-audit`, and `npm run test:checklist`; persisted Checkout flag remains disabled.
 - [x] Handoff/export flow tamamlandığında. Verified by `npm run test:handoff`; no export file or partner API was executed.
 - [x] Local dry-run boundary audit tamamlandığında. Verified by `docs/audits/2026-05-11_LOCAL_BOUNDARY_AUDIT.md`, `npm test`, and `npm run check:preflight`.
-- [ ] Staging pilot öncesinde. BLOCKED: pre-pilot code-boundary audit readiness is complete, but protected preview final smoke, PM production aggregate baseline, SFC certificate review, and owner pilot approval are still required.
+- [ ] Staging pilot öncesinde. BLOCKED: pre-pilot code-boundary and protected preview smoke are complete, but PM production aggregate baseline, SFC certificate review, and owner pilot approval are still required.
 - [ ] Production go/no-go öncesinde. BLOCKED: staging pilot, final audit, and owner decision required.
 
 ## Completion Rule

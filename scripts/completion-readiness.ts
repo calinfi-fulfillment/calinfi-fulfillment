@@ -31,6 +31,7 @@ const requiredDocs = [
   "docs/evidence/EASYSHIP_SANDBOX_RATES_2026-05-14.json",
   "docs/evidence/SFC_READ_ONLY_SMOKE_2026-05-14.json",
   "docs/evidence/STRIPE_CLI_CHECKOUT_2026-05-14.json",
+  "docs/evidence/VERCEL_PROTECTED_PREVIEW_SMOKE_2026-05-15.json",
   "docs/audits/2026-05-11_LOCAL_BOUNDARY_AUDIT.md",
   "docs/audits/2026-05-15_PRE_PILOT_BOUNDARY_AUDIT.md",
 ];
@@ -149,6 +150,51 @@ type StripeTestCheckoutEvidence = {
   };
 };
 
+type VercelProtectedPreviewEvidence = {
+  provider?: string;
+  checkedAt?: string;
+  project?: {
+    name?: string;
+    id?: string;
+  };
+  deployment?: {
+    id?: string;
+    url?: string;
+    target?: string;
+    readyState?: string;
+    productionAliasAttached?: boolean;
+  };
+  deploymentProtection?: {
+    directAnonymousStatus?: number;
+    authenticatedSmokeMethod?: string;
+    bypassSecretStoredInRepo?: boolean;
+  };
+  routes?: Array<{
+    path?: string;
+    status?: number;
+    sizeBytes?: number;
+  }>;
+  health?: {
+    ok?: boolean;
+    blockedPmSupabase?: boolean;
+    liveFlagsOff?: boolean;
+    publicSupabaseConfigured?: boolean;
+    serviceRoleSupabaseConfigured?: boolean;
+  };
+  contentSmoke?: Record<string, boolean>;
+  runtimeLogs?: {
+    errorEntriesPrinted?: number;
+  };
+  mutationBoundary?: {
+    productionDeploy?: boolean;
+    productionDomainAlias?: boolean;
+    liveSupabaseMutation?: boolean;
+    providerMutation?: boolean;
+    stripeLiveAction?: boolean;
+    labelExportTrackingAction?: boolean;
+  };
+};
+
 function packageScripts() {
   const packageJson = JSON.parse(readFileSync("package.json", "utf8")) as { scripts?: Record<string, string> };
   return packageJson.scripts ?? {};
@@ -201,6 +247,17 @@ function loadStripeTestEvidence(): StripeTestCheckoutEvidence | null {
 
   try {
     return JSON.parse(readFileSync(evidencePath, "utf8")) as StripeTestCheckoutEvidence;
+  } catch {
+    return null;
+  }
+}
+
+function loadVercelProtectedPreviewEvidence(): VercelProtectedPreviewEvidence | null {
+  const evidencePath = "docs/evidence/VERCEL_PROTECTED_PREVIEW_SMOKE_2026-05-15.json";
+  if (!existsSync(evidencePath)) return null;
+
+  try {
+    return JSON.parse(readFileSync(evidencePath, "utf8")) as VercelProtectedPreviewEvidence;
   } catch {
     return null;
   }
@@ -300,6 +357,37 @@ function stripeEvidenceReady(evidence: StripeTestCheckoutEvidence | null) {
   );
 }
 
+function vercelProtectedPreviewReady(evidence: VercelProtectedPreviewEvidence | null) {
+  if (!evidence) return false;
+
+  const requiredRoutes = new Set(["/api/health", "/", "/shipping", "/quotes", "/payments", "/handoffs", "/reports"]);
+  const routeStatuses = new Map((evidence.routes ?? []).map((route) => [route.path, route.status]));
+  const contentSmokeValues = Object.values(evidence.contentSmoke ?? {});
+  const mutationBoundaryValues = Object.values(evidence.mutationBoundary ?? {});
+
+  return Boolean(
+    evidence.provider === "vercel" &&
+      evidence.project?.name === "odun-fulfillment-v1" &&
+      evidence.deployment?.target === "preview" &&
+      evidence.deployment.readyState === "READY" &&
+      evidence.deployment.productionAliasAttached === false &&
+      evidence.deploymentProtection?.directAnonymousStatus === 401 &&
+      evidence.deploymentProtection.authenticatedSmokeMethod === "vercel curl" &&
+      evidence.deploymentProtection.bypassSecretStoredInRepo === false &&
+      [...requiredRoutes].every((path) => routeStatuses.get(path) === 200) &&
+      evidence.health?.ok === true &&
+      evidence.health.blockedPmSupabase === false &&
+      evidence.health.liveFlagsOff === true &&
+      evidence.health.publicSupabaseConfigured === true &&
+      evidence.health.serviceRoleSupabaseConfigured === false &&
+      contentSmokeValues.length > 0 &&
+      contentSmokeValues.every(Boolean) &&
+      evidence.runtimeLogs?.errorEntriesPrinted === 0 &&
+      mutationBoundaryValues.length > 0 &&
+      mutationBoundaryValues.every((value) => value === false),
+  );
+}
+
 const scripts = packageScripts();
 const docChecks: Check[] = requiredDocs.map((path) => ({
   name: `doc:${path}`,
@@ -322,6 +410,8 @@ const stripeTestEvidence = loadStripeTestEvidence();
 const stripeTestEvidenceReady = stripeEvidenceReady(stripeTestEvidence);
 const sfcSmokeEvidence = loadSfcSmokeEvidence();
 const sfcSmokeEvidenceReady = sfcEvidenceReady(sfcSmokeEvidence);
+const vercelPreviewEvidence = loadVercelProtectedPreviewEvidence();
+const vercelPreviewEvidenceReady = vercelProtectedPreviewReady(vercelPreviewEvidence);
 const liveMutationSafe = areLiveMutationFlagsDisabled(process.env);
 const pmSupabaseSafe = !isPledgeManagerSupabaseUrl(envValue("NEXT_PUBLIC_SUPABASE_URL"), process.env);
 const easyshipShipmentSafe = envValue("EASYSHIP_ENABLE_SHIPMENTS") !== "true";
@@ -376,6 +466,13 @@ const checks: Check[] = [
       : "Stripe test checkout evidence is missing or incomplete.",
   },
   {
+    name: "vercel-protected-preview-evidence",
+    ok: vercelPreviewEvidenceReady,
+    detail: vercelPreviewEvidenceReady
+      ? `Protected Vercel preview smoke evidence present from ${vercelPreviewEvidence?.checkedAt}; deployment ${vercelPreviewEvidence?.deployment?.id} passed 7 routes.`
+      : "Protected Vercel preview smoke evidence is missing or incomplete.",
+  },
+  {
     name: "sfc-mutations-disabled",
     ok: sfcMutationSafe && sfcReadiness.code !== "sfc_mutation_blocked",
     detail: sfcMutationSafe ? "SFC mutation flag is disabled." : "SFC mutation flag is enabled.",
@@ -402,7 +499,7 @@ const launchBlockers = [
       ? [`Current branch ${gitBranch || "(unknown)"} is ${gitAheadCount} commit(s) ahead of ${gitUpstream}; push is still required.`]
       : []),
   "Vercel Git integration/account alignment is not confirmed.",
-  "Protected preview smoke must be rerun after the latest changes are deployed.",
+  ...(!vercelPreviewEvidenceReady ? ["Protected preview smoke must be rerun after the latest changes are deployed."] : []),
   "PM production read-only aggregate baseline still requires approved scope.",
   ...(!stripeTestEvidenceReady ? ["Stripe test checkout evidence is still pending."] : []),
   ...(!easyshipRatesEvidenceReady
@@ -457,6 +554,16 @@ console.log(
                 ok: stripeTestEvidenceReady,
                 cliSessionId: stripeTestEvidence.checkoutSessionSmoke?.sessionId ?? null,
                 appSessionId: stripeTestEvidence.appRestrictedKeyCheckoutSmoke?.sessionId ?? null,
+              }
+            : null,
+        },
+        vercelPreview: {
+          evidence: vercelPreviewEvidence
+            ? {
+                checkedAt: vercelPreviewEvidence.checkedAt,
+                ok: vercelPreviewEvidenceReady,
+                deploymentId: vercelPreviewEvidence.deployment?.id ?? null,
+                url: vercelPreviewEvidence.deployment?.url ?? null,
               }
             : null,
         },

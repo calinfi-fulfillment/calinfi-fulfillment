@@ -1,0 +1,58 @@
+{
+  "provider": "vercel",
+  "checkedAt": "2026-05-15",
+  "project": {
+    "name": "odun-fulfillment-v1",
+    "id": "prj_gxorHDOfctSfP6KcAo6stLzFIkyf",
+    "teamSlug": "hello-75539063s-projects"
+  },
+  "deployment": {
+    "id": "dpl_59MCgMUs4zHAKVbLkv7tcsQpiYYH",
+    "url": "https://odun-fulfillment-v1-d8gd7ptgr-hello-75539063s-projects.vercel.app",
+    "target": "preview",
+    "readyState": "READY",
+    "productionAliasAttached": false
+  },
+  "deploymentProtection": {
+    "directAnonymousStatus": 401,
+    "authenticatedSmokeMethod": "vercel curl",
+    "bypassSecretStoredInRepo": false
+  },
+  "routes": [
+    { "path": "/api/health", "status": 200, "sizeBytes": 463 },
+    { "path": "/", "status": 200, "sizeBytes": 59911 },
+    { "path": "/shipping", "status": 200, "sizeBytes": 59818 },
+    { "path": "/quotes", "status": 200, "sizeBytes": 48555 },
+    { "path": "/payments", "status": 200, "sizeBytes": 36812 },
+    { "path": "/handoffs", "status": 200, "sizeBytes": 35923 },
+    { "path": "/reports", "status": 200, "sizeBytes": 28568 }
+  ],
+  "health": {
+    "ok": true,
+    "blockedPmSupabase": false,
+    "liveFlagsOff": true,
+    "publicSupabaseConfigured": true,
+    "serviceRoleSupabaseConfigured": false
+  },
+  "contentSmoke": {
+    "rootContainsSafetyStrip": true,
+    "navigationContainsTurkishOpsLabels": true,
+    "shippingSurfaceRendered": true,
+    "quotesSurfaceRendered": true,
+    "paymentsSurfaceRendered": true,
+    "handoffsSurfaceRendered": true,
+    "reportsSurfaceRendered": true
+  },
+  "runtimeLogs": {
+    "errorQueryWindow": "10m",
+    "errorEntriesPrinted": 0
+  },
+  "mutationBoundary": {
+    "productionDeploy": false,
+    "productionDomainAlias": false,
+    "liveSupabaseMutation": false,
+    "providerMutation": false,
+    "stripeLiveAction": false,
+    "labelExportTrackingAction": false
+  }
+}

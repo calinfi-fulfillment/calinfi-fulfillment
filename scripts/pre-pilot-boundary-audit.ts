@@ -96,6 +96,39 @@ type StripeEvidence = {
   };
 };
 
+type VercelPreviewEvidence = {
+  provider?: string;
+  project?: {
+    name?: string;
+  };
+  deployment?: {
+    target?: string;
+    readyState?: string;
+    productionAliasAttached?: boolean;
+  };
+  deploymentProtection?: {
+    directAnonymousStatus?: number;
+    authenticatedSmokeMethod?: string;
+    bypassSecretStoredInRepo?: boolean;
+  };
+  routes?: Array<{
+    path?: string;
+    status?: number;
+  }>;
+  health?: {
+    ok?: boolean;
+    blockedPmSupabase?: boolean;
+    liveFlagsOff?: boolean;
+    publicSupabaseConfigured?: boolean;
+    serviceRoleSupabaseConfigured?: boolean;
+  };
+  contentSmoke?: Record<string, boolean>;
+  runtimeLogs?: {
+    errorEntriesPrinted?: number;
+  };
+  mutationBoundary?: Record<string, boolean>;
+};
+
 function loadJson<T>(path: string): T | null {
   if (!existsSync(path)) return null;
   try {
@@ -112,6 +145,7 @@ function text(path: string) {
 const stripe = loadJson<StripeEvidence>("docs/evidence/STRIPE_CLI_CHECKOUT_2026-05-14.json");
 const easyship = loadJson<EasyshipEvidence>("docs/evidence/EASYSHIP_SANDBOX_RATES_2026-05-14.json");
 const sfc = loadJson<SfcEvidence>("docs/evidence/SFC_READ_ONLY_SMOKE_2026-05-14.json");
+const vercelPreview = loadJson<VercelPreviewEvidence>("docs/evidence/VERCEL_PROTECTED_PREVIEW_SMOKE_2026-05-15.json");
 const checklist = text("docs/PROJECT_CHECKLIST.md");
 const envExample = text(".env.example");
 const stagingPilot = text("docs/runbooks/STAGING_PILOT.md");
@@ -177,6 +211,30 @@ const sfcReady = Boolean(
     sfc.mutationBoundary.externalActions === "read_only_provider_api_only",
 );
 
+const vercelPreviewReady = Boolean(
+  vercelPreview?.provider === "vercel" &&
+    vercelPreview.project?.name === "odun-fulfillment-v1" &&
+    vercelPreview.deployment?.target === "preview" &&
+    vercelPreview.deployment.readyState === "READY" &&
+    vercelPreview.deployment.productionAliasAttached === false &&
+    vercelPreview.deploymentProtection?.directAnonymousStatus === 401 &&
+    vercelPreview.deploymentProtection.authenticatedSmokeMethod === "vercel curl" &&
+    vercelPreview.deploymentProtection.bypassSecretStoredInRepo === false &&
+    ["/api/health", "/", "/shipping", "/quotes", "/payments", "/handoffs", "/reports"].every((path) =>
+      vercelPreview.routes?.some((route) => route.path === path && route.status === 200),
+    ) &&
+    vercelPreview.health?.ok === true &&
+    vercelPreview.health.blockedPmSupabase === false &&
+    vercelPreview.health.liveFlagsOff === true &&
+    vercelPreview.health.publicSupabaseConfigured === true &&
+    vercelPreview.health.serviceRoleSupabaseConfigured === false &&
+    Object.values(vercelPreview.contentSmoke ?? {}).length > 0 &&
+    Object.values(vercelPreview.contentSmoke ?? {}).every(Boolean) &&
+    vercelPreview.runtimeLogs?.errorEntriesPrinted === 0 &&
+    Object.values(vercelPreview.mutationBoundary ?? {}).length > 0 &&
+    Object.values(vercelPreview.mutationBoundary ?? {}).every((value) => value === false),
+);
+
 const checks: AuditCheck[] = [
   {
     name: "pm-supabase-blocklist",
@@ -210,9 +268,11 @@ const checks: AuditCheck[] = [
   },
   {
     name: "protected-preview-final-smoke",
-    ok: false,
+    ok: vercelPreviewReady,
     blocking: true,
-    detail: "Blocked until the pushed branch is redeployed to protected Vercel preview and `/api/health`, `/`, `/shipping`, `/quotes`, `/payments`, `/handoffs`, `/reports` are smoked.",
+    detail: vercelPreviewReady
+      ? "Protected Vercel preview smoke passed for `/api/health`, `/`, `/shipping`, `/quotes`, `/payments`, `/handoffs`, and `/reports`."
+      : "Blocked until the pushed branch is redeployed to protected Vercel preview and `/api/health`, `/`, `/shipping`, `/quotes`, `/payments`, `/handoffs`, `/reports` are smoked.",
   },
   {
     name: "pm-production-aggregate-baseline",
