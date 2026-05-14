@@ -59,6 +59,7 @@ The public SFC API page says the interface is available through SOAP and HTTP, a
 ```bash
 SFC_MODE=read_only
 SFC_WSDL_URL=http://fulfill.sfcservice.com/default/svc/wsdl
+SFC_SERVICE_URL=http://cff-api.suntekcorps.com/default/svc/web-service
 SFC_CUSTOMER_ID=
 SFC_APP_TOKEN=
 SFC_APP_KEY=
@@ -102,4 +103,5 @@ We will not create orders, create ASN records, create/update products, buy label
 - `SFC_ENABLE_MUTATIONS=false`.
 - `npm run smoke:sfc-read-only-plan` returns ready.
 - `npm run smoke:sfc-read-only-api` returns successful summaries for warehouse, shipping methods, stock, and rate.
+- Product visibility checks use `npm run smoke:sfc-product-visibility` with `SFC_SMOKE_STOCK_SKUS` and return successful `getStockBySKU` summaries.
 - No raw credentials, raw SOAP bodies, or backer PII are logged.

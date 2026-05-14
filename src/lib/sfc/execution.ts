@@ -12,6 +12,8 @@ export type SfcReadOnlyExecutionSummary = {
   responseBytes: number;
   responseSha256: string;
   hasSoapFault: boolean;
+  hasWsdlDocument: boolean;
+  responseKind: "soap_response" | "soap_fault" | "wsdl_document" | "unknown";
   containsCredentialEcho: boolean;
 };
 
@@ -83,17 +85,21 @@ export function summarizeSfcReadOnlyResponse(
 ): SfcReadOnlyExecutionSummary {
   const containsCredentialEcho = configuredCredentialValues(env).some((value) => responseText.includes(value));
   const hasSoapFault = /<(?:\w+:)?Fault[\s>]/i.test(responseText) || /faultstring/i.test(responseText);
+  const hasWsdlDocument = /<(?:\w+:)?definitions[\s>]/i.test(responseText) || /<(?:\w+:)?schema[\s>]/i.test(responseText);
   const responseSha256 = createHash("sha256").update(responseText).digest("hex");
+  const responseKind = hasWsdlDocument ? "wsdl_document" : hasSoapFault ? "soap_fault" : /Response[\s>]/i.test(responseText) ? "soap_response" : "unknown";
 
   return {
     action: request.action,
     status: response.status,
     statusText: response.statusText,
-    ok: response.ok && !hasSoapFault && !containsCredentialEcho,
+    ok: response.ok && !hasSoapFault && !hasWsdlDocument && !containsCredentialEcho,
     contentType: response.headers.get("content-type") ?? "unknown",
     responseBytes: Buffer.byteLength(responseText, "utf8"),
     responseSha256,
     hasSoapFault,
+    hasWsdlDocument,
+    responseKind,
     containsCredentialEcho,
   };
 }

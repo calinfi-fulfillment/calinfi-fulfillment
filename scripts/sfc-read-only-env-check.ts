@@ -1,4 +1,4 @@
-import { createSfcReadOnlySmokePlan, createSfcReadiness, sfcWsdlUrl } from "../src/lib/sfc";
+import { createSfcReadOnlySmokePlan, createSfcReadiness, sfcServiceUrl, sfcWsdlUrl } from "../src/lib/sfc";
 import { loadLocalEnvFile } from "./load-local-env";
 
 loadLocalEnvFile();
@@ -39,6 +39,28 @@ function safeUrlCheck() {
   }
 }
 
+function safeServiceUrlCheck() {
+  try {
+    const url = new URL(sfcServiceUrl(process.env));
+    const knownHost =
+      url.hostname === "cff-api.suntekcorps.com" || url.hostname === "fulfill.sfcservice.com" || url.hostname === "fulfill.sendfromchina.com";
+    const knownProtocol = url.protocol === "http:" || url.protocol === "https:";
+
+    return {
+      ok: knownProtocol && knownHost && !url.pathname.endsWith("/wsdl"),
+      detail:
+        knownProtocol && knownHost && !url.pathname.endsWith("/wsdl")
+          ? `${url.hostname}${url.pathname}`
+          : "SFC service URL must use the SOAP service endpoint, not the WSDL document URL.",
+    };
+  } catch {
+    return {
+      ok: false,
+      detail: "SFC service URL is not parseable.",
+    };
+  }
+}
+
 const readiness = createSfcReadiness(process.env);
 const smokePlan = createSfcReadOnlySmokePlan(
   {
@@ -53,6 +75,7 @@ const smokePlan = createSfcReadOnlySmokePlan(
   process.env,
 );
 const wsdl = safeUrlCheck();
+const serviceUrl = safeServiceUrlCheck();
 const rateAction = smokePlan.requests.find((request) => request.action === "getRateByMode" || request.action === "getRates")?.action ?? "missing";
 const credentialKeys = ["SFC_CUSTOMER_ID", "SFC_APP_TOKEN", "SFC_APP_KEY"] as const;
 
@@ -66,6 +89,11 @@ const checks: Check[] = [
     name: "sfc-wsdl-known-host",
     ok: wsdl.ok,
     detail: wsdl.detail,
+  },
+  {
+    name: "sfc-service-known-host",
+    ok: serviceUrl.ok,
+    detail: serviceUrl.detail,
   },
   {
     name: "sfc-credentials-present",

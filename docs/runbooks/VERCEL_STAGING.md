@@ -109,6 +109,6 @@ npm run test:no-secrets
 ## Blockers
 
 - GitHub integration is blocked by account mismatch and must be resolved before automatic PR previews or production promotion can replace manual/local staging workflows.
-- Stripe test account/webhook verification remains pending owner-approved setup.
+- Stripe CLI test account/webhook smoke and app-specific `rk_test_` restricted-key Checkout smoke are complete; persisted Checkout flag remains disabled until explicit staged checkout approval.
 - PM production read-only aggregate baseline remains pending owner-approved audit.
 - Formal Sınır Bekçisi pre-pilot audit remains pending after GitHub integration, Stripe test setup, and PM baseline context are ready.

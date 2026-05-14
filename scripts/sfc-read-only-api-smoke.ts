@@ -70,6 +70,8 @@ async function main() {
         responseBytes: 0,
         responseSha256: "",
         hasSoapFault: false,
+        hasWsdlDocument: false,
+        responseKind: "unknown" as const,
         containsCredentialEcho: false,
         error: message,
       });

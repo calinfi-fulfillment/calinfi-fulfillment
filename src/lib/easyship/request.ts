@@ -47,16 +47,25 @@ function endpoint(baseUrl: string, path: string) {
   return `${baseUrl.replace(/\/$/, "")}/${path.replace(/^\//, "")}`;
 }
 
-function easyshipItemFromLine(line: QuoteRequest["lines"][number]) {
+function easyshipItemFromLine(line: QuoteRequest["lines"][number], currency: string) {
   return {
+    description: line.sku,
     sku: line.sku,
     quantity: line.quantity,
+    hs_code: "732189",
+    declared_currency: currency,
+    declared_customs_value: 10,
     actual_weight: line.weightGrams ? Math.max(line.weightGrams / 1000, 0.001) : undefined,
   };
 }
 
 export function buildEasyshipRatesBody(input: EasyshipRatePlanInput) {
   const parsed = EasyshipRatePlanInputSchema.parse(input);
+  const box = {
+    length: parsed.box.length,
+    width: parsed.box.width,
+    height: parsed.box.height,
+  };
 
   return {
     origin_address: parsed.originAddress,
@@ -66,8 +75,8 @@ export function buildEasyshipRatesBody(input: EasyshipRatePlanInput) {
     parcels: [
       {
         total_actual_weight: parsed.totalActualWeightKg,
-        box: parsed.box,
-        items: parsed.quoteRequest.lines.map(easyshipItemFromLine),
+        box,
+        items: parsed.quoteRequest.lines.map((line) => easyshipItemFromLine(line, parsed.quoteRequest.currency)),
       },
     ],
   };

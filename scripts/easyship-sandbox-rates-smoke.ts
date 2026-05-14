@@ -63,7 +63,18 @@ async function main() {
   const readiness = createEasyshipReadiness(env);
 
   assert.equal(readiness.mode, "sandbox", "EASYSHIP_MODE must be sandbox for this smoke.");
-  assert.equal(readiness.ok, true, `Easyship sandbox readiness failed: ${readiness.code}`);
+  if (!readiness.ok) {
+    const tokenCheck = readiness.checks.find((check) => check.name === "sandbox-token");
+    throw new Error(
+      `Easyship sandbox readiness failed: ${JSON.stringify({
+        code: readiness.code,
+        mode: readiness.mode,
+        apiBaseUrl: readiness.apiBaseUrl,
+        sandboxToken: tokenCheck?.detail ?? "Sandbox token check failed.",
+        externalActions: "none",
+      })}`,
+    );
+  }
 
   const token = easyshipApiToken(env);
   assert.equal(token.length > 0, true, "EASYSHIP_API_TOKEN is required.");
@@ -123,25 +134,31 @@ async function main() {
     body: JSON.stringify(plan.body),
     signal: AbortSignal.timeout(15_000),
   });
-  const responseBody = await response.json().catch(() => ({}));
+  const rawResponseBody = await response.text();
+  let responseBody: unknown = {};
+  try {
+    responseBody = rawResponseBody ? JSON.parse(rawResponseBody) : {};
+  } catch {
+    responseBody = {};
+  }
 
   if (!response.ok) {
     const errorSummary = {
       status: response.status,
       statusText: response.statusText,
+      contentType: response.headers.get("content-type") ?? "unknown",
       code: typeof responseBody === "object" && responseBody && "code" in responseBody ? String(responseBody.code) : "unknown",
       message:
         typeof responseBody === "object" && responseBody && "message" in responseBody
           ? redactToken(String(responseBody.message), token).slice(0, 240)
-          : "Easyship returned a non-JSON or undocumented error.",
+          : redactToken(rawResponseBody || "Easyship returned an empty or undocumented error.", token).slice(0, 500),
       hint: easyshipSmokeHint(response.status),
     };
 
     throw new Error(`Easyship sandbox rates smoke failed: ${JSON.stringify(errorSummary)}`);
   }
 
-  const bodyText = JSON.stringify(responseBody);
-  assert.equal(bodyText.includes(token), false, "Easyship response must not echo token.");
+  assert.equal(rawResponseBody.includes(token), false, "Easyship response must not echo token.");
 
   const rateCount =
     typeof responseBody === "object" && responseBody && "rates" in responseBody && Array.isArray(responseBody.rates)

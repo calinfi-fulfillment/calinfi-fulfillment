@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import type { SafetyEnv } from "../safety";
-import { sfcWsdlUrl } from "./config";
+import { sfcServiceUrl } from "./config";
 
 export type SfcSoapAction =
   | "getWarehouse"
@@ -119,7 +119,7 @@ function envelope(action: SfcSoapAction, innerXml: string, headerInnerXml = "") 
     `<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cff="http://www.chinafulfill.com/CffSvc/">`,
     `<soapenv:Header/>`,
     `<soapenv:Body>`,
-    `<cff:${action}Request>${headerXml(headerInnerXml)}${innerXml}</cff:${action}Request>`,
+    `<cff:${action}>${headerXml(headerInnerXml)}${innerXml}</cff:${action}>`,
     `</soapenv:Body>`,
     `</soapenv:Envelope>`,
   ].join("");
@@ -130,10 +130,10 @@ function plan(action: SfcSoapAction, body: string, mutation: boolean, env: Safet
     provider: "sendfromchina",
     action,
     method: "POST",
-    url: sfcWsdlUrl(env),
+    url: sfcServiceUrl(env),
     headers: {
       "content-type": "text/xml; charset=utf-8",
-      SOAPAction: action,
+      SOAPAction: `http://www.chinafulfill.com/CffSvc/${action}`,
     },
     body,
     mutation,
@@ -190,10 +190,9 @@ export function buildSfcRatesEstimatePlan(input: SfcRatesEstimateRequest, env?: 
 
 export function buildSfcStockPlan(input: SfcStockRequest, env?: SafetyEnv) {
   const parsed = SfcStockRequestSchema.parse(input);
-  const headerInnerXml = tag("warehouseId", parsed.warehouseId);
-  const innerXml = `<sku>${escapeXml(parsed.sku)}</sku>`;
+  const innerXml = [`<sku>${escapeXml(parsed.sku)}</sku>`, tag("warehouseId", parsed.warehouseId)].join("");
 
-  return plan("getStockBySKU", envelope("getStockBySKU", innerXml, headerInnerXml), false, env);
+  return plan("getStockBySKU", envelope("getStockBySKU", innerXml), false, env);
 }
 
 export function buildSfcCreateOrderPreviewPlan(input: SfcOrderPreview, env?: SafetyEnv) {

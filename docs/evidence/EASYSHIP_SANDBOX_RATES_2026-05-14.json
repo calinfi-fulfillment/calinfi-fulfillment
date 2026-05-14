@@ -1,0 +1,32 @@
+{
+  "provider": "easyship",
+  "checkedAt": "2026-05-14",
+  "mode": "sandbox",
+  "apiVersion": "2024-09",
+  "credentialHandling": "owner-provided sandbox token stored only in ignored local .env.local; no token value is stored in repo",
+  "mutationBoundary": {
+    "easyshipEnableRates": true,
+    "easyshipEnableShipments": false,
+    "easyshipEnableTracking": false,
+    "fulfillmentEnablePartnerApiPush": false,
+    "externalActions": "sandbox_rates_only",
+    "mutatingActions": []
+  },
+  "ratesSmoke": {
+    "ok": true,
+    "endpoint": "https://public-api-sandbox.easyship.com/2024-09/rates",
+    "status": 200,
+    "rateCount": 4,
+    "payload": "synthetic_non_pii_odun_rate_request",
+    "rawResponseStored": false,
+    "credentialEchoes": 0
+  },
+  "schemaFixesApplied": [
+    "Removed unsupported box.unit field from the 2024-09 rates payload.",
+    "Added required synthetic item description, HS code, declared currency, and declared customs value fields."
+  ],
+  "remainingProviderBlockers": [
+    "Easyship shipment creation, label purchase, export, and tracking remain disabled until explicit owner approval.",
+    "Production Easyship token and label/payment ownership still require separate review before pilot/prod mutation windows."
+  ]
+}

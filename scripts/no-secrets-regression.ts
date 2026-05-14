@@ -3,7 +3,7 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const root = process.cwd();
-const ignoredDirs = new Set([".git", ".next", "node_modules"]);
+const ignoredDirs = new Set([".agents", ".git", ".next", "node_modules"]);
 const ignoredFiles = new Set(["package-lock.json", "scripts/no-secrets-regression.ts", "scripts/staging-launch-gates-regression.ts"]);
 const searchableExtensions = new Set([".css", ".env.example", ".json", ".md", ".mjs", ".sql", ".ts", ".tsx", ".yaml"]);
 

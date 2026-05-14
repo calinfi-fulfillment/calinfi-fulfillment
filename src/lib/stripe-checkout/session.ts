@@ -147,7 +147,6 @@ export function buildStripeCheckoutSessionParams(
     params: {
       mode: "payment",
       client_reference_id: data.sourceOrderKey,
-      payment_method_types: ["card"],
       line_items: [
         {
           price_data: {

@@ -62,6 +62,14 @@ const missingSandboxToken = createEasyshipReadiness({
 assert.equal(missingSandboxToken.ok, false);
 assert.equal(missingSandboxToken.code, "easyship_token_missing");
 
+const invalidSandboxToken = createEasyshipReadiness({
+  EASYSHIP_MODE: "sandbox",
+  EASYSHIP_API_TOKEN: "token1",
+  EASYSHIP_ENABLE_RATES: "true",
+});
+assert.equal(invalidSandboxToken.ok, false);
+assert.equal(invalidSandboxToken.code, "easyship_token_invalid_shape");
+
 const sandboxReady = createEasyshipReadiness({
   EASYSHIP_MODE: "sandbox",
   EASYSHIP_API_TOKEN: "sandbox_synthetic_token",
@@ -84,10 +92,19 @@ const ratesPlan = buildEasyshipRatesRequestPlan(ratePlanInput, {
   EASYSHIP_MODE: "sandbox",
   EASYSHIP_API_TOKEN: "sandbox_synthetic_token",
 });
+const ratesBody = ratesPlan.body as {
+  parcels: Array<{
+    box: Record<string, unknown>;
+    items: Array<Record<string, unknown>>;
+  }>;
+};
 assert.equal(ratesPlan.method, "POST");
 assert.equal(ratesPlan.url, "https://public-api-sandbox.easyship.com/2024-09/rates");
 assert.equal(ratesPlan.headers.authorization, "Bearer <configured>");
 assert.equal(JSON.stringify(ratesPlan).includes("sandbox_synthetic_token"), false);
+assert.equal("unit" in ratesBody.parcels[0]!.box, false);
+assert.equal(ratesBody.parcels[0]!.items[0]!.declared_currency, "USD");
+assert.equal(ratesBody.parcels[0]!.items[0]!.declared_customs_value, 10);
 assert.equal(ratesPlan.externalActions, "none");
 
 const shipmentPlan = buildEasyshipShipmentRequestPlan(

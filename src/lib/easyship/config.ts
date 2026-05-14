@@ -7,6 +7,7 @@ export type EasyshipReadinessCode =
   | "easyship_sandbox_ready"
   | "easyship_production_blocked"
   | "easyship_token_missing"
+  | "easyship_token_invalid_shape"
   | "easyship_live_flags_enabled";
 
 export type EasyshipReadiness = {
@@ -51,10 +52,18 @@ export function easyshipApiToken(env: SafetyEnv = process.env) {
   return envValue(env, "EASYSHIP_API_TOKEN");
 }
 
+export function easyshipApiTokenLooksUsable(env: SafetyEnv = process.env) {
+  const token = easyshipApiToken(env);
+  if (token.length < 20) return false;
+  return !/^(placeholder|sandbox|test|token)$/i.test(token);
+}
+
 export function createEasyshipReadiness(env: SafetyEnv = process.env): EasyshipReadiness {
   const mode = easyshipMode(env);
   const apiBaseUrl = easyshipApiBaseUrl(env);
-  const tokenPresent = easyshipApiToken(env).length > 0;
+  const token = easyshipApiToken(env);
+  const tokenPresent = token.length > 0;
+  const tokenLooksUsable = easyshipApiTokenLooksUsable(env);
   const ratesEnabled = enabled(env, "EASYSHIP_ENABLE_RATES");
   const shipmentsEnabled = enabled(env, "EASYSHIP_ENABLE_SHIPMENTS");
   const trackingEnabled = enabled(env, "EASYSHIP_ENABLE_TRACKING");
@@ -69,8 +78,12 @@ export function createEasyshipReadiness(env: SafetyEnv = process.env): EasyshipR
     },
     {
       name: "sandbox-token",
-      ok: mode === "mock" || tokenPresent,
-      detail: tokenPresent ? "Easyship token is present in env; value is not logged." : "Easyship token is not configured.",
+      ok: mode === "mock" || (tokenPresent && tokenLooksUsable),
+      detail: tokenPresent
+        ? tokenLooksUsable
+          ? "Easyship token is present and passes local shape checks; value is not logged."
+          : `Easyship token is present but too short or placeholder-like; length=${token.length}.`
+        : "Easyship token is not configured.",
     },
     {
       name: "rates-flag",
@@ -122,6 +135,17 @@ export function createEasyshipReadiness(env: SafetyEnv = process.env): EasyshipR
       provider: "easyship",
       mode,
       code: "easyship_token_missing",
+      apiBaseUrl,
+      checks,
+    };
+  }
+
+  if (mode === "sandbox" && !tokenLooksUsable) {
+    return {
+      ok: false,
+      provider: "easyship",
+      mode,
+      code: "easyship_token_invalid_shape",
       apiBaseUrl,
       checks,
     };

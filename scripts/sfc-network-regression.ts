@@ -222,6 +222,7 @@ const sfcSmokePlan = createSfcReadOnlySmokePlan(
   {
     SFC_MODE: "read_only",
     SFC_WSDL_URL: "https://example.test/sfc/wsdl",
+    SFC_SERVICE_URL: "https://example.test/sfc/web-service",
     SFC_CUSTOMER_ID: "synthetic-customer",
     SFC_APP_TOKEN: "synthetic-token",
     SFC_APP_KEY: "synthetic-key",
@@ -251,7 +252,7 @@ const sfcMutationBlocked = createSfcReadiness({
 assert.equal(sfcMutationBlocked.ok, false);
 assert.equal(sfcMutationBlocked.code, "sfc_mutation_blocked");
 
-const env = { SFC_WSDL_URL: "https://example.test/sfc/wsdl" };
+const env = { SFC_WSDL_URL: "https://example.test/sfc/wsdl", SFC_SERVICE_URL: "https://example.test/sfc/web-service" };
 const warehousePlan = buildSfcGetWarehousePlan(env);
 const shippingMethodPlan = buildSfcGetShippingMethodPlan({ warehouseId: 1 }, env);
 const ratePlan = buildSfcRatePlan(
@@ -286,11 +287,13 @@ const stockPlan = buildSfcStockPlan({ sku: "CLF-ODN-CORE", warehouseId: 1 }, env
 for (const requestPlan of [warehousePlan, shippingMethodPlan, ratePlan, rateEstimatePlan, stockPlan]) {
   assert.equal(requestPlan.provider, "sendfromchina");
   assert.equal(requestPlan.method, "POST");
-  assert.equal(requestPlan.url, env.SFC_WSDL_URL);
+  assert.equal(requestPlan.url, env.SFC_SERVICE_URL);
+  assert.equal(requestPlan.headers.SOAPAction, `http://www.chinafulfill.com/CffSvc/${requestPlan.action}`);
   assert.equal(requestPlan.mutation, false);
   assert.equal(requestPlan.externalActions, "none");
   assert.equal(requestPlan.body.includes("synthetic-token"), false);
   assert.equal(requestPlan.body.includes("synthetic-key"), false);
+  assert.doesNotMatch(requestPlan.body, /<cff:\w+Request>/);
 }
 
 assert.equal(ratePlan.action, "getRateByMode");
@@ -299,8 +302,8 @@ assert.equal(rateEstimatePlan.action, "getRates");
 assert.match(rateEstimatePlan.body, /<divisionId>1<\/divisionId>/);
 assert.match(rateEstimatePlan.body, /<zipCode>000000<\/zipCode>/);
 assert.equal(stockPlan.action, "getStockBySKU");
-assert.match(stockPlan.body, /<HeaderRequest>.*<warehouseId>1<\/warehouseId>.*<\/HeaderRequest>/);
 assert.match(stockPlan.body, /<sku>CLF-ODN-CORE<\/sku>/);
+assert.match(stockPlan.body, /<warehouseId>1<\/warehouseId>/);
 assert.doesNotMatch(stockPlan.body, /<steps>/);
 
 const sfcExecutionEnv = {
@@ -326,8 +329,25 @@ const sfcExecutionSummary = summarizeSfcReadOnlyResponse(
   sfcExecutionEnv,
 );
 assert.equal(sfcExecutionSummary.ok, true);
+assert.equal(sfcExecutionSummary.responseKind, "soap_response");
+assert.equal(sfcExecutionSummary.hasWsdlDocument, false);
 assert.equal(sfcExecutionSummary.responseBytes > 0, true);
 assert.equal(JSON.stringify(sfcExecutionSummary).includes("synthetic-token"), false);
+
+const sfcWsdlDocumentSummary = summarizeSfcReadOnlyResponse(
+  warehousePlan,
+  {
+    ok: true,
+    status: 200,
+    statusText: "OK",
+    headers: new Headers({ "content-type": "text/xml" }),
+  },
+  "<wsdl:definitions><xsd:schema></xsd:schema></wsdl:definitions>",
+  sfcExecutionEnv,
+);
+assert.equal(sfcWsdlDocumentSummary.ok, false);
+assert.equal(sfcWsdlDocumentSummary.hasWsdlDocument, true);
+assert.equal(sfcWsdlDocumentSummary.responseKind, "wsdl_document");
 
 const sfcCredentialEchoSummary = summarizeSfcReadOnlyResponse(
   warehousePlan,

@@ -1,0 +1,36 @@
+{
+  "provider": "sendfromchina",
+  "checkedAt": "2026-05-14",
+  "mode": "read_only",
+  "credentialHandling": "owner-provided credentials were passed through local command environment only; no credential values are stored in repo",
+  "mutationBoundary": {
+    "sfcEnableMutations": false,
+    "externalActions": "read_only_provider_api_only",
+    "mutatingActions": []
+  },
+  "readOnlyApiSmoke": {
+    "ok": true,
+    "actions": ["getWarehouse", "getShippingMethod", "getStockBySKU", "getRates"],
+    "soapFaults": 0,
+    "wsdlDocumentResponses": 0,
+    "credentialEchoes": 0,
+    "rawSoapStored": false
+  },
+  "productVisibility": {
+    "ok": true,
+    "action": "getStockBySKU",
+    "warehouseId": "1",
+    "checkedSkus": 34,
+    "visibleSkus": 34,
+    "missingSkus": 0,
+    "soapFaults": 0,
+    "wsdlDocumentResponses": 0,
+    "credentialEchoes": 0,
+    "stockValuesObserved": ["0"],
+    "rawSoapStored": false
+  },
+  "remainingProviderBlockers": [
+    "SFC canonical warehouse ID and Asia DDP method codes still need written provider confirmation before mutation pilot.",
+    "SFC credential rotation or explicit certificate-source review is still required before pilot/prod mutation windows."
+  ]
+}

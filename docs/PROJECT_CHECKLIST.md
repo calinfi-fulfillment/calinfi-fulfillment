@@ -28,9 +28,9 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/s
 - [ ] Vercel Git integration confirmed. BLOCKED: account mismatch; direct Git connection was rejected, so automatic PR previews require Vercel GitHub app/account setup.
 - [ ] Protected Vercel preview final smoke passed for `/api/health`, `/`, `/shipping`, `/quotes`, `/payments`, `/handoffs`, `/reports`. BLOCKED: requires updated preview deployment after latest local changes.
 - [ ] PM production read-only aggregate baseline alındı. BLOCKED: owner-approved PM production read-only aggregate scope required; no raw PII rows.
-- [ ] Stripe test mode gerçek env doğrulandı. BLOCKED: owner-approved Stripe test account/env setup required.
-- [ ] Easyship sandbox `/rates` smoke geçti. BLOCKED: owner confirmed sandbox path; 2026-05-13 run reached sandbox `/2024-09/rates` but returned HTTP 401, so token must have `public.rate:read` scope for the same 2024-09 API integration.
-- [ ] SFC read-only smoke geçti. BLOCKED: owner approved non-mutating provider calls; valid SFC read-only credentials/env are still required.
+- [x] Stripe test mode gerçek env doğrulandı. Verified on 2026-05-14 by CLI login, webhook secret, publishable key, app-specific `rk_test_` restricted key, no-charge test Checkout Session, and app restricted-key Checkout smoke; persisted Checkout flag remains disabled.
+- [x] Easyship sandbox `/rates` smoke geçti. Verified on 2026-05-14 with owner-provided sandbox token in ignored local env: `/2024-09/rates` returned HTTP 200 with 4 rates; shipment, label, export, and tracking remained disabled.
+- [x] SFC read-only smoke geçti. Verified on 2026-05-14 with owner-provided read-only credentials via local command env: `getWarehouse`, `getShippingMethod`, `getStockBySKU`, and `getRates` returned SOAP responses without faults, credential echo, WSDL document response, or mutation.
 - [ ] Sınır Bekçisi pre-pilot audit geçti. BLOCKED: requires PM aggregate baseline, Stripe/Easyship/SFC evidence, staging evidence, and owner-approved audit scope.
 - [ ] 1-2 allowlisted staging pilot order run completed. BLOCKED: requires pre-pilot audit pass and explicit owner pilot approval.
 
@@ -230,11 +230,12 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/s
 - Takeover continuity fix added the missing `scripts/sfc-network-regression.ts` and wired Ops UI coverage for the SFC + Easyship network panel; verified by `npm run test:sfc-network`, `npm run test:ops-ui`, `npm run test:easyship-adapter`, `npm run test:no-secrets`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npm test`. No Easyship/SFC external request, label, shipment, export, tracking, deploy, migration, or live mutation was run.
 - UX/UI specialist polish pass tightened the app shell, navigation, table density, shipping console hierarchy, safety banner prominence, and keyboard row selection; verified by `npm run test:ops-ui`, `npm run typecheck`, `npm run lint`, `npm run build`, `npm run test:no-secrets`, and local `/shipping` plus `/quotes` HTTP 200 smoke. No live provider call, label, export, tracking, migration, deploy, secret, or PII example was added.
 - SFC read-only smoke planning pass added a redacted local plan helper, `smoke:sfc-read-only-plan`, and an owner-scope runbook; verified by `npm run test:sfc-network`, `npm run typecheck`, `npm run lint`, and `npm run test:no-secrets`. No SFC external request, mutation, ASN, order creation, export, label, tracking, deploy, migration, secret, or PII example was added.
-- Non-mutation provider smoke scope was accepted on 2026-05-13. SFC read-only API execution command `smoke:sfc-read-only-api` was added for `getWarehouse`, `getShippingMethod`, `getStockBySKU`, and read-only rate lookup only; current local env still needs secure SFC credential configuration before any SFC request. Easyship sandbox `/rates` was attempted with shipment/label/tracking disabled and returned HTTP 401 from the sandbox endpoint; token/scope correction is still required.
-- Completion readiness automation added `check:completion-readiness` / `test:completion-readiness`; local package readiness is `true`, production launch readiness is `false` with explicit blockers for commit/push, preview redeploy, PM baseline, Stripe test env, Easyship 401, SFC credentials, pre-pilot audit, and production go/no-go. Verified by `npm run check:completion-readiness`, `npm run typecheck`, and `npm run lint`.
+- Non-mutation provider smoke scope was accepted on 2026-05-13. SFC read-only API execution command `smoke:sfc-read-only-api` now posts to the real SOAP service endpoint for `getWarehouse`, `getShippingMethod`, `getStockBySKU`, and read-only rate lookup only; 2026-05-14 read-only smoke passed without faults or credential echo. Easyship sandbox `/rates` also passed on 2026-05-14 after aligning the 2024-09 payload schema.
+- Completion readiness automation added `check:completion-readiness` / `test:completion-readiness`; local package readiness is `true`, production launch readiness is `false` with explicit blockers for commit/push, preview redeploy, PM baseline, Stripe test env, SFC certificate review, pre-pilot audit, and production go/no-go. Verified by `npm run check:completion-readiness`, `npm run typecheck`, and `npm run lint`.
 - SFC negotiation brief pass added the owner-facing SFC requirements runbook, reusable agreement brief model, and Kargo Merkezi agreement panel so SFC can provide the exact read-only credentials/warehouse/method-code inputs needed to finish today. Verified by `npm run test:sfc-network`, `npm run test:ops-ui`, and `npm run test:staging-launch-gates`.
-- SFC API 3.0 PDF and PHP sample alignment pass updated SKU stock smoke to `getStockBySKU`, keeps stock warehouse ID in `HeaderRequest` per sample code, and adds `getRates` as an allowed read-only estimate action. No credential value was copied into repo docs or source.
-- SFC read-only env doctor was added so the real API smoke can be checked without printing credentials. It validates mode, WSDL host, credential presence/length only, read-only/mutation flags, warehouse ID, stock SKU, rate action, and certificate rotation/review confirmation.
+- SFC API 3.0 PDF and PHP sample alignment pass updated SKU stock smoke to `getStockBySKU`, posts stock warehouse ID at request level, and adds `getRates` as an allowed read-only estimate action. No credential value was copied into repo docs or source.
+- SFC read-only env doctor was added so the real API smoke can be checked without printing credentials. It validates mode, WSDL host, SOAP service endpoint, credential presence/length only, read-only/mutation flags, warehouse ID, stock SKU, rate action, and certificate rotation/review confirmation.
+- 2026-05-14 continuation packaging pass verified the Stripe/Easyship/SFC smoke evidence through completion readiness and reran `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run test:no-secrets`. No external provider request, deploy, migration, label, shipment, export, tracking, payment capture, SFC mutation, secret value, or PII example was added.
 
 ## 13. Staging Pilot
 
@@ -274,7 +275,7 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/s
 - [x] Stripe Test Pilot değişiklikleri PR #1'e push edildi. Verified by push of commit `0b134d0` to `codex/phase-13-staging`.
 - [x] Provider adapter prep tamamlandı. Verified by `npm run test:provider-adapter` and `npm run test:provider-mock-handoff`; external actions remain `none`.
 - [ ] PM baseline/audit still blocked until approval. BLOCKED: PM production read-only baseline and formal pre-pilot audit require separate owner-approved scope.
-- [ ] Stripe test mode doğrulandı. BLOCKED: synthetic contract validator passed, but real Stripe test account/env verification requires owner-approved setup.
+- [x] Stripe test mode doğrulandı. Verified by `smoke:stripe-restricted-key-checkout`; app-specific `rk_test_` created a test Checkout Session with `livemode=false`, while persisted Checkout flag remains disabled.
 - [ ] PM production read-only aggregate baseline alındı. BLOCKED: requires owner-approved production read-only aggregate check.
 - [x] 1-2 allowlisted pilot senaryosu planlandı. Verified by `docs/runbooks/STAGING_PILOT.md` and `npm run test:staging-launch-gates`.
 - [ ] Sınır Bekçisi pre-pilot audit geçti. BLOCKED: formal pre-pilot audit requires staging env and owner-approved baseline context.
@@ -303,8 +304,9 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/s
 
 - [x] `.env.local` Easyship sandbox env user-side configured. Verified by smoke readiness reaching the Easyship sandbox request step without printing token values.
 - [x] Sandbox token was not printed or committed. Verified by redacted smoke output and `npm run test:no-secrets`.
-- [x] `smoke:easyship-sandbox-rates` script eklendi. Verified by `npm run smoke:easyship-sandbox-rates`.
-- [ ] Sandbox `/rates` smoke geçti. BLOCKED: owner confirmed Easyship sandbox is the test path; 2026-05-13 run returned HTTP 401 Unauthorized from `/2024-09/rates`; verify the sandbox Bearer token has `public.rate:read` scope and that `.env.local` uses the token from the same 2024-09 Easyship API integration.
+- [x] Easyship sandbox env doctor eklendi. Verified by `check:easyship-sandbox-env`; it reports token presence/length only and performs no external API call.
+- [x] `smoke:easyship-sandbox-rates` script eklendi. Verified by 2026-05-14 sandbox HTTP 200 smoke with redacted token output.
+- [x] Sandbox `/rates` smoke geçti. Verified on 2026-05-14: Easyship sandbox endpoint returned HTTP 200 with 4 rates for the synthetic non-PII ODUN payload.
 - [x] Shipment/label/export/tracking disabled kaldı. Verified by smoke script forced guards and no shipment/label/tracking endpoint calls.
 - [x] `test:no-secrets`, `typecheck`, `lint`, `build` geçti. Verified by `npm run test:no-secrets`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npm test`.
 
@@ -369,7 +371,7 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/s
 - [x] Product/customs sync preview stays local-only and PII-free. Verified by `externalActions: none`, synthetic SFC product sync regression, and `npm run test:no-secrets`.
 - [x] Freight batch manifest stays PII-free. Verified by `containsBackerPii: false`, source-order/SKU-only manifest regression, and `npm run test:sfc-network`.
 - [x] Local-only network phase checks passed. Verified by `npm run test:sfc-network`, `npm run test:ops-ui`, `npm run typecheck`, and `npm run lint`.
-- [ ] Real SFC/Easyship API smoke passed. BLOCKED: owner approved non-mutating provider calls; SFC requires valid read-only credentials/env, and Easyship sandbox token currently returns HTTP 401.
+- [x] Real SFC/Easyship API smoke passed. Verified by SFC read-only SOAP smoke/product visibility and Easyship sandbox `/rates` HTTP 200 evidence; no shipment, label, export, tracking, order, ASN, or product mutation was run.
 
 ## 22. UX/UI Specialist Ops Polish
 
@@ -394,17 +396,17 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/s
 - [x] SFC read-only API execution command eklendi. Verified by `smoke:sfc-read-only-api`, `hydrateSfcRequestBodyForExecution`, response summary redaction regression, and `npm run test:sfc-network`.
 - [x] SFC read-only API output raw SOAP body basmaz. Verified by response summary fields: status, content type, byte size, SHA-256, SOAP fault flag, and credential echo flag only.
 - [x] SFC read-only env doctor eklendi. Verified by `check:sfc-read-only-env` script and no credential value output.
-- [ ] Real SFC read-only smoke passed. BLOCKED: owner approved non-mutating provider calls and provided credential values, but credentials are not securely configured in ignored local env yet and warehouse/method details still need confirmation.
+- [x] Real SFC read-only smoke passed. Verified on 2026-05-14 by `smoke:sfc-read-only-api` against the SOAP service endpoint; all four read-only actions returned SOAP responses with no credential echo.
 
 ## 24. Completion Readiness Evidence
 
 - [x] Completion readiness checker eklendi. Verified by `scripts/completion-readiness.ts` and `check:completion-readiness`.
 - [x] Completion readiness checker `npm test` içine bağlandı. Verified by `test:completion-readiness` in `package.json`.
-- [x] Operator doküman seti varlığı otomatik doğrulanıyor. Verified by 13 required docs plus 8 guide screenshots in `npm run check:completion-readiness`.
+- [x] Operator doküman seti varlığı otomatik doğrulanıyor. Verified by 17 required docs plus 8 guide screenshots in `npm run check:completion-readiness`.
 - [x] PM Supabase boundary otomatik doğrulanıyor. Verified by `pm-supabase-boundary` check in `npm run check:completion-readiness`.
 - [x] Live mutation/provider safety flags otomatik doğrulanıyor. Verified by `live-mutation-flags-disabled`, `easyship-non-mutation-flags`, `sfc-mutations-disabled`, and `sfc-read-only-plan-safe` checks.
 - [x] Local package readiness true. Verified by `npm run check:completion-readiness` returning `okForLocalPackage: true`.
-- [ ] Production launch readiness true. BLOCKED: `npm run check:completion-readiness` reports `okForProductionLaunch: false` until preview redeploy smoke, PM baseline, Stripe test env, Easyship HTTP 200 sandbox `/rates`, SFC read-only credentials/smoke, pre-pilot audit, and owner go/no-go are complete.
+- [ ] Production launch readiness true. BLOCKED: `npm run check:completion-readiness` reports `okForProductionLaunch: false` until preview redeploy smoke, PM baseline, SFC certificate review, pre-pilot audit, and owner go/no-go are complete.
 
 ## 25. SFC Same-day Agreement Brief
 
@@ -421,10 +423,12 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/s
 ## 26. SFC API Sample Alignment
 
 - [x] SFC API 3.0 PDF alanları incelendi. Verified by local PDF review for HeaderRequest, `getStockBySKU`, `getWarehouse`, `getShippingMethod`, `getRate`, `getRateByMode`, `getRates`, and `getStock`.
-- [x] PHP stock sample ile planner hizalandı. Verified by `buildSfcStockPlan` using `getStockBySKU` and HeaderRequest-level warehouse ID.
+- [x] PHP stock sample ile planner hizalandı. Verified by `buildSfcStockPlan` using `getStockBySKU`, WSDL operation wrapper, and request-level warehouse ID.
 - [x] PHP shipping fee estimate sample desteklendi. Verified by `buildSfcRatesEstimatePlan` using read-only `getRates`.
 - [x] Real smoke öncesi env gate eklendi. Verified by `npm run check:sfc-read-only-env`.
-- [ ] Gerçek SFC read-only smoke çalıştı. BLOCKED: secure ignored env configuration, warehouse ID, and DDP method code confirmation are still needed before running `smoke:sfc-read-only-api`.
+- [x] SFC WSDL dokümanı ile gerçek SOAP service endpoint ayrıldı. Verified by `SFC_SERVICE_URL`, `npm run test:sfc-network`, and WSDL-document response guard.
+- [x] Gerçek SFC read-only smoke çalıştı. Verified on 2026-05-14 by `smoke:sfc-read-only-api` for `getWarehouse`, `getShippingMethod`, `getStockBySKU`, and `getRates`; no SOAP fault, credential echo, WSDL document response, or mutation.
+- [x] SFC product visibility smoke eklendi. Verified by `smoke:sfc-product-visibility`; ODUN product upload check read all 34 SKUs by `getStockBySKU`, warehouse `1`, stock `0`, no SOAP fault or credential echo.
 
 ## Audit Gates
 

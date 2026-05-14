@@ -23,6 +23,7 @@ Set these values in `.env.local` when owner-approved credentials are available:
 ```bash
 SFC_MODE=read_only
 SFC_WSDL_URL=http://fulfill.sfcservice.com/default/svc/wsdl
+SFC_SERVICE_URL=http://cff-api.suntekcorps.com/default/svc/web-service
 SFC_CUSTOMER_ID=
 SFC_APP_TOKEN=
 SFC_APP_KEY=
@@ -49,7 +50,7 @@ npm run check:sfc-read-only-env
 Expected safe behavior:
 
 - Prints only presence/length checks, not credential values.
-- Confirms `SFC_MODE=read_only`, read-only flag, mutation flag, warehouse ID, stock SKU, rate action, and known WSDL host.
+- Confirms `SFC_MODE=read_only`, read-only flag, mutation flag, warehouse ID, stock SKU, rate action, known WSDL host, and SOAP service endpoint.
 - Requires `SFC_CERT_ROTATED_CONFIRMED=true` before reporting that the real read-only API smoke is safe to run.
 
 ## Planning Command
@@ -80,6 +81,21 @@ Expected safe behavior:
 - Does not print raw request bodies, raw response bodies, credentials, or PII.
 - Prints only action names, HTTP status, content type, response byte size, response SHA-256, SOAP fault flag, and credential echo flag.
 - Exits non-zero if any response has an HTTP error, SOAP fault, credential echo, or request failure.
+- Exits non-zero if the endpoint returns the WSDL document instead of a SOAP operation response.
+
+## Product Visibility Smoke
+
+After products are uploaded in SFC, verify SKU visibility with `getStockBySKU` only:
+
+```bash
+SFC_SMOKE_STOCK_SKUS=CLF-STV-ODN,CLF-STV-OLS npm run smoke:sfc-product-visibility
+```
+
+Expected safe behavior:
+
+- Executes only `getStockBySKU`.
+- Prints SKU, ask/message, stock fields, response hash, and warehouse ID.
+- Does not print raw SOAP bodies or credentials.
 
 ## Blockers
 

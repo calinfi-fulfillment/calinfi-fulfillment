@@ -91,6 +91,7 @@ async function main() {
   }
 
   assert.equal(params.params.mode, "payment");
+  assert.equal("payment_method_types" in params.params, false);
   assert.equal(params.params.line_items?.[0]?.price_data?.unit_amount, quote.totalCents);
   assert.equal(params.params.metadata?.fulfillment_quote_id, quoteId);
   assert.equal(params.params.metadata?.environment, "test");

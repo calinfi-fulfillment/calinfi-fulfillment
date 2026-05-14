@@ -16,6 +16,7 @@ export type SfcReadiness = {
 };
 
 const DEFAULT_SFC_WSDL_URL = "http://fulfill.sfcservice.com/default/svc/wsdl";
+const DEFAULT_SFC_SERVICE_URL = "http://cff-api.suntekcorps.com/default/svc/web-service";
 
 function enabled(env: SafetyEnv, key: string) {
   return String(env[key] ?? "").trim() === "true";
@@ -31,6 +32,10 @@ export function sfcMode(env: SafetyEnv = process.env): SfcMode {
 
 export function sfcWsdlUrl(env: SafetyEnv = process.env) {
   return String(env.SFC_WSDL_URL || DEFAULT_SFC_WSDL_URL);
+}
+
+export function sfcServiceUrl(env: SafetyEnv = process.env) {
+  return String(env.SFC_SERVICE_URL || DEFAULT_SFC_SERVICE_URL);
 }
 
 export function sfcCredentialsPresent(env: SafetyEnv = process.env) {

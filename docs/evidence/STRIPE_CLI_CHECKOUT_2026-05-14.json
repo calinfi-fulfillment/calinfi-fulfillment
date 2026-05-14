@@ -1,0 +1,62 @@
+{
+  "provider": "stripe",
+  "checkedAt": "2026-05-14",
+  "mode": "test",
+  "account": {
+    "displayName": "CALINFI LLC",
+    "accountId": "acct_1QolQnE7Fqj7RAJ6"
+  },
+  "credentialHandling": "Stripe CLI login and webhook signing secret were stored only in local machine config or ignored .env.local; no Stripe secret, restricted key, or webhook secret value is stored in repo.",
+  "cli": {
+    "installed": true,
+    "version": "1.40.9",
+    "login": "completed",
+    "loginKeyExpiresAt": "2026-08-12"
+  },
+  "webhookSecret": {
+    "configuredInIgnoredLocalEnv": true,
+    "prefix": "stripe_webhook_signing_secret",
+    "rawValueStoredInRepo": false
+  },
+  "publishableKey": {
+    "configuredInIgnoredLocalEnv": true,
+    "prefix": "pk_test_",
+    "rawValueStoredInRepo": false
+  },
+  "restrictedKey": {
+    "configuredInIgnoredLocalEnv": true,
+    "prefix": "rk_test_",
+    "rawValueStoredInRepo": false
+  },
+  "checkoutSessionSmoke": {
+    "ok": true,
+    "sessionId": "cs_test_a106I0mNK6Dlx4XTKadlyVAiKofSnbG2TTqAp77HWwZeVpFxB3pxlpfDld",
+    "livemode": false,
+    "status": "open",
+    "paymentStatus": "unpaid",
+    "amountTotal": 100,
+    "currency": "usd",
+    "paymentMethodTypesSentByApp": false,
+    "dynamicPaymentMethodsReturned": true,
+    "rawCheckoutUrlStored": false
+  },
+  "appRestrictedKeyCheckoutSmoke": {
+    "ok": true,
+    "sessionId": "cs_test_a1uv2WnpjwEPLaaI0LLjrYaXBD2K7WUXNnwUA06qDogOu9iz48dHaX9WS0",
+    "livemode": false,
+    "readinessCodeWithCheckoutEnabled": "stripe_checkout_ready",
+    "persistedCheckoutFlag": false,
+    "rawCheckoutUrlStored": false
+  },
+  "mutationBoundary": {
+    "stripeMode": "test",
+    "fulfillmentEnableStripeCheckout": false,
+    "externalActions": "stripe_test_checkout_session_create_only",
+    "livePaymentActions": [],
+    "chargesCaptured": 0
+  },
+  "remainingProviderBlockers": [
+    "Keep FULFILLMENT_ENABLE_STRIPE_CHECKOUT=false until the restricted key is configured and owner explicitly approves the staged checkout test.",
+    "No live Stripe mode or production payment attempt is approved."
+  ]
+}

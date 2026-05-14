@@ -29,6 +29,8 @@ const VALUE_LABELS: Record<string, string> = {
   "easyship_mock_only": "Easyship maket modda",
   "easyship_production_blocked": "Easyship canlı kapalı",
   "easyship_sandbox_ready": "Easyship sandbox hazır",
+  "easyship_token_invalid_shape": "Easyship token geçersiz",
+  "easyship_token_missing": "Easyship token eksik",
   exported: "Dışa aktarıldı",
   failed: "Hata",
   fresh: "Güncel fiyat",

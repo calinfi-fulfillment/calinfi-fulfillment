@@ -13,3 +13,6 @@ labels/
 tmp/
 supabase/.temp/
 .vercel
+.agents/
+skills-lock.json
+outputs/

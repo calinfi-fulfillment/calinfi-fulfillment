@@ -126,8 +126,10 @@ Current local implementation status:
 - SFC SOAP plans redact credentials and PII, and every request plan reports `externalActions: none`.
 - SFC read-only API smoke execution is now scripted for owner-approved non-mutating calls only; it executes the read-only action set without printing raw SOAP bodies.
 - Easyship regional last-mile plans redact the token and remain request-plan-only.
+- Easyship sandbox env doctor reports token presence/length and safe flags without external API calls.
 - Easyship sandbox `/rates` smoke uses the sandbox Public API endpoint and keeps shipment, label, export, and tracking disabled.
-- Real SFC read-only smoke remains credential-gated; Easyship sandbox `/rates` is currently blocked by HTTP 401 until the sandbox token/scope is corrected.
+- Real SFC read-only smoke passed on 2026-05-14 through the SOAP service endpoint.
+- Easyship sandbox `/rates` passed on 2026-05-14 against the 2024-09 endpoint with a synthetic non-PII payload; shipment, label, export, and tracking actions remained disabled.
 
 ## Open Questions For SFC/Easyship Setup
 
@@ -138,4 +140,4 @@ Current local implementation status:
 - Which US and EU regional depots will receive bulk freight?
 - Will Easyship labels be bought by ODUN directly or through the regional depot account?
 - Which party pays carrier invoices for regional last-mile: ODUN, 3PL, or Easyship account balance?
-- Does the configured Easyship sandbox API token have `public.rate:read` for the 2024-09 Public API integration?
+- Which Easyship production account/project will own label payment, courier billing, and production API tokens?
