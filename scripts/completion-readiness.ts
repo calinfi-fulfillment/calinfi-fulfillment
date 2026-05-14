@@ -32,6 +32,7 @@ const requiredDocs = [
   "docs/evidence/SFC_READ_ONLY_SMOKE_2026-05-14.json",
   "docs/evidence/STRIPE_CLI_CHECKOUT_2026-05-14.json",
   "docs/audits/2026-05-11_LOCAL_BOUNDARY_AUDIT.md",
+  "docs/audits/2026-05-15_PRE_PILOT_BOUNDARY_AUDIT.md",
 ];
 
 const requiredScripts = [
@@ -42,6 +43,8 @@ const requiredScripts = [
   "check:sfc-read-only-env",
   "test",
   "test:no-secrets",
+  "test:checklist",
+  "test:pre-pilot-boundary-audit",
   "test:sfc-network",
   "smoke:easyship-sandbox-rates",
   "smoke:stripe-restricted-key-checkout",
