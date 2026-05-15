@@ -1,0 +1,75 @@
+{
+  "provider": "odun-fulfillment-v1",
+  "checkedAt": "2026-05-15T06:43:44Z",
+  "status": "completed",
+  "scope": {
+    "ownerApproved": true,
+    "mode": "staging_inventory_schema_only",
+    "stagingProjectRef": "mgdsvapgltzwhsioccqd",
+    "appliedMigrationId": "0003_inventory_module",
+    "productionMigration": false,
+    "pmProductionMutation": false,
+    "rawRowsPrinted": false,
+    "rawPiiStored": false,
+    "serviceKeysPrinted": false,
+    "connectionStringsStored": false,
+    "secretsStored": false
+  },
+  "migration": {
+    "method": "supabase db query --linked --file",
+    "supabaseCliVersion": "2.95.4",
+    "historyRecorded": true,
+    "remoteHistoryNote": "Remote staging already had timestamped 0001 and 0002 records; 0003 was applied transactionally and recorded as 0003."
+  },
+  "publicSurface": {
+    "ok": true,
+    "mode": "read-only-limit-zero-requests",
+    "tables": [
+      "inventory_locations",
+      "inventory_batches",
+      "inventory_reservations"
+    ],
+    "views": [
+      "fulfillment_stock_feed"
+    ],
+    "statusBySurface": {
+      "inventory_locations": 200,
+      "inventory_batches": 200,
+      "inventory_reservations": 200,
+      "fulfillment_stock_feed": 200
+    }
+  },
+  "rlsClientDeny": {
+    "ok": true,
+    "summary": "All inventory tables have RLS enabled with deny-client policies for anon/authenticated clients.",
+    "tables": [
+      {
+        "table": "inventory_batches",
+        "rlsEnabled": true,
+        "denyPolicyCount": 1
+      },
+      {
+        "table": "inventory_locations",
+        "rlsEnabled": true,
+        "denyPolicyCount": 1
+      },
+      {
+        "table": "inventory_reservations",
+        "rlsEnabled": true,
+        "denyPolicyCount": 1
+      }
+    ]
+  },
+  "mutationBoundary": {
+    "externalActions": "none",
+    "stagingDbSchemaMutation": true,
+    "stagingDbSeedImport": false,
+    "productionDbMutation": false,
+    "providerMutation": false,
+    "stripeLiveAction": false,
+    "labelExportTrackingAction": false,
+    "pmProductionRead": false,
+    "pmProductionMutation": false,
+    "rawPiiAccess": false
+  }
+}

@@ -10,11 +10,13 @@ assert.match(checklist, /PM production read-only aggregate baseline alındı\. V
 assert.match(checklist, /SFC API certificate rotate\/review confirmed\. Verified by owner-approved `docs\/evidence\/SFC_CERTIFICATE_REVIEW_2026-05-15\.json`/);
 assert.match(checklist, /Sınır Bekçisi pre-pilot audit geçti\. Verified by owner-approved SFC certificate review evidence/);
 assert.match(checklist, /1-2 allowlisted staging pilot order run completed\. Verified by `docs\/evidence\/STAGING_PILOT_ORDER_RUN_2026-05-15\.json`/);
+assert.match(checklist, /Inventory staging schema drift kapandı\. Verified by owner-approved `docs\/evidence\/STAGING_INVENTORY_SCHEMA_2026-05-15\.json`/);
 assert.match(checklist, /`test:staging-pilot-run`/);
+assert.match(checklist, /`npm run test:staging-schema-public` to cover `fulfillment_stock_feed`/);
 assert.match(checklist, /- \[x\] Stripe test-mode pilot öncesinde\./);
 assert.doesNotMatch(
   checklist,
-  /real Stripe test env not connected|Stripe real test account\/env verification is still pending|Easyship 401|fresh staging Supabase and PM read-only baseline required|preview redeploy/i,
+  /real Stripe test env not connected|Stripe real test account\/env verification is still pending|Easyship 401|fresh staging Supabase and PM read-only baseline required|preview redeploy|unapplied inventory migration/i,
 );
 
 const allowedOpenItems = [

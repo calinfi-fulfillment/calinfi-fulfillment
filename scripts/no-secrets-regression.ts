@@ -10,6 +10,7 @@ const searchableExtensions = new Set([".css", ".env.example", ".json", ".md", ".
 const secretPatterns = [
   { name: "stripe-live-secret", pattern: new RegExp(["sk", "live"].join("_")) },
   { name: "stripe-webhook-secret", pattern: new RegExp(["wh", "sec"].join("")) },
+  { name: "supabase-personal-access-token", pattern: /sbp_[A-Za-z0-9]{30,}/ },
   { name: "jwt-like-token", pattern: /eyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}/ },
   {
     name: "non-empty-secret-env",

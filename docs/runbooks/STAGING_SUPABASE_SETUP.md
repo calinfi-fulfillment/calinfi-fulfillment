@@ -11,9 +11,10 @@ This runbook covers the owner-approved fresh Fulfillment staging Supabase setup.
 - Local `.env.local` now points at the owner-provided non-PM project with only public client config.
 - `npm run check:staging-prep` reports `staging_ready` with live/provider/export flags disabled.
 - Supabase MCP server `supabase` is configured for project ref `mgdsvapgltzwhsioccqd`, OAuth login completed successfully, and MCP tools are visible in Codex.
-- Migrations `0001_fulfillment_v1_core` and `0002_staging_schema_hardening` are applied to staging.
-- `npm run test:staging-schema-public` verifies the required V1 public table surface with read-only zero-row selects.
+- Migrations `0001_fulfillment_v1_core`, `0002_staging_schema_hardening`, and owner-approved staging-only `0003_inventory_module` are applied to staging.
+- `npm run test:staging-schema-public` verifies the required V1 public table surface, inventory tables, and `fulfillment_stock_feed` view with read-only zero-row selects.
 - Synthetic pilot fixture is imported into staging using synthetic-only records; no PM production data or PII was imported.
+- Inventory tables are schema-only at this stage; no real stock seed/import was run.
 
 ## Required Owner Decision
 
@@ -31,6 +32,7 @@ Do not use the PM production project. The blocked PM project ref remains `cjygwb
 
 - Generate the DB password locally and store it in macOS Keychain or another secret manager.
 - Do not print or commit the DB password, service role key, API keys, auth links, or raw tokens.
+- Delete or rotate temporary CLI access tokens after the approved schema window is complete.
 - Link the repo only to the fresh Fulfillment staging project.
 - Keep `FULFILLMENT_ENABLE_PROVIDER_API_QUOTES=false`, `FULFILLMENT_ENABLE_STRIPE_CHECKOUT=false`, `FULFILLMENT_ENABLE_HANDOFF_EXPORTS=false`, and `FULFILLMENT_ENABLE_PARTNER_API_PUSH=false`.
 

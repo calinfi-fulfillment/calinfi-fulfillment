@@ -28,8 +28,17 @@ const requiredTables = [
   "inventory_reservations",
 ] as const;
 
-type TableCheck = {
+const requiredViews = ["fulfillment_stock_feed"] as const;
+
+type SurfaceCheck = {
   table: (typeof requiredTables)[number];
+  ok: boolean;
+  status: number | null;
+  code: string | null;
+};
+
+type ViewCheck = {
+  view: (typeof requiredViews)[number];
   ok: boolean;
   status: number | null;
   code: string | null;
@@ -58,12 +67,12 @@ async function checkTableSurface() {
     },
   });
 
-  const results: TableCheck[] = [];
+  const tableResults: SurfaceCheck[] = [];
 
   for (const table of requiredTables) {
     const { error, status } = await supabase.from(table).select("id", { count: "exact" }).limit(0);
 
-    results.push({
+    tableResults.push({
       table,
       ok: !error,
       status: status ?? null,
@@ -71,7 +80,22 @@ async function checkTableSurface() {
     });
   }
 
-  const missingOrBlocked = results.filter((result) => !result.ok);
+  const viewResults: ViewCheck[] = [];
+
+  for (const view of requiredViews) {
+    const { error, status } = await supabase.from(view).select("product_id", { count: "exact" }).limit(0);
+
+    viewResults.push({
+      view,
+      ok: !error,
+      status: status ?? null,
+      code: error?.code ?? null,
+    });
+  }
+
+  const missingOrBlockedTables = tableResults.filter((result) => !result.ok);
+  const missingOrBlockedViews = viewResults.filter((result) => !result.ok);
+  const missingOrBlocked = [...missingOrBlockedTables, ...missingOrBlockedViews];
 
   console.log(
     JSON.stringify(
@@ -80,7 +104,8 @@ async function checkTableSurface() {
         checked: "staging-schema-public",
         target: redactUrl(supabaseUrl),
         mode: "read-only-limit-zero-requests",
-        tables: results,
+        tables: tableResults,
+        views: viewResults,
         externalActions: "zero-row selects only; no row reads, inserts, updates, deletes, migrations, or RPC calls",
       },
       null,
@@ -92,7 +117,10 @@ async function checkTableSurface() {
     missingOrBlocked,
     [],
     `Staging Supabase public schema surface is missing or inaccessible for: ${missingOrBlocked
-      .map((result) => `${result.table}${result.code ? `:${result.code}` : ""}`)
+      .map((result) => {
+        if ("table" in result) return `${result.table}${result.code ? `:${result.code}` : ""}`;
+        return `${result.view}${result.code ? `:${result.code}` : ""}`;
+      })
       .join(", ")}`,
   );
 }

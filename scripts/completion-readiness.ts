@@ -41,6 +41,7 @@ const requiredDocs = [
   "docs/evidence/PM_PRODUCTION_AGGREGATE_BASELINE_2026-05-15.json",
   "docs/evidence/SFC_CERTIFICATE_REVIEW_2026-05-15.json",
   "docs/evidence/STAGING_PILOT_ORDER_RUN_2026-05-15.json",
+  "docs/evidence/STAGING_INVENTORY_SCHEMA_2026-05-15.json",
   "docs/audits/2026-05-11_LOCAL_BOUNDARY_AUDIT.md",
   "docs/audits/2026-05-15_PRE_PILOT_BOUNDARY_AUDIT.md",
 ];
@@ -352,6 +353,57 @@ type StagingPilotRunEvidence = {
   };
 };
 
+type StagingInventorySchemaEvidence = {
+  provider?: string;
+  checkedAt?: string;
+  status?: string;
+  scope?: {
+    ownerApproved?: boolean;
+    mode?: string;
+    stagingProjectRef?: string;
+    appliedMigrationId?: string;
+    productionMigration?: boolean;
+    pmProductionMutation?: boolean;
+    rawRowsPrinted?: boolean;
+    rawPiiStored?: boolean;
+    serviceKeysPrinted?: boolean;
+    connectionStringsStored?: boolean;
+    secretsStored?: boolean;
+  };
+  migration?: {
+    method?: string;
+    supabaseCliVersion?: string;
+    historyRecorded?: boolean;
+    remoteHistoryNote?: string;
+  };
+  publicSurface?: {
+    ok?: boolean;
+    mode?: string;
+    tables?: string[];
+    views?: string[];
+  };
+  rlsClientDeny?: {
+    ok?: boolean;
+    tables?: Array<{
+      table?: string;
+      rlsEnabled?: boolean;
+      denyPolicyCount?: number;
+    }>;
+  };
+  mutationBoundary?: {
+    externalActions?: string;
+    stagingDbSchemaMutation?: boolean;
+    stagingDbSeedImport?: boolean;
+    productionDbMutation?: boolean;
+    providerMutation?: boolean;
+    stripeLiveAction?: boolean;
+    labelExportTrackingAction?: boolean;
+    pmProductionRead?: boolean;
+    pmProductionMutation?: boolean;
+    rawPiiAccess?: boolean;
+  };
+};
+
 function packageScripts() {
   const packageJson = JSON.parse(readFileSync("package.json", "utf8")) as { scripts?: Record<string, string> };
   return packageJson.scripts ?? {};
@@ -453,6 +505,17 @@ function loadStagingPilotRunEvidence(): StagingPilotRunEvidence | null {
   }
 }
 
+function loadStagingInventorySchemaEvidence(): StagingInventorySchemaEvidence | null {
+  const evidencePath = "docs/evidence/STAGING_INVENTORY_SCHEMA_2026-05-15.json";
+  if (!existsSync(evidencePath)) return null;
+
+  try {
+    return JSON.parse(readFileSync(evidencePath, "utf8")) as StagingInventorySchemaEvidence;
+  } catch {
+    return null;
+  }
+}
+
 function pmProductionBaselineReady(evidence: PmProductionAggregateBaselineEvidence | null) {
   if (!evidence) return false;
 
@@ -537,6 +600,45 @@ function stagingPilotRunReady(evidence: StagingPilotRunEvidence | null) {
       boundary?.externalActions === "none" &&
       mutationBoundaryValues.length > 0 &&
       mutationBoundaryValues.every(([, value]) => value === false),
+  );
+}
+
+function stagingInventorySchemaReady(evidence: StagingInventorySchemaEvidence | null) {
+  if (!evidence) return false;
+
+  const requiredInventoryTables = new Set(["inventory_locations", "inventory_batches", "inventory_reservations"]);
+  const tables = new Set(evidence.publicSurface?.tables ?? []);
+  const views = new Set(evidence.publicSurface?.views ?? []);
+  const boundary = evidence.mutationBoundary;
+  const mutationBoundaryValues = Object.entries(boundary ?? {}).filter(([key]) => key !== "externalActions");
+
+  return Boolean(
+    evidence.provider === "odun-fulfillment-v1" &&
+      evidence.status === "completed" &&
+      evidence.scope?.ownerApproved === true &&
+      evidence.scope.mode === "staging_inventory_schema_only" &&
+      evidence.scope.stagingProjectRef === "mgdsvapgltzwhsioccqd" &&
+      evidence.scope.appliedMigrationId === "0003_inventory_module" &&
+      evidence.scope.productionMigration === false &&
+      evidence.scope.pmProductionMutation === false &&
+      evidence.scope.rawRowsPrinted === false &&
+      evidence.scope.rawPiiStored === false &&
+      evidence.scope.serviceKeysPrinted === false &&
+      evidence.scope.connectionStringsStored === false &&
+      evidence.scope.secretsStored === false &&
+      evidence.migration?.method === "supabase db query --linked --file" &&
+      evidence.migration?.historyRecorded === true &&
+      evidence.publicSurface?.ok === true &&
+      evidence.publicSurface.mode === "read-only-limit-zero-requests" &&
+      [...requiredInventoryTables].every((table) => tables.has(table)) &&
+      views.has("fulfillment_stock_feed") &&
+      evidence.rlsClientDeny?.ok === true &&
+      evidence.rlsClientDeny.tables?.length === 3 &&
+      evidence.rlsClientDeny.tables.every((table) => table.rlsEnabled === true && (table.denyPolicyCount ?? 0) >= 1) &&
+      boundary?.externalActions === "none" &&
+      boundary?.stagingDbSchemaMutation === true &&
+      mutationBoundaryValues.length > 0 &&
+      mutationBoundaryValues.filter(([key]) => key !== "stagingDbSchemaMutation").every(([, value]) => value === false),
   );
 }
 
@@ -730,6 +832,8 @@ const pmBaselineEvidence = loadPmProductionBaselineEvidence();
 const pmBaselineReady = pmProductionBaselineReady(pmBaselineEvidence);
 const stagingPilotEvidence = loadStagingPilotRunEvidence();
 const stagingPilotEvidenceReady = stagingPilotRunReady(stagingPilotEvidence);
+const stagingInventorySchemaEvidence = loadStagingInventorySchemaEvidence();
+const stagingInventorySchemaEvidenceReady = stagingInventorySchemaReady(stagingInventorySchemaEvidence);
 const liveMutationSafe = areLiveMutationFlagsDisabled(process.env);
 const pmSupabaseSafe = !isPledgeManagerSupabaseUrl(envValue("NEXT_PUBLIC_SUPABASE_URL"), process.env);
 const easyshipShipmentSafe = envValue("EASYSHIP_ENABLE_SHIPMENTS") !== "true";
@@ -853,6 +957,13 @@ const checks: Check[] = [
       ? `Allowlisted staging pilot run evidence is complete from ${stagingPilotEvidence?.checkedAt}; 2 synthetic orders reached handoff preview with no external actions.`
       : "Allowlisted staging pilot run evidence is missing or incomplete.",
   },
+  {
+    name: "staging-inventory-schema-evidence",
+    ok: stagingInventorySchemaEvidenceReady,
+    detail: stagingInventorySchemaEvidenceReady
+      ? `Staging inventory schema evidence is complete from ${stagingInventorySchemaEvidence?.checkedAt}; public inventory tables and stock feed view passed zero-row checks.`
+      : "Staging inventory schema evidence is missing or incomplete.",
+  },
 ];
 
 const launchBlockers = [
@@ -964,6 +1075,18 @@ console.log(
                 orders: stagingPilotEvidence.syntheticPilotRun?.ordersCompleted ?? 0,
                 exportedPreviewRows: stagingPilotEvidence.syntheticPilotRun?.exportedPreviewRows ?? 0,
                 stagingProjectRef: stagingPilotEvidence.scope?.stagingProjectRef ?? null,
+              }
+            : null,
+        },
+        stagingInventorySchema: {
+          evidence: stagingInventorySchemaEvidence
+            ? {
+                checkedAt: stagingInventorySchemaEvidence.checkedAt,
+                ok: stagingInventorySchemaEvidenceReady,
+                migration: stagingInventorySchemaEvidence.scope?.appliedMigrationId ?? null,
+                stagingProjectRef: stagingInventorySchemaEvidence.scope?.stagingProjectRef ?? null,
+                tables: stagingInventorySchemaEvidence.publicSurface?.tables?.length ?? 0,
+                views: stagingInventorySchemaEvidence.publicSurface?.views?.length ?? 0,
               }
             : null,
         },
