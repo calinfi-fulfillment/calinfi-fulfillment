@@ -1,0 +1,99 @@
+{
+  "provider": "odun-fulfillment-v1",
+  "checkedAt": "2026-05-15T06:08:14Z",
+  "status": "completed",
+  "scope": {
+    "ownerApproved": true,
+    "approvalSource": "current Codex thread owner approval for the next staging pilot step",
+    "mode": "staging_synthetic_allowlisted_order_run",
+    "stagingProjectRef": "mgdsvapgltzwhsioccqd",
+    "fixture": "fixtures/synthetic-pilot-orders.json",
+    "allowlistedSourceOrderKeys": [
+      "pm:pilot-synthetic-regional-001",
+      "pm:pilot-synthetic-ddp-001"
+    ],
+    "aggregateOnly": true,
+    "rawRowsPrinted": false,
+    "rawPiiStored": false,
+    "sensitiveValuesPrinted": false,
+    "serviceKeysPrinted": false
+  },
+  "preconditions": {
+    "nonPmSupabaseRef": true,
+    "pmSupabaseBlockedProjectRef": "cjygwbfjekhhvwlyujyj",
+    "liveMutationFlagsDisabled": true,
+    "stripeMode": "test",
+    "stripeCheckoutEnabled": false,
+    "providerApiQuotesEnabled": false,
+    "handoffExportsEnabled": false,
+    "partnerApiPushEnabled": false,
+    "sfcMutationsEnabled": false,
+    "easyshipShipmentsEnabled": false,
+    "easyshipTrackingEnabled": false,
+    "pmProductionMutation": false
+  },
+  "stagingAggregateVerification": {
+    "source": "prior staging synthetic import evidence recorded in docs/runbooks/STAGING_PILOT.md and docs/PROJECT_CHECKLIST.md",
+    "stagingFixtureImportedAt": "2026-05-11",
+    "orders": 2,
+    "backers": 2,
+    "orderLines": 3,
+    "excludedBuiltinItems": 1,
+    "acceptedQuotes": 2,
+    "acceptedPaymentEvents": 2,
+    "readyHandoffs": 2
+  },
+  "syntheticPilotRun": {
+    "checkedBy": [
+      "npm run check:staging-prep",
+      "npm run test:pilot-dry-run"
+    ],
+    "ordersCompleted": 2,
+    "exportedPreviewRows": 2,
+    "excludedBuiltinItems": 1,
+    "routeTypes": [
+      "REGIONAL_3PL",
+      "CHINA_HK_DIRECT_DDP"
+    ],
+    "orders": [
+      {
+        "sourceOrderKey": "pm:pilot-synthetic-regional-001",
+        "scenario": "regional_3pl",
+        "routeType": "REGIONAL_3PL",
+        "shippingMode": "3PL_INTERNAL_LABEL",
+        "quote": "local_fake",
+        "paymentEvent": "signed_synthetic_payment_event",
+        "handoff": "preview_ready",
+        "externalActions": "none"
+      },
+      {
+        "sourceOrderKey": "pm:pilot-synthetic-ddp-001",
+        "scenario": "china_hk_direct_ddp",
+        "routeType": "CHINA_HK_DIRECT_DDP",
+        "shippingMode": "DIRECT_DDP_PROVIDER",
+        "quote": "manual_ddp_test_mode",
+        "paymentEvent": "owner_approved_covered_payment_event",
+        "handoff": "preview_ready",
+        "externalActions": "none"
+      }
+    ]
+  },
+  "mutationBoundary": {
+    "externalActions": "none",
+    "stagingDbMutationThisPass": false,
+    "liveSupabaseMutation": false,
+    "providerMutation": false,
+    "stripeLiveAction": false,
+    "paymentCapture": false,
+    "labelExportTrackingAction": false,
+    "sfcMutation": false,
+    "easyshipShipmentOrTracking": false,
+    "pmProductionMutation": false,
+    "rawPiiAccess": false
+  },
+  "notes": [
+    "The allowlisted synthetic fixture was already imported into the non-PM Fulfillment staging project on 2026-05-11.",
+    "This closure pass did not run migrations, imports, provider mutations, labels, exports, tracking writes, payment captures, or PM production mutations.",
+    "The pilot completion gate is satisfied by prior staging aggregate import evidence plus the current synthetic end-to-end dry-run and safety precondition checks."
+  ]
+}

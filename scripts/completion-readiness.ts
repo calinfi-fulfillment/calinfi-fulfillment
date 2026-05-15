@@ -40,6 +40,7 @@ const requiredDocs = [
   "docs/evidence/VERCEL_MAIN_GIT_DEPLOY_SMOKE_2026-05-15.json",
   "docs/evidence/PM_PRODUCTION_AGGREGATE_BASELINE_2026-05-15.json",
   "docs/evidence/SFC_CERTIFICATE_REVIEW_2026-05-15.json",
+  "docs/evidence/STAGING_PILOT_ORDER_RUN_2026-05-15.json",
   "docs/audits/2026-05-11_LOCAL_BOUNDARY_AUDIT.md",
   "docs/audits/2026-05-15_PRE_PILOT_BOUNDARY_AUDIT.md",
 ];
@@ -54,6 +55,7 @@ const requiredScripts = [
   "test:no-secrets",
   "test:checklist",
   "test:pre-pilot-boundary-audit",
+  "test:staging-pilot-run",
   "test:sfc-certificate-review",
   "test:sfc-network",
   "smoke:easyship-sandbox-rates",
@@ -283,6 +285,73 @@ type PmProductionAggregateBaselineEvidence = {
   };
 };
 
+type StagingPilotRunEvidence = {
+  provider?: string;
+  checkedAt?: string;
+  status?: string;
+  scope?: {
+    ownerApproved?: boolean;
+    mode?: string;
+    stagingProjectRef?: string;
+    fixture?: string;
+    allowlistedSourceOrderKeys?: string[];
+    aggregateOnly?: boolean;
+    rawRowsPrinted?: boolean;
+    rawPiiStored?: boolean;
+    sensitiveValuesPrinted?: boolean;
+    serviceKeysPrinted?: boolean;
+  };
+  preconditions?: {
+    nonPmSupabaseRef?: boolean;
+    pmSupabaseBlockedProjectRef?: string;
+    liveMutationFlagsDisabled?: boolean;
+    stripeMode?: string;
+    stripeCheckoutEnabled?: boolean;
+    providerApiQuotesEnabled?: boolean;
+    handoffExportsEnabled?: boolean;
+    partnerApiPushEnabled?: boolean;
+    sfcMutationsEnabled?: boolean;
+    easyshipShipmentsEnabled?: boolean;
+    easyshipTrackingEnabled?: boolean;
+    pmProductionMutation?: boolean;
+  };
+  stagingAggregateVerification?: {
+    orders?: number;
+    backers?: number;
+    orderLines?: number;
+    excludedBuiltinItems?: number;
+    acceptedQuotes?: number;
+    acceptedPaymentEvents?: number;
+    readyHandoffs?: number;
+  };
+  syntheticPilotRun?: {
+    checkedBy?: string[];
+    ordersCompleted?: number;
+    exportedPreviewRows?: number;
+    excludedBuiltinItems?: number;
+    routeTypes?: string[];
+    orders?: Array<{
+      sourceOrderKey?: string;
+      routeType?: string;
+      shippingMode?: string;
+      externalActions?: string;
+    }>;
+  };
+  mutationBoundary?: {
+    externalActions?: string;
+    stagingDbMutationThisPass?: boolean;
+    liveSupabaseMutation?: boolean;
+    providerMutation?: boolean;
+    stripeLiveAction?: boolean;
+    paymentCapture?: boolean;
+    labelExportTrackingAction?: boolean;
+    sfcMutation?: boolean;
+    easyshipShipmentOrTracking?: boolean;
+    pmProductionMutation?: boolean;
+    rawPiiAccess?: boolean;
+  };
+};
+
 function packageScripts() {
   const packageJson = JSON.parse(readFileSync("package.json", "utf8")) as { scripts?: Record<string, string> };
   return packageJson.scripts ?? {};
@@ -373,6 +442,17 @@ function loadPmProductionBaselineEvidence(): PmProductionAggregateBaselineEviden
   }
 }
 
+function loadStagingPilotRunEvidence(): StagingPilotRunEvidence | null {
+  const evidencePath = "docs/evidence/STAGING_PILOT_ORDER_RUN_2026-05-15.json";
+  if (!existsSync(evidencePath)) return null;
+
+  try {
+    return JSON.parse(readFileSync(evidencePath, "utf8")) as StagingPilotRunEvidence;
+  } catch {
+    return null;
+  }
+}
+
 function pmProductionBaselineReady(evidence: PmProductionAggregateBaselineEvidence | null) {
   if (!evidence) return false;
 
@@ -398,6 +478,65 @@ function pmProductionBaselineReady(evidence: PmProductionAggregateBaselineEviden
       evidence.boundary?.pmFulfillmentSyncDisabled === true &&
       evidence.boundary?.fulfillmentOperationalRowsZero === true &&
       evidence.boundary?.externalActions === "pm_production_read_only_aggregate_only",
+  );
+}
+
+function stagingPilotRunReady(evidence: StagingPilotRunEvidence | null) {
+  if (!evidence) return false;
+
+  const sourceOrderKeys = new Set(evidence.scope?.allowlistedSourceOrderKeys ?? []);
+  const routeTypes = new Set(evidence.syntheticPilotRun?.routeTypes ?? []);
+  const preconditions = evidence.preconditions;
+  const aggregate = evidence.stagingAggregateVerification;
+  const run = evidence.syntheticPilotRun;
+  const boundary = evidence.mutationBoundary;
+  const mutationBoundaryValues = Object.entries(boundary ?? {}).filter(([key]) => key !== "externalActions");
+
+  return Boolean(
+    evidence.provider === "odun-fulfillment-v1" &&
+      evidence.status === "completed" &&
+      evidence.scope?.ownerApproved === true &&
+      evidence.scope.mode === "staging_synthetic_allowlisted_order_run" &&
+      evidence.scope.stagingProjectRef === "mgdsvapgltzwhsioccqd" &&
+      evidence.scope.fixture === "fixtures/synthetic-pilot-orders.json" &&
+      evidence.scope.aggregateOnly === true &&
+      evidence.scope.rawRowsPrinted === false &&
+      evidence.scope.rawPiiStored === false &&
+      evidence.scope.sensitiveValuesPrinted === false &&
+      evidence.scope.serviceKeysPrinted === false &&
+      sourceOrderKeys.size === 2 &&
+      sourceOrderKeys.has("pm:pilot-synthetic-regional-001") &&
+      sourceOrderKeys.has("pm:pilot-synthetic-ddp-001") &&
+      preconditions?.nonPmSupabaseRef === true &&
+      preconditions?.pmSupabaseBlockedProjectRef === "cjygwbfjekhhvwlyujyj" &&
+      preconditions?.liveMutationFlagsDisabled === true &&
+      preconditions?.stripeMode === "test" &&
+      preconditions?.stripeCheckoutEnabled === false &&
+      preconditions?.providerApiQuotesEnabled === false &&
+      preconditions?.handoffExportsEnabled === false &&
+      preconditions?.partnerApiPushEnabled === false &&
+      preconditions?.sfcMutationsEnabled === false &&
+      preconditions?.easyshipShipmentsEnabled === false &&
+      preconditions?.easyshipTrackingEnabled === false &&
+      preconditions?.pmProductionMutation === false &&
+      aggregate?.orders === 2 &&
+      aggregate?.backers === 2 &&
+      aggregate?.orderLines === 3 &&
+      aggregate?.excludedBuiltinItems === 1 &&
+      aggregate?.acceptedQuotes === 2 &&
+      aggregate?.acceptedPaymentEvents === 2 &&
+      aggregate?.readyHandoffs === 2 &&
+      run?.ordersCompleted === 2 &&
+      run?.exportedPreviewRows === 2 &&
+      run?.excludedBuiltinItems === 1 &&
+      routeTypes.size === 2 &&
+      routeTypes.has("REGIONAL_3PL") &&
+      routeTypes.has("CHINA_HK_DIRECT_DDP") &&
+      run?.orders?.length === 2 &&
+      run?.orders.every((order) => order.externalActions === "none") &&
+      boundary?.externalActions === "none" &&
+      mutationBoundaryValues.length > 0 &&
+      mutationBoundaryValues.every(([, value]) => value === false),
   );
 }
 
@@ -589,6 +728,8 @@ const vercelMainGitDeployEvidence = loadVercelMainGitDeployEvidence();
 const vercelMainGitDeployEvidenceReady = vercelMainGitDeployReady(vercelMainGitDeployEvidence);
 const pmBaselineEvidence = loadPmProductionBaselineEvidence();
 const pmBaselineReady = pmProductionBaselineReady(pmBaselineEvidence);
+const stagingPilotEvidence = loadStagingPilotRunEvidence();
+const stagingPilotEvidenceReady = stagingPilotRunReady(stagingPilotEvidence);
 const liveMutationSafe = areLiveMutationFlagsDisabled(process.env);
 const pmSupabaseSafe = !isPledgeManagerSupabaseUrl(envValue("NEXT_PUBLIC_SUPABASE_URL"), process.env);
 const easyshipShipmentSafe = envValue("EASYSHIP_ENABLE_SHIPMENTS") !== "true";
@@ -702,8 +843,15 @@ const checks: Check[] = [
     name: "pre-pilot-boundary-audit-formal-pass",
     ok: prePilotAuditReady,
     detail: prePilotAuditReady
-      ? "Formal pre-pilot boundary evidence is complete; staging pilot still requires explicit allowlisted pilot-run approval."
+      ? "Formal pre-pilot boundary evidence is complete."
       : "Formal pre-pilot boundary evidence is not complete.",
+  },
+  {
+    name: "staging-pilot-order-run-evidence",
+    ok: stagingPilotEvidenceReady,
+    detail: stagingPilotEvidenceReady
+      ? `Allowlisted staging pilot run evidence is complete from ${stagingPilotEvidence?.checkedAt}; 2 synthetic orders reached handoff preview with no external actions.`
+      : "Allowlisted staging pilot run evidence is missing or incomplete.",
   },
 ];
 
@@ -734,7 +882,9 @@ const launchBlockers = [
     : []),
   ...(!sfcCertificateReviewed ? ["SFC certificate rotation/review confirmation is still required before pilot/prod smoke."] : []),
   ...(!prePilotAuditReady ? ["Formal pre-pilot Sınır Bekçisi audit is still pending."] : []),
-  "1-2 allowlisted staging pilot order run is still pending explicit pilot-run approval and execution.",
+  ...(!stagingPilotEvidenceReady
+    ? ["1-2 allowlisted staging pilot order run is still pending explicit pilot-run approval and execution."]
+    : []),
   "Production environment, backup timing, final audit, owner go/no-go, and production smoke are still pending.",
 ];
 
@@ -803,6 +953,17 @@ console.log(
                 pmBackers: pmBaselineEvidence.tableCounts?.pm_backers ?? 0,
                 pmPledges: pmBaselineEvidence.tableCounts?.pm_pledges ?? 0,
                 fulfillmentOrders: pmBaselineEvidence.fulfillmentIntakeLinks?.fulfillmentOrders ?? 0,
+              }
+            : null,
+        },
+        stagingPilot: {
+          evidence: stagingPilotEvidence
+            ? {
+                checkedAt: stagingPilotEvidence.checkedAt,
+                ok: stagingPilotEvidenceReady,
+                orders: stagingPilotEvidence.syntheticPilotRun?.ordersCompleted ?? 0,
+                exportedPreviewRows: stagingPilotEvidence.syntheticPilotRun?.exportedPreviewRows ?? 0,
+                stagingProjectRef: stagingPilotEvidence.scope?.stagingProjectRef ?? null,
               }
             : null,
         },

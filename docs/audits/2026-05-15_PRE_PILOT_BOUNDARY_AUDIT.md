@@ -8,7 +8,7 @@ Scope: ODUN Fulfillment V1 repo, committed local/staging evidence, PM production
 
 No critical boundary blockers remain for the formal pre-pilot audit.
 
-The 1-2 allowlisted staging pilot order run is still a separate execution step and requires explicit pilot-run approval plus allowlisted synthetic/staging order scope.
+Post-audit update: the 1-2 allowlisted staging pilot order run is now recorded at `docs/evidence/STAGING_PILOT_ORDER_RUN_2026-05-15.json` after explicit owner approval in the current Codex thread. No live provider mutation, label/export/tracking write, payment capture, PM production mutation, or raw PII access was performed.
 
 ## High
 
@@ -56,14 +56,15 @@ None for pre-pilot boundary evidence.
 - PM invite-status counts reconcile to 446 total backers: pending 362, sent 42, accepted 42, disabled 0.
 - PM pledge-status counts reconcile to 28 total pledges: draft 1, selection_submitted 27, and zero fulfillment-ready/locked/payment-pending/manual-hold/cancelled pledges.
 - Existing staging notes record non-PM Fulfillment Supabase ref `mgdsvapgltzwhsioccqd`, applied V1 migrations, public schema verification, and synthetic pilot fixture import.
+- Pilot run closure evidence records 2 allowlisted synthetic orders, 3 order lines, 1 built-in exclusion, 2 accepted quotes, 2 accepted payment events, and 2 ready handoffs.
 - No live migration, import, export, label, provider mutation, payment capture, or production deploy was performed for this audit.
 
 ## Suggested Next Fixes
 
-1. Request explicit owner approval for the 1-2 allowlisted staging pilot order run.
-2. Run the staging pilot only with allowlisted order scope and no live provider mutation, label/export/tracking write, or payment capture.
-3. Record pilot evidence, then proceed to production launch gates.
+1. Keep staging inventory migration drift separate until an owner-approved schema update window.
+2. Prepare production environment, backup/snapshot timing, rollback/flag-off drill, and final audit inputs.
+3. Request owner go/no-go only after production launch gates are ready.
 
 ## Skill Memory Updated
 
-Yes. `calinfi-pm-fulfillment-auditor` should record this as a formal pre-pilot boundary pass. Pilot execution remains a separate owner-approved step.
+Yes. `calinfi-pm-fulfillment-auditor` should record this as a formal pre-pilot boundary pass with the staging pilot order run now completed as a separate owner-approved evidence step.

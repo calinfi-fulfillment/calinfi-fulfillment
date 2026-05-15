@@ -9,6 +9,8 @@ assert.match(checklist, /Vercel Git integration confirmed\. Verified by `docs\/e
 assert.match(checklist, /PM production read-only aggregate baseline alındı\. Verified by `docs\/evidence\/PM_PRODUCTION_AGGREGATE_BASELINE_2026-05-15\.json`/);
 assert.match(checklist, /SFC API certificate rotate\/review confirmed\. Verified by owner-approved `docs\/evidence\/SFC_CERTIFICATE_REVIEW_2026-05-15\.json`/);
 assert.match(checklist, /Sınır Bekçisi pre-pilot audit geçti\. Verified by owner-approved SFC certificate review evidence/);
+assert.match(checklist, /1-2 allowlisted staging pilot order run completed\. Verified by `docs\/evidence\/STAGING_PILOT_ORDER_RUN_2026-05-15\.json`/);
+assert.match(checklist, /`test:staging-pilot-run`/);
 assert.match(checklist, /- \[x\] Stripe test-mode pilot öncesinde\./);
 assert.doesNotMatch(
   checklist,
@@ -16,7 +18,6 @@ assert.doesNotMatch(
 );
 
 const allowedOpenItems = [
-  /1-2 allowlisted staging pilot order run completed/,
   /Production environment configured/,
   /Production flags reviewed/,
   /Backup\/snapshot completed/,

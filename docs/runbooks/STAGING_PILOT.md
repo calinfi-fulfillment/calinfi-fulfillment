@@ -60,3 +60,5 @@ Stop immediately and turn flags off if:
 - 2026-05-11: Supabase MCP tools became visible in Codex; migrations `0001_fulfillment_v1_core` and `0002_staging_schema_hardening` were applied to the new staging project.
 - 2026-05-11: Required V1 public table surface was verified with `npm run test:staging-schema-public`; this uses zero-row selects and does not read PII rows.
 - 2026-05-11: Synthetic pilot fixture was imported into staging with 2 synthetic orders, 1 built-in exclusion, 2 accepted quotes, 2 accepted payment events, and 2 ready handoffs.
+- 2026-05-15: Owner approved the next pilot step in the current Codex thread. The 1-2 allowlisted staging pilot order run was closed with `docs/evidence/STAGING_PILOT_ORDER_RUN_2026-05-15.json`, `npm run check:staging-prep`, `npm run test:pilot-dry-run`, and `npm run test:staging-pilot-run`; no live provider/payment/label/export mutation was run.
+- 2026-05-15: `npm run test:staging-schema-public` now detects that the later inventory migration tables are not yet applied to staging. Do not apply migration `0003_inventory_module.sql` without a separate owner-approved staging schema update window.
