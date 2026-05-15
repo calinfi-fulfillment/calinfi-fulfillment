@@ -1,6 +1,6 @@
 # SFC Negotiation Brief
 
-Last updated: 2026-05-13
+Last updated: 2026-05-15
 
 ## Goal
 
@@ -34,6 +34,7 @@ The public SFC API page says the interface is available through SOAP and HTTP, a
 - Credentials must be entered only into ignored local/deployment env storage.
 - Do not paste them into docs, tickets, screenshots, chat, or PR comments.
 - Rotate the API certificate before pilot/prod smoke if a credential value was ever shared through a non-secret channel.
+- After rotation/review, approve only the redacted review packet at `docs/evidence/SFC_CERTIFICATE_REVIEW_2026-05-15.json`; do not paste credential values into the evidence.
 
 3. Warehouse activation
    - Confirm the canonical ODUN warehouse ID.
@@ -100,6 +101,7 @@ We will not create orders, create ASN records, create/update products, buy label
 ## Done Criteria
 
 - SFC credentials are configured only in ignored env storage.
+- Redacted certificate-source review packet is approved, or `SFC_CERT_ROTATED_CONFIRMED=true` is set after explicit owner approval.
 - `SFC_ENABLE_MUTATIONS=false`.
 - `npm run smoke:sfc-read-only-plan` returns ready.
 - `npm run smoke:sfc-read-only-api` returns successful summaries for warehouse, shipping methods, stock, and rate.

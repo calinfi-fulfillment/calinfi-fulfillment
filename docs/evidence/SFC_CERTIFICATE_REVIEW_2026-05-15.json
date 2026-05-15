@@ -1,0 +1,36 @@
+{
+  "provider": "sendfromchina",
+  "checkedAt": "2026-05-15",
+  "status": "pending_owner_confirmation",
+  "approval": {
+    "ownerApproved": false,
+    "certificateSourceReviewed": false,
+    "credentialsRotated": false,
+    "approvedAt": null,
+    "reviewer": "pending"
+  },
+  "scope": {
+    "redacted": true,
+    "rawCredentialValuesStored": false,
+    "rawSoapStored": false,
+    "rawPiiStored": false,
+    "serviceKeysStored": false
+  },
+  "currentEnvDoctor": {
+    "readinessCode": "sfc_credentials_missing",
+    "smokePlanCode": "sfc_read_only_env_not_ready",
+    "credentialsPresent": false,
+    "certificateFlagConfirmed": false,
+    "safeToRunReadOnlyApi": false
+  },
+  "mutationBoundary": {
+    "externalActions": "none",
+    "sfcEnableMutations": false,
+    "mutatingActions": []
+  },
+  "requiredBeforePass": [
+    "Owner confirms SFC credential certificate source was officially reviewed or rotated.",
+    "No raw SFC credential values are stored in repo, docs, tickets, screenshots, or logs.",
+    "SFC mutations remain disabled for pre-pilot read-only/pass gating."
+  ]
+}

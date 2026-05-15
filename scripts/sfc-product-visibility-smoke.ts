@@ -1,5 +1,6 @@
 import { assertSfcReadOnlyExecutionPlan, buildSfcStockPlan, createSfcReadiness, hydrateSfcRequestBodyForExecution, summarizeSfcReadOnlyResponse } from "../src/lib/sfc";
 import { loadLocalEnvFile } from "./load-local-env";
+import { loadSfcCertificateReviewEvidence, sfcCertificateReviewApproved } from "./sfc-certificate-review-evidence";
 
 loadLocalEnvFile();
 
@@ -60,7 +61,8 @@ function extractTag(xml: string, tag: string) {
 
 function assertSafeRuntime() {
   const readiness = createSfcReadiness(process.env);
-  const certificateReviewed = envValue("SFC_CERT_ROTATED_CONFIRMED") === "true";
+  const certificateReviewEvidence = loadSfcCertificateReviewEvidence();
+  const certificateReviewed = envValue("SFC_CERT_ROTATED_CONFIRMED") === "true" || sfcCertificateReviewApproved(certificateReviewEvidence);
 
   if (!readiness.ok || readiness.code !== "sfc_read_only_ready" || !certificateReviewed) {
     console.log(
@@ -77,7 +79,9 @@ function assertSafeRuntime() {
               ok: certificateReviewed,
               detail: certificateReviewed
                 ? "SFC certificate rotation/review is confirmed."
-                : "Set SFC_CERT_ROTATED_CONFIRMED=true only after rotation or explicit approval.",
+                : `Set SFC_CERT_ROTATED_CONFIRMED=true or approve redacted certificate-review evidence; current evidence status is ${
+                    certificateReviewEvidence?.status ?? "missing"
+                  }.`,
             },
           ],
           externalActions: "none",

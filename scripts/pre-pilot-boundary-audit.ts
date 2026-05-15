@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 
+import { loadSfcCertificateReviewEvidence, sfcCertificateReviewApproved } from "./sfc-certificate-review-evidence";
+
 type AuditCheck = {
   name: string;
   ok: boolean;
@@ -219,6 +221,7 @@ function text(path: string) {
 const stripe = loadJson<StripeEvidence>("docs/evidence/STRIPE_CLI_CHECKOUT_2026-05-14.json");
 const easyship = loadJson<EasyshipEvidence>("docs/evidence/EASYSHIP_SANDBOX_RATES_2026-05-14.json");
 const sfc = loadJson<SfcEvidence>("docs/evidence/SFC_READ_ONLY_SMOKE_2026-05-14.json");
+const sfcCertificateReview = loadSfcCertificateReviewEvidence();
 const vercelPreview = loadJson<VercelPreviewEvidence>("docs/evidence/VERCEL_PROTECTED_PREVIEW_SMOKE_2026-05-15.json");
 const vercelMainGitDeploy = loadJson<VercelMainGitDeployEvidence>("docs/evidence/VERCEL_MAIN_GIT_DEPLOY_SMOKE_2026-05-15.json");
 const pmBaseline = loadJson<PmProductionAggregateBaselineEvidence>(
@@ -287,6 +290,7 @@ const sfcReady = Boolean(
     sfc.mutationBoundary?.sfcEnableMutations === false &&
     sfc.mutationBoundary.externalActions === "read_only_provider_api_only",
 );
+const sfcCertificateReviewReady = sfcCertificateReviewApproved(sfcCertificateReview);
 
 const vercelPreviewReady = Boolean(
   vercelPreview?.provider === "vercel" &&
@@ -415,9 +419,13 @@ const checks: AuditCheck[] = [
   },
   {
     name: "sfc-certificate-review",
-    ok: false,
+    ok: sfcCertificateReviewReady,
     blocking: true,
-    detail: "Blocked until SFC credential rotation or explicit certificate-source review is confirmed.",
+    detail: sfcCertificateReviewReady
+      ? "SFC credential rotation or explicit certificate-source review is confirmed with redacted evidence."
+      : `Blocked until SFC credential rotation or explicit certificate-source review is confirmed; current status is ${
+          sfcCertificateReview?.status ?? "missing"
+        }.`,
   },
   {
     name: "vercel-git-integration",

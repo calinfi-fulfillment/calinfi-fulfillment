@@ -1,6 +1,6 @@
 # SFC Read-only Smoke Plan
 
-Last updated: 2026-05-13
+Last updated: 2026-05-15
 
 ## Purpose
 
@@ -41,6 +41,8 @@ SFC_SMOKE_SHIPPING_METHOD_CODE=
 
 Do not paste credentials into docs, tickets, screenshots, or source files. If a credential value was ever shared through a non-secret channel, rotate it in SFC before using it for a production or pilot smoke.
 
+Certificate-source review is tracked separately in `docs/evidence/SFC_CERTIFICATE_REVIEW_2026-05-15.json`. That file must stay redacted: it records approval status only, never credential values.
+
 ## Env Doctor
 
 ```bash
@@ -51,7 +53,8 @@ Expected safe behavior:
 
 - Prints only presence/length checks, not credential values.
 - Confirms `SFC_MODE=read_only`, read-only flag, mutation flag, warehouse ID, stock SKU, rate action, known WSDL host, and SOAP service endpoint.
-- Requires `SFC_CERT_ROTATED_CONFIRMED=true` before reporting that the real read-only API smoke is safe to run.
+- Requires `SFC_CERT_ROTATED_CONFIRMED=true` or approved redacted certificate-review evidence before reporting that the real read-only API smoke is safe to run.
+- `npm run test:sfc-certificate-review` validates that the review packet is redacted even while it remains pending.
 
 ## Planning Command
 
@@ -101,4 +104,5 @@ Expected safe behavior:
 
 - `SFC_ENABLE_MUTATIONS=true` is always blocked.
 - Missing SFC credentials block the smoke plan.
+- Pending `docs/evidence/SFC_CERTIFICATE_REVIEW_2026-05-15.json` blocks formal pre-pilot pass.
 - SFC order/ASN/product mutation still requires explicit owner approval in a separate step.

@@ -25,6 +25,7 @@ Verified closed high-risk evidence:
 - PM Supabase project ref remains blocklisted and completion readiness reports Fulfillment is not configured against the blocked PM Supabase ref.
 - Protected Vercel preview deployment `dpl_59MCgMUs4zHAKVbLkv7tcsQpiYYH` passed `/api/health`, `/`, `/shipping`, `/quotes`, `/payments`, `/handoffs`, and `/reports`; anonymous direct access remains HTTP 401.
 - New Vercel account GitHub import is confirmed by `docs/evidence/VERCEL_MAIN_GIT_DEPLOY_SMOKE_2026-05-15.json`; main deployment `dpl_FadPJzuqvjNnFMiFaQi6iBqmw9oW` passed the same 7-route public smoke with live flags off and no service-role Supabase configured.
+- SFC certificate-review packet exists at `docs/evidence/SFC_CERTIFICATE_REVIEW_2026-05-15.json` and is redacted, but status remains `pending_owner_confirmation`.
 
 ## Medium
 
@@ -43,6 +44,7 @@ Verified closed high-risk evidence:
 - PM repo `npm run verify:live`
 - PM production aggregate count probes using Supabase count/head reads only
 - `npm run check:sfc-read-only-env`
+- `npm run test:sfc-certificate-review`
 - public Node `fetch` smoke against `https://calinfi-fulfillment-5idm.vercel.app`
 - `npx -y vercel@latest deploy --yes --scope hello-75539063s-projects`
 - anonymous `curl` against `/api/health` on the protected preview
@@ -59,7 +61,7 @@ Verified closed high-risk evidence:
 
 ## Suggested Next Fixes
 
-1. Confirm SFC credential rotation or explicit certificate-source review.
+1. Confirm SFC credential rotation or explicit certificate-source review, then update the redacted review packet from `pending_owner_confirmation` to `approved`.
 2. Rerun `npm run test:pre-pilot-boundary-audit` and `npm run check:completion-readiness`.
 3. Only then request owner approval for the 1-2 allowlisted staging pilot order run.
 

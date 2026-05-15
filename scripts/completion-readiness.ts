@@ -5,6 +5,11 @@ import { createEasyshipReadiness } from "../src/lib/easyship";
 import { areLiveMutationFlagsDisabled, isPledgeManagerSupabaseUrl } from "../src/lib/safety";
 import { createSfcReadOnlySmokePlan, createSfcReadiness } from "../src/lib/sfc";
 import { loadLocalEnvFile } from "./load-local-env";
+import {
+  loadSfcCertificateReviewEvidence,
+  sfcCertificateReviewApproved,
+  sfcCertificateReviewRedacted,
+} from "./sfc-certificate-review-evidence";
 
 loadLocalEnvFile();
 
@@ -34,6 +39,7 @@ const requiredDocs = [
   "docs/evidence/VERCEL_PROTECTED_PREVIEW_SMOKE_2026-05-15.json",
   "docs/evidence/VERCEL_MAIN_GIT_DEPLOY_SMOKE_2026-05-15.json",
   "docs/evidence/PM_PRODUCTION_AGGREGATE_BASELINE_2026-05-15.json",
+  "docs/evidence/SFC_CERTIFICATE_REVIEW_2026-05-15.json",
   "docs/audits/2026-05-11_LOCAL_BOUNDARY_AUDIT.md",
   "docs/audits/2026-05-15_PRE_PILOT_BOUNDARY_AUDIT.md",
 ];
@@ -48,6 +54,7 @@ const requiredScripts = [
   "test:no-secrets",
   "test:checklist",
   "test:pre-pilot-boundary-audit",
+  "test:sfc-certificate-review",
   "test:sfc-network",
   "smoke:easyship-sandbox-rates",
   "smoke:stripe-restricted-key-checkout",
@@ -574,6 +581,8 @@ const stripeTestEvidence = loadStripeTestEvidence();
 const stripeTestEvidenceReady = stripeEvidenceReady(stripeTestEvidence);
 const sfcSmokeEvidence = loadSfcSmokeEvidence();
 const sfcSmokeEvidenceReady = sfcEvidenceReady(sfcSmokeEvidence);
+const sfcCertificateReviewEvidence = loadSfcCertificateReviewEvidence();
+const sfcCertificateReviewEvidenceRedacted = sfcCertificateReviewRedacted(sfcCertificateReviewEvidence);
 const vercelPreviewEvidence = loadVercelProtectedPreviewEvidence();
 const vercelPreviewEvidenceReady = vercelProtectedPreviewReady(vercelPreviewEvidence);
 const vercelMainGitDeployEvidence = loadVercelMainGitDeployEvidence();
@@ -585,7 +594,7 @@ const pmSupabaseSafe = !isPledgeManagerSupabaseUrl(envValue("NEXT_PUBLIC_SUPABAS
 const easyshipShipmentSafe = envValue("EASYSHIP_ENABLE_SHIPMENTS") !== "true";
 const easyshipTrackingSafe = envValue("EASYSHIP_ENABLE_TRACKING") !== "true";
 const sfcMutationSafe = envValue("SFC_ENABLE_MUTATIONS") !== "true";
-const sfcCertificateReviewed = envValue("SFC_CERT_ROTATED_CONFIRMED") === "true";
+const sfcCertificateReviewed = sfcCertificateReviewApproved(sfcCertificateReviewEvidence);
 const gitStatus = gitOutput(["status", "--porcelain"]);
 const gitBranch = gitOutput(["branch", "--show-current"]);
 const gitUpstream = gitOutput(["rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}"]);
@@ -670,6 +679,13 @@ const checks: Check[] = [
     detail: sfcSmokeEvidenceReady
       ? `SFC read-only smoke evidence present from ${sfcSmokeEvidence?.checkedAt}; ${sfcSmokeEvidence?.productVisibility?.visibleSkus}/${sfcSmokeEvidence?.productVisibility?.checkedSkus} SKUs visible.`
       : "SFC read-only smoke evidence is missing or incomplete.",
+  },
+  {
+    name: "sfc-certificate-review-evidence-redacted",
+    ok: sfcCertificateReviewEvidenceRedacted,
+    detail: sfcCertificateReviewEvidenceRedacted
+      ? `SFC certificate review packet is redacted and currently ${sfcCertificateReviewEvidence?.status}.`
+      : "SFC certificate review packet is missing or not redacted.",
   },
 ];
 
@@ -782,6 +798,14 @@ console.log(
                 ok: sfcSmokeEvidenceReady,
                 visibleSkus: sfcSmokeEvidence.productVisibility?.visibleSkus ?? 0,
                 checkedSkus: sfcSmokeEvidence.productVisibility?.checkedSkus ?? 0,
+              }
+            : null,
+          certificateReview: sfcCertificateReviewEvidence
+            ? {
+                checkedAt: sfcCertificateReviewEvidence.checkedAt,
+                status: sfcCertificateReviewEvidence.status,
+                redacted: sfcCertificateReviewEvidenceRedacted,
+                approvedForPilotGate: sfcCertificateReviewed,
               }
             : null,
         },

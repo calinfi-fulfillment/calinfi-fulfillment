@@ -235,6 +235,7 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-28 yerel/s
 - SFC negotiation brief pass added the owner-facing SFC requirements runbook, reusable agreement brief model, and Kargo Merkezi agreement panel so SFC can provide the exact read-only credentials/warehouse/method-code inputs needed to finish today. Verified by `npm run test:sfc-network`, `npm run test:ops-ui`, and `npm run test:staging-launch-gates`.
 - SFC API 3.0 PDF and PHP sample alignment pass updated SKU stock smoke to `getStockBySKU`, posts stock warehouse ID at request level, and adds `getRates` as an allowed read-only estimate action. No credential value was copied into repo docs or source.
 - SFC read-only env doctor was added so the real API smoke can be checked without printing credentials. It validates mode, WSDL host, SOAP service endpoint, credential presence/length only, read-only/mutation flags, warehouse ID, stock SKU, rate action, and certificate rotation/review confirmation.
+- SFC certificate review packet added at `docs/evidence/SFC_CERTIFICATE_REVIEW_2026-05-15.json`; it is redacted and currently pending owner confirmation. Verified by `npm run test:sfc-certificate-review`.
 - 2026-05-14 continuation packaging pass verified the Stripe/Easyship/SFC smoke evidence through completion readiness and reran `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run test:no-secrets`. No external provider request, deploy, migration, label, shipment, export, tracking, payment capture, SFC mutation, secret value, or PII example was added.
 - 2026-05-15 checklist closure pass added `test:pre-pilot-boundary-audit` and `test:checklist`, recorded `docs/audits/2026-05-15_PRE_PILOT_BOUNDARY_AUDIT.md`, and updated stale Stripe/Easyship/SFC audit gates. Local code-boundary readiness and PM aggregate baseline are true; SFC certificate review, pilot approval, and production gates remain blocked.
 - 2026-05-15 protected preview smoke passed on Vercel deployment `dpl_59MCgMUs4zHAKVbLkv7tcsQpiYYH`: `/api/health`, `/`, `/shipping`, `/quotes`, `/payments`, `/handoffs`, and `/reports` returned HTTP 200 through `vercel curl`; anonymous direct access returned HTTP 401; health reported PM Supabase not blocked, live flags off, public Supabase configured, and service-role Supabase not configured. No production deploy, alias, live mutation, provider mutation, payment capture, label, export, or tracking action was run.
@@ -402,6 +403,7 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-28 yerel/s
 - [x] SFC read-only API execution command eklendi. Verified by `smoke:sfc-read-only-api`, `hydrateSfcRequestBodyForExecution`, response summary redaction regression, and `npm run test:sfc-network`.
 - [x] SFC read-only API output raw SOAP body basmaz. Verified by response summary fields: status, content type, byte size, SHA-256, SOAP fault flag, and credential echo flag only.
 - [x] SFC read-only env doctor eklendi. Verified by `check:sfc-read-only-env` script and no credential value output.
+- [x] SFC certificate review packet eklendi. Verified by `docs/evidence/SFC_CERTIFICATE_REVIEW_2026-05-15.json` and `npm run test:sfc-certificate-review`; status remains `pending_owner_confirmation`.
 - [x] Real SFC read-only smoke passed. Verified on 2026-05-14 by `smoke:sfc-read-only-api` against the SOAP service endpoint; all four read-only actions returned SOAP responses with no credential echo.
 
 ## 24. Completion Readiness Evidence
@@ -423,7 +425,7 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-28 yerel/s
 - [x] Kargo Merkezi içine SFC anlaşma paneli eklendi. Verified by `SfcAgreementBriefPanel` and `npm run test:ops-ui`.
 - [x] SFC resmi kaynak linkleri dokümana eklendi. Verified by `docs/runbooks/SFC_NEGOTIATION_BRIEF.md`.
 - [x] SFC read-only credential seti teslim alındı. Verified by owner-provided API user/token/key; values were not echoed or stored in repo.
-- [ ] SFC API certificate rotate/review confirmed. BLOCKED: because credential values crossed a non-secret channel, set `SFC_CERT_ROTATED_CONFIRMED=true` only after rotation or explicit owner approval.
+- [ ] SFC API certificate rotate/review confirmed. BLOCKED: because credential values crossed a non-secret channel, approve `docs/evidence/SFC_CERTIFICATE_REVIEW_2026-05-15.json` or set `SFC_CERT_ROTATED_CONFIRMED=true` only after rotation or explicit owner approval.
 - [ ] SFC warehouse ve DDP method-code detayları doğrulandı. BLOCKED: SFC must confirm canonical ODUN warehouse ID and approved Asia DDP shipping method code(s).
 
 ## 26. SFC API Sample Alignment
@@ -441,6 +443,7 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-28 yerel/s
 - [x] Pre-pilot boundary audit script eklendi. Verified by `npm run test:pre-pilot-boundary-audit`; it reports `okForCodeBoundary=true`, `okForPrePilot=false`, and no external actions.
 - [x] Pre-pilot audit note eklendi. Verified by `docs/audits/2026-05-15_PRE_PILOT_BOUNDARY_AUDIT.md`.
 - [x] Checklist regression eklendi. Verified by `npm run test:checklist`; every remaining open item has an explicit `BLOCKED:` reason and obsolete Stripe/Easyship/SFC blockers are rejected.
+- [x] SFC certificate review regression eklendi. Verified by `npm run test:sfc-certificate-review`; pending status is allowed only while the packet stays redacted and no mutation is approved.
 - [x] Full test suite yeni audit/checklist kapılarını içeriyor. Verified by `npm test` script including `test:pre-pilot-boundary-audit` and `test:checklist`.
 - [x] Stripe/Easyship/SFC evidence gates checklist içinde güncellendi. Verified by `npm run test:checklist`.
 - [x] Protected Vercel preview smoke evidence eklendi. Verified by `docs/evidence/VERCEL_PROTECTED_PREVIEW_SMOKE_2026-05-15.json`, `npm run check:completion-readiness`, and `npm run test:pre-pilot-boundary-audit`.

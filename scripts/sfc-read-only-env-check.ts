@@ -1,5 +1,6 @@
 import { createSfcReadOnlySmokePlan, createSfcReadiness, sfcServiceUrl, sfcWsdlUrl } from "../src/lib/sfc";
 import { loadLocalEnvFile } from "./load-local-env";
+import { loadSfcCertificateReviewEvidence, sfcCertificateReviewApproved } from "./sfc-certificate-review-evidence";
 
 loadLocalEnvFile();
 
@@ -78,6 +79,8 @@ const wsdl = safeUrlCheck();
 const serviceUrl = safeServiceUrlCheck();
 const rateAction = smokePlan.requests.find((request) => request.action === "getRateByMode" || request.action === "getRates")?.action ?? "missing";
 const credentialKeys = ["SFC_CUSTOMER_ID", "SFC_APP_TOKEN", "SFC_APP_KEY"] as const;
+const certificateReviewEvidence = loadSfcCertificateReviewEvidence();
+const certificateReviewed = enabled("SFC_CERT_ROTATED_CONFIRMED") || sfcCertificateReviewApproved(certificateReviewEvidence);
 
 const checks: Check[] = [
   {
@@ -129,10 +132,12 @@ const checks: Check[] = [
   },
   {
     name: "sfc-certificate-rotation-reviewed",
-    ok: enabled("SFC_CERT_ROTATED_CONFIRMED"),
-    detail: enabled("SFC_CERT_ROTATED_CONFIRMED")
+    ok: certificateReviewed,
+    detail: certificateReviewed
       ? "SFC certificate rotation/review is confirmed."
-      : "Set SFC_CERT_ROTATED_CONFIRMED=true only after rotating or explicitly approving the certificate source.",
+      : `Set SFC_CERT_ROTATED_CONFIRMED=true or approve redacted certificate-review evidence; current evidence status is ${
+          certificateReviewEvidence?.status ?? "missing"
+        }.`,
   },
   {
     name: "sfc-plan-safe",
@@ -152,6 +157,10 @@ console.log(
       readinessCode: readiness.code,
       smokePlanCode: smokePlan.code,
       safeToRunReadOnlyApi: ok,
+      certificateReview: {
+        evidenceStatus: certificateReviewEvidence?.status ?? "missing",
+        approved: certificateReviewed,
+      },
       requests: smokePlan.requests.map((request) => ({
         action: request.action,
         mutation: request.mutation,
