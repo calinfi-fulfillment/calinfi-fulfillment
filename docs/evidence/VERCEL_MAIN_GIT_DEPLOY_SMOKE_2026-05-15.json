@@ -1,0 +1,78 @@
+{
+  "provider": "vercel",
+  "checkedAt": "2026-05-15",
+  "project": {
+    "name": "calinfi-fulfillment-5idm",
+    "source": "new Vercel account GitHub import",
+    "repository": "github.com/calinfi-fulfillment/calinfi-fulfillment"
+  },
+  "deployment": {
+    "id": "dpl_FadPJzuqvjNnFMiFaQi6iBqmw9oW",
+    "url": "https://calinfi-fulfillment-5idm.vercel.app",
+    "target": "production",
+    "readyState": "READY",
+    "branch": "main",
+    "commit": "816fb0e",
+    "frameworkPreset": "Next.js",
+    "rootDirectory": "repository root",
+    "customProductionDomainAttached": false
+  },
+  "gitIntegration": {
+    "confirmed": true,
+    "source": "Vercel dashboard GitHub import",
+    "productionBranch": "main",
+    "rootDirectory": "repository root"
+  },
+  "routes": [
+    {
+      "path": "/",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "/shipping",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "/quotes",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "/payments",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "/handoffs",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "/reports",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "/api/health",
+      "status": 200,
+      "contentType": "application/json"
+    }
+  ],
+  "health": {
+    "ok": true,
+    "blockedPmSupabase": false,
+    "liveFlagsOff": true,
+    "publicSupabaseConfigured": false,
+    "serviceRoleSupabaseConfigured": false
+  },
+  "mutationBoundary": {
+    "externalActions": "public_route_smoke_only",
+    "liveSupabaseMutation": false,
+    "providerMutation": false,
+    "stripeLiveAction": false,
+    "labelExportTrackingAction": false,
+    "customDomainAlias": false
+  }
+}

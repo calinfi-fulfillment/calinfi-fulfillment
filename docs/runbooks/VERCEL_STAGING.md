@@ -6,8 +6,18 @@ This runbook is for a separate ODUN Fulfillment V1 Vercel staging project. Do no
 
 - GitHub branch `codex/phase-13-staging` is pushed.
 - Draft PR #1 is open: https://github.com/calinfi-fulfillment/calinfi-fulfillment/pull/1
+- New Vercel account GitHub import is confirmed for repository `calinfi-fulfillment/calinfi-fulfillment`.
+- Current Git-connected main deployment:
+  - Project name: `calinfi-fulfillment-5idm`
+  - Deployment id: `dpl_FadPJzuqvjNnFMiFaQi6iBqmw9oW`
+  - Public URL: https://calinfi-fulfillment-5idm.vercel.app
+  - Branch/commit: `main` / `816fb0e`
+  - Framework preset: Next.js
+  - Root directory: repository root
+  - Custom production domain: none
+  - Evidence: `docs/evidence/VERCEL_MAIN_GIT_DEPLOY_SMOKE_2026-05-15.json`
 - Vercel account discovery previously showed existing projects `calinfi-pledge-manager` and `calinfi-production-app`.
-- Separate Fulfillment Vercel project is now verified:
+- Legacy/manual protected preview project remains verified:
   - Project id: `prj_gxorHDOfctSfP6KcAo6stLzFIkyf`
   - Project name: `odun-fulfillment-v1`
   - Team id: `team_2jOtOHRsgfDrveJXXNwrbnvt`
@@ -19,22 +29,22 @@ This runbook is for a separate ODUN Fulfillment V1 Vercel staging project. Do no
 - Local workspace is linked to this Vercel project with `.vercel/`; `.vercel/` is ignored and must not be committed.
 - Preview env was configured on the separate Fulfillment project with the non-PM Supabase public URL/key and all live/provider/export/Stripe Checkout flags disabled.
 - No service-role key, Stripe live secret, provider API secret, PM production env, or custom production CALINFI domain was added.
-- GitHub integration is not connected yet; Vercel rejected direct Git connection, so the current preview was deployed manually from the local branch.
+- The old Vercel account rejected direct Git connection; this is superseded by the new Vercel account GitHub import above. The protected preview was deployed manually from the local branch.
 - Re-check on 2026-05-11 confirmed:
   - GitHub CLI viewer has `ADMIN` permission on `calinfi-fulfillment/calinfi-fulfillment`.
   - `vercel git connect` still fails for the repo.
   - GitHub App installation lookup does not confirm a usable Vercel app installation for this repo.
-- Owner confirmed the likely cause is account mismatch: Vercel is connected to a different account than the new Fulfillment GitHub repository.
-- Local + Supabase staging development continues without Vercel Git integration; see `docs/runbooks/LOCAL_STAGING_WITHOUT_VERCEL.md`.
+- Owner confirmed the likely cause was account mismatch; the new account path resolves GitHub import for the current main deployment.
+- Local + Supabase staging development can still continue without Vercel dependency; see `docs/runbooks/LOCAL_STAGING_WITHOUT_VERCEL.md`.
 - An earlier deployment failed before serving because the project framework preset was `Other`; the preset was corrected to Next.js before the ready preview deployment.
 
 ## Required Vercel Project
 
 Create or import a new project, for example:
 
-- Project name: `odun-fulfillment-v1`
-- Project id: `prj_gxorHDOfctSfP6KcAo6stLzFIkyf`
-- Git repository: `calinfi-fulfillment/calinfi-fulfillment` (currently blocked; manual preview deploy used)
+- Project name: `calinfi-fulfillment-5idm`
+- Protected preview project id, if using the legacy manual preview: `prj_gxorHDOfctSfP6KcAo6stLzFIkyf`
+- Git repository: `calinfi-fulfillment/calinfi-fulfillment`
 - Framework preset: Next.js
 - Root directory: repository root
 - Production branch: `main`
@@ -80,20 +90,22 @@ Completed preview verification:
 - No production domain alias is attached.
 - No live provider, label, export, Stripe Checkout, or partner push action is enabled.
 - Direct anonymous fetches return HTTP 401 because Vercel Deployment Protection is enabled; protected preview smoke used Vercel-authenticated access.
+- 2026-05-15 Git-connected main deployment `dpl_FadPJzuqvjNnFMiFaQi6iBqmw9oW` on `calinfi-fulfillment-5idm` returned HTTP 200 for `/api/health`, `/`, `/shipping`, `/quotes`, `/payments`, `/handoffs`, and `/reports`.
+- Main `/api/health` reported live flags off and service-role Supabase not configured.
 
-## Git Integration Next Action Checklist
+## Git Integration Maintenance Checklist
 
-Use the Vercel dashboard path only if CLI connection keeps failing:
+Use the Vercel dashboard path if the new account needs repo settings review:
 
-- [ ] Open Vercel project `odun-fulfillment-v1`.
-- [ ] Connect Git repository `calinfi-fulfillment/calinfi-fulfillment`.
-- [ ] If prompted, install or update the Vercel GitHub App for the `calinfi-fulfillment` account.
+- [x] Git repository `calinfi-fulfillment/calinfi-fulfillment` is connected on the new Vercel account. Verified by `docs/evidence/VERCEL_MAIN_GIT_DEPLOY_SMOKE_2026-05-15.json`.
+- [ ] Open Vercel project `calinfi-fulfillment-5idm`.
+- [ ] If prompted in future, install or update the Vercel GitHub App for the `calinfi-fulfillment` account.
 - [ ] Grant access only to `calinfi-fulfillment/calinfi-fulfillment`, not all repositories.
 - [ ] Keep framework preset as Next.js and root directory as repository root.
 - [ ] Keep production branch as `main`; use PR/non-main branches for previews.
 - [ ] Do not attach PM or CALINFI production domains.
 - [ ] Do not enable production env, provider API, Stripe Checkout, partner push, or live exports during this step.
-- [ ] After connection, trigger or wait for a PR preview on `codex/phase-13-staging`.
+- [ ] Optional: trigger or wait for a PR preview on `codex/phase-13-staging`.
 - [ ] Verify `/api/health`, `/`, `/shipping`, `/quotes`, `/payments`, `/handoffs`, and `/reports` through the preview URL.
 
 Post-connect CLI checks:
@@ -107,7 +119,7 @@ npm run test:no-secrets
 
 ## Blockers
 
-- GitHub integration is blocked by account mismatch and must be resolved before automatic PR previews or production promotion can replace manual/local staging workflows.
+- GitHub integration is confirmed on the new Vercel account; keep production env/custom domain rollout gated separately from this Git connection.
 - Stripe CLI test account/webhook smoke and app-specific `rk_test_` restricted-key Checkout smoke are complete; persisted Checkout flag remains disabled until explicit staged checkout approval.
-- PM production read-only aggregate baseline remains pending owner-approved audit.
-- Formal Sınır Bekçisi pre-pilot audit remains pending until PM aggregate baseline and SFC certificate review are ready.
+- PM production read-only aggregate baseline is complete in aggregate/count-only mode; see `docs/evidence/PM_PRODUCTION_AGGREGATE_BASELINE_2026-05-15.json`.
+- Formal Sınır Bekçisi pre-pilot audit remains pending until SFC certificate review is ready.

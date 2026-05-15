@@ -14,24 +14,24 @@ Bu dosya ODUN Fulfillment V1 için canonical proje checklist'idir. Her implement
 
 ## Final Completion Plan
 
-Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/staging ürün yüzeyi ve güvenlik hazırlığı olarak tamamlanmış kabul edilir; kalan işler canlıya geçiş kapılarıdır.
+Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-28 yerel/staging ürün yüzeyi ve güvenlik hazırlığı olarak tamamlanmış kabul edilir; kalan işler canlıya geçiş kapılarıdır.
 
 ### A. Repo / PR Paketleme
 
 - [x] Son local değişiklikler commitlendi. Verified by package commit on `codex/phase-13-staging` after full local regression.
 - [x] Branch `codex/phase-13-staging` PR #1'e push edildi. Verified by `git push -u origin codex/phase-13-staging`.
 - [x] PR #1 açıklaması güncel final scope, verification, blocked live gates ve no-live-action notlarıyla yenilendi. Verified by `gh pr edit 1`.
-- [x] Final regression paketi PR üzerinde/local equivalent olarak geçti. Verified by 2026-05-13 `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, `npm run test:no-secrets`, and `npm run check:completion-readiness`. Note: automatic Vercel PR previews still require Vercel Git integration resolution.
+- [x] Final regression paketi PR üzerinde/local equivalent olarak geçti. Verified by 2026-05-13 `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, `npm run test:no-secrets`, and `npm run check:completion-readiness`. Note: Vercel Git integration is now confirmed on the new account; production env/custom domain rollout remains a separate launch gate.
 
 ### B. Staging Pilot Gate
 
-- [ ] Vercel Git integration confirmed. BLOCKED: account mismatch; direct Git connection was rejected, so automatic PR previews require Vercel GitHub app/account setup.
+- [x] Vercel Git integration confirmed. Verified by `docs/evidence/VERCEL_MAIN_GIT_DEPLOY_SMOKE_2026-05-15.json`; new Vercel account GitHub import deployed `main` commit `816fb0e` to `https://calinfi-fulfillment-5idm.vercel.app` and public smoke returned 200 for `/api/health`, `/`, `/shipping`, `/quotes`, `/payments`, `/handoffs`, and `/reports`.
 - [x] Protected Vercel preview final smoke passed for `/api/health`, `/`, `/shipping`, `/quotes`, `/payments`, `/handoffs`, `/reports`. Verified on 2026-05-15 by Vercel preview deployment `dpl_59MCgMUs4zHAKVbLkv7tcsQpiYYH` and `docs/evidence/VERCEL_PROTECTED_PREVIEW_SMOKE_2026-05-15.json`; direct anonymous access remains HTTP 401.
-- [ ] PM production read-only aggregate baseline alındı. BLOCKED: owner-approved PM production read-only aggregate scope required; no raw PII rows.
+- [x] PM production read-only aggregate baseline alındı. Verified by `docs/evidence/PM_PRODUCTION_AGGREGATE_BASELINE_2026-05-15.json`; aggregate/count only, no raw PII rows, no sensitive values, and no service keys printed or stored.
 - [x] Stripe test mode gerçek env doğrulandı. Verified on 2026-05-14 by CLI login, webhook secret, publishable key, app-specific `rk_test_` restricted key, no-charge test Checkout Session, and app restricted-key Checkout smoke; persisted Checkout flag remains disabled.
 - [x] Easyship sandbox `/rates` smoke geçti. Verified on 2026-05-14 with owner-provided sandbox token in ignored local env: `/2024-09/rates` returned HTTP 200 with 4 rates; shipment, label, export, and tracking remained disabled.
 - [x] SFC read-only smoke geçti. Verified on 2026-05-14 with owner-provided read-only credentials via local command env: `getWarehouse`, `getShippingMethod`, `getStockBySKU`, and `getRates` returned SOAP responses without faults, credential echo, WSDL document response, or mutation.
-- [ ] Sınır Bekçisi pre-pilot audit geçti. BLOCKED: local/staging code-boundary audit readiness and protected preview smoke are complete, but formal pass still requires PM production aggregate baseline and SFC certificate review.
+- [ ] Sınır Bekçisi pre-pilot audit geçti. BLOCKED: local/staging code-boundary audit readiness, PM aggregate baseline, and protected preview smoke are complete, but formal pass still requires SFC certificate review.
 - [ ] 1-2 allowlisted staging pilot order run completed. BLOCKED: requires pre-pilot audit pass and explicit owner pilot approval.
 
 ### C. Production Launch Gate
@@ -129,7 +129,7 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/s
 
 ## 9. Ops UI
 
-- [x] App shell ve nav hazır: Cockpit, Orders, Quotes, Payments, Handoffs, Exceptions, Reports. Verified by `npm run test:ops-ui`, `npm run build`, and local route smoke.
+- [x] App shell ve nav hazır: Cockpit, Shipping, Production & Stock, Orders, Quotes, Payments, Handoffs, Exceptions, Reports. Verified by `npm run test:ops-ui`, `npm run build`, and local route smoke.
 - [x] Cockpit queue cards hazır. Verified by `src/app/page.tsx` and `npm run test:ops-ui`.
 - [x] Orders readiness table hazır. Verified by `src/app/orders/page.tsx` and local `/orders` smoke.
 - [x] Quotes queue ve manual DDP quote UI hazır. Verified by `src/app/quotes/page.tsx` and local `/quotes` smoke.
@@ -218,8 +218,8 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/s
 - Vercel Preview env was configured with the non-PM Supabase public env and all live/provider/export/Stripe Checkout flags disabled; no service-role key or live/provider secret was added.
 - Manual protected Vercel Preview deployment `dpl_7B3Cbxp5sJoxAgjxRRrSVigCxqHV` is ready at https://odun-fulfillment-v1-qpqnp1r8q-hello-75539063s-projects.vercel.app.
 - Protected preview smoke passed for `/api/health`, `/`, and `/reports`; direct anonymous fetches return HTTP 401 because Deployment Protection is enabled.
-- Vercel Git integration is still blocked; direct Git connection to `calinfi-fulfillment/calinfi-fulfillment` was rejected even though GitHub CLI viewer has repo `ADMIN` permission, so automatic PR previews require Vercel GitHub app/repo setup.
-- Vercel Git integration is now treated as launch/pre-production work, not a development blocker; local + Supabase staging continuation is documented in `docs/runbooks/LOCAL_STAGING_WITHOUT_VERCEL.md`.
+- Vercel Git integration was originally blocked on the old account, but the new Vercel account GitHub import is now confirmed for `calinfi-fulfillment/calinfi-fulfillment`.
+- Local + Supabase staging continuation remains documented in `docs/runbooks/LOCAL_STAGING_WITHOUT_VERCEL.md` as a fallback mode.
 - Stripe test contract validation and synthetic webhook normalization were added without creating Stripe Checkout sessions; verified by `npm run test:stripe-contract`.
 - Provider-agnostic mock adapter was added for rates, handoff, tracking, and health checks; verified by `npm run test:provider-adapter` and `npm run test:provider-mock-handoff`.
 - Cockpit, Payments, Quotes, and Handoffs now show local-staging/Vercel-bypass, test webhook, mock rate, and mock handoff readiness surfaces; verified by `npm run test:ops-ui`.
@@ -231,14 +231,16 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/s
 - UX/UI specialist polish pass tightened the app shell, navigation, table density, shipping console hierarchy, safety banner prominence, and keyboard row selection; verified by `npm run test:ops-ui`, `npm run typecheck`, `npm run lint`, `npm run build`, `npm run test:no-secrets`, and local `/shipping` plus `/quotes` HTTP 200 smoke. No live provider call, label, export, tracking, migration, deploy, secret, or PII example was added.
 - SFC read-only smoke planning pass added a redacted local plan helper, `smoke:sfc-read-only-plan`, and an owner-scope runbook; verified by `npm run test:sfc-network`, `npm run typecheck`, `npm run lint`, and `npm run test:no-secrets`. No SFC external request, mutation, ASN, order creation, export, label, tracking, deploy, migration, secret, or PII example was added.
 - Non-mutation provider smoke scope was accepted on 2026-05-13. SFC read-only API execution command `smoke:sfc-read-only-api` now posts to the real SOAP service endpoint for `getWarehouse`, `getShippingMethod`, `getStockBySKU`, and read-only rate lookup only; 2026-05-14 read-only smoke passed without faults or credential echo. Easyship sandbox `/rates` also passed on 2026-05-14 after aligning the 2024-09 payload schema.
-- Completion readiness automation added `check:completion-readiness` / `test:completion-readiness`; local package readiness is `true`, production launch readiness is `false` with explicit blockers for commit/push, PM baseline, SFC certificate review, pre-pilot audit, and production go/no-go. Verified by `npm run check:completion-readiness`, `npm run typecheck`, and `npm run lint`.
+- Completion readiness automation added `check:completion-readiness` / `test:completion-readiness`; local package readiness is `true`, production launch readiness is `false` with explicit blockers for commit/push, SFC certificate review, pre-pilot audit, and production go/no-go. Verified by `npm run check:completion-readiness`, `npm run typecheck`, and `npm run lint`.
 - SFC negotiation brief pass added the owner-facing SFC requirements runbook, reusable agreement brief model, and Kargo Merkezi agreement panel so SFC can provide the exact read-only credentials/warehouse/method-code inputs needed to finish today. Verified by `npm run test:sfc-network`, `npm run test:ops-ui`, and `npm run test:staging-launch-gates`.
 - SFC API 3.0 PDF and PHP sample alignment pass updated SKU stock smoke to `getStockBySKU`, posts stock warehouse ID at request level, and adds `getRates` as an allowed read-only estimate action. No credential value was copied into repo docs or source.
 - SFC read-only env doctor was added so the real API smoke can be checked without printing credentials. It validates mode, WSDL host, SOAP service endpoint, credential presence/length only, read-only/mutation flags, warehouse ID, stock SKU, rate action, and certificate rotation/review confirmation.
 - 2026-05-14 continuation packaging pass verified the Stripe/Easyship/SFC smoke evidence through completion readiness and reran `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run test:no-secrets`. No external provider request, deploy, migration, label, shipment, export, tracking, payment capture, SFC mutation, secret value, or PII example was added.
-- 2026-05-15 checklist closure pass added `test:pre-pilot-boundary-audit` and `test:checklist`, recorded `docs/audits/2026-05-15_PRE_PILOT_BOUNDARY_AUDIT.md`, and updated stale Stripe/Easyship/SFC audit gates. Local code-boundary readiness is true; PM aggregate baseline, SFC certificate review, pilot approval, and production gates remain blocked.
+- 2026-05-15 checklist closure pass added `test:pre-pilot-boundary-audit` and `test:checklist`, recorded `docs/audits/2026-05-15_PRE_PILOT_BOUNDARY_AUDIT.md`, and updated stale Stripe/Easyship/SFC audit gates. Local code-boundary readiness and PM aggregate baseline are true; SFC certificate review, pilot approval, and production gates remain blocked.
 - 2026-05-15 protected preview smoke passed on Vercel deployment `dpl_59MCgMUs4zHAKVbLkv7tcsQpiYYH`: `/api/health`, `/`, `/shipping`, `/quotes`, `/payments`, `/handoffs`, and `/reports` returned HTTP 200 through `vercel curl`; anonymous direct access returned HTTP 401; health reported PM Supabase not blocked, live flags off, public Supabase configured, and service-role Supabase not configured. No production deploy, alias, live mutation, provider mutation, payment capture, label, export, or tracking action was run.
 - 2026-05-15 synthetic UI E2E pass added `test:ui` with Chrome-driven coverage for `/`, `/shipping`, `/orders`, `/quotes`, `/payments`, `/handoffs`, `/exceptions`, and `/reports`; fixed order route sync, negative manual DDP input handling, table/form accessibility label collisions, responsive grid overflow, and missing app icon resource. Verified by `npm run test:ui`, `npm run typecheck`, `npm run lint`, `npm run build`, `npm run test:no-secrets`, and `npm test`.
+- 2026-05-15 new Vercel account GitHub import confirmed main deployment `dpl_FadPJzuqvjNnFMiFaQi6iBqmw9oW` on project `calinfi-fulfillment-5idm`; public smoke for `/api/health`, `/`, `/shipping`, `/quotes`, `/payments`, `/handoffs`, and `/reports` returned HTTP 200 with live mutation flags off, no service-role Supabase configured, and no custom production domain attached.
+- 2026-05-15 production/stock module pass added a Fulfillment-owned `/inventory` tab for produced, on-hand, reserved, available, demand, shortage, batch, total amount delta, and local fulfillment stock-feed visibility. Added inventory domain enums, static migration `0003_inventory_module.sql`, synthetic fixture calculations, `test:inventory`, and UI E2E coverage. No live migration, staging mutation, provider mutation, label, export, PM production read, PM mutation, or SFC stock write was run.
 
 ## 13. Staging Pilot
 
@@ -259,7 +261,7 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/s
 - [x] Vercel staging setup checklist eklendi. Verified by `docs/runbooks/VERCEL_STAGING.md`.
 - [x] Fresh Fulfillment Vercel staging project verified. Verified by Vercel project `odun-fulfillment-v1` / `prj_gxorHDOfctSfP6KcAo6stLzFIkyf`.
 - [x] Vercel Git integration next-action checklist eklendi. Verified by `docs/runbooks/VERCEL_STAGING.md`.
-- [ ] Vercel Git integration confirmed. BLOCKED: account mismatch; direct Git connection was rejected, so resolve under launch/pre-production instead of local development.
+- [x] Vercel Git integration confirmed. Verified by new Vercel account GitHub import evidence `docs/evidence/VERCEL_MAIN_GIT_DEPLOY_SMOKE_2026-05-15.json`.
 - [x] Vercel preview env configured. Verified by Preview env setup on project `odun-fulfillment-v1`; live/provider/export/Stripe Checkout flags remain disabled and no service-role key was added.
 - [x] Vercel preview smoke passed. Verified by protected preview smoke for `/api/health`, `/`, and `/reports` on deployment `dpl_7B3Cbxp5sJoxAgjxRRrSVigCxqHV`.
 - [x] Vercel'siz local/staging devam checklist'i eklendi. Verified by `docs/runbooks/LOCAL_STAGING_WITHOUT_VERCEL.md` and `npm run test:vercel-bypass-mode`.
@@ -277,11 +279,11 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/s
 - [x] Stripe webhook duplicate/mismatch/idempotency regression geçti. Verified by `npm run test:stripe-webhook`.
 - [x] Stripe Test Pilot değişiklikleri PR #1'e push edildi. Verified by push of commit `0b134d0` to `codex/phase-13-staging`.
 - [x] Provider adapter prep tamamlandı. Verified by `npm run test:provider-adapter` and `npm run test:provider-mock-handoff`; external actions remain `none`.
-- [ ] PM baseline/audit still blocked until approval. BLOCKED: pre-pilot code-boundary audit readiness is complete, but PM production read-only baseline and formal audit pass require separate owner-approved aggregate scope.
+- [x] PM production aggregate baseline evidence eklendi. Verified by `docs/evidence/PM_PRODUCTION_AGGREGATE_BASELINE_2026-05-15.json`; PM production checks stayed aggregate/count-only and no raw PII rows were printed.
 - [x] Stripe test mode doğrulandı. Verified by `smoke:stripe-restricted-key-checkout`; app-specific `rk_test_` created a test Checkout Session with `livemode=false`, while persisted Checkout flag remains disabled.
-- [ ] PM production read-only aggregate baseline alındı. BLOCKED: requires owner-approved production read-only aggregate check.
+- [x] PM production read-only aggregate baseline alındı. Verified by `docs/evidence/PM_PRODUCTION_AGGREGATE_BASELINE_2026-05-15.json`; aggregate counts reconcile PM backer and pledge totals, fulfillment intake links remain zero, and PM->Fulfillment sync remains disabled.
 - [x] 1-2 allowlisted pilot senaryosu planlandı. Verified by `docs/runbooks/STAGING_PILOT.md` and `npm run test:staging-launch-gates`.
-- [ ] Sınır Bekçisi pre-pilot audit geçti. BLOCKED: `npm run test:pre-pilot-boundary-audit` passes code/provider/preview evidence, but formal audit pass still needs PM production aggregate baseline and SFC certificate review.
+- [ ] Sınır Bekçisi pre-pilot audit geçti. BLOCKED: `npm run test:pre-pilot-boundary-audit` passes code/provider/PM-baseline/preview evidence, but formal audit pass still needs SFC certificate review.
 
 ## 14. Launch Readiness
 
@@ -321,7 +323,7 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/s
 - [x] Orders, Quotes, Payments, Handoffs, Exceptions, Reports workbenches use plain Turkish action labels. Verified by focused source regression and `npm run test:ops-ui`.
 - [x] Safety/live-action disabled messaging stayed visible. Verified by disabled live buttons and safety strip source inspection.
 - [x] `test:ops-ui`, `typecheck`, `lint`, `build`, `test:no-secrets` geçti. Verified by focused checks and `npm test`.
-- [x] Local smoke for `/`, `/orders`, `/quotes`, `/payments`, `/handoffs`, `/exceptions`, `/reports` passed. Verified by local HTTP 200 smoke.
+- [x] Local smoke for `/`, `/inventory`, `/orders`, `/quotes`, `/payments`, `/handoffs`, `/exceptions`, `/reports` passed. Verified by local HTTP 200 smoke.
 
 ## 18. Easyship-Style Shipping Console
 
@@ -410,7 +412,7 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/s
 - [x] PM Supabase boundary otomatik doğrulanıyor. Verified by `pm-supabase-boundary` check in `npm run check:completion-readiness`.
 - [x] Live mutation/provider safety flags otomatik doğrulanıyor. Verified by `live-mutation-flags-disabled`, `easyship-non-mutation-flags`, `sfc-mutations-disabled`, and `sfc-read-only-plan-safe` checks.
 - [x] Local package readiness true. Verified by `npm run check:completion-readiness` returning `okForLocalPackage: true`.
-- [ ] Production launch readiness true. BLOCKED: `npm run check:completion-readiness` reports `okForProductionLaunch: false` until PM baseline, SFC certificate review, pre-pilot audit, and owner go/no-go are complete.
+- [ ] Production launch readiness true. BLOCKED: `npm run check:completion-readiness` reports `okForProductionLaunch: false` until SFC certificate review, pre-pilot audit, and owner go/no-go are complete.
 
 ## 25. SFC Same-day Agreement Brief
 
@@ -442,7 +444,18 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/s
 - [x] Full test suite yeni audit/checklist kapılarını içeriyor. Verified by `npm test` script including `test:pre-pilot-boundary-audit` and `test:checklist`.
 - [x] Stripe/Easyship/SFC evidence gates checklist içinde güncellendi. Verified by `npm run test:checklist`.
 - [x] Protected Vercel preview smoke evidence eklendi. Verified by `docs/evidence/VERCEL_PROTECTED_PREVIEW_SMOKE_2026-05-15.json`, `npm run check:completion-readiness`, and `npm run test:pre-pilot-boundary-audit`.
-- [x] Local code-boundary pre-pilot readiness true. Verified by `npm run test:pre-pilot-boundary-audit`; formal pilot pass remains blocked by PM production aggregate baseline and SFC certificate review.
+- [x] Local code-boundary pre-pilot readiness true. Verified by `npm run test:pre-pilot-boundary-audit`; formal pilot pass remains blocked by SFC certificate review.
+
+## 28. Production & Stock Module
+
+- [x] Fulfillment-owned `/inventory` route eklendi. Verified by `src/app/inventory/page.tsx`, `OPS_NAV_ITEMS`, and `npm run test:ops-ui`.
+- [x] Üretim/stok domain hesaplayıcısı eklendi: produced, received, on-hand, reserved, damaged, in-transit, safety stock, available, demand, reservable, shortage. Verified by `src/lib/inventory/index.ts` and `npm run test:inventory`.
+- [x] Toplam tutar değişimi eklendi: original amount, current amount, amount delta. Verified by `npm run test:inventory` and `npm run test:ui`.
+- [x] Built-in kutu içeriği fulfillment stok reservation feed'inden çıkarıldı. Verified by `npm run test:inventory`.
+- [x] Fulfillment stok feed'i local-only ve external action `none` olarak kaldı. Verified by `buildFulfillmentStockFeed`, UI disabled live warehouse button, and `npm run test:inventory`.
+- [x] Stok schema taslağı eklendi: `inventory_locations`, `inventory_batches`, `inventory_reservations`, and `fulfillment_stock_feed`. Verified by `supabase/migrations/0003_inventory_module.sql` and `npm run test:schema`; migration was not applied to live/staging without owner approval.
+- [x] UI E2E stok akışı eklendi. Verified by `npm run test:ui` covering `/inventory`, total amount delta, local SFC `getStockBySKU` planning, fulfillment feed preview, and disabled live warehouse mutation.
+- [x] Güvenlik sınırı korundu: PM production verisi okunmadı/değişmedi, SFC/Easyship/3PL canlı stok yazımı veya export çalışmadı. Verified by `npm run test:no-secrets`, disabled controls, and implementation scope.
 
 ## Audit Gates
 
@@ -453,9 +466,9 @@ Sınır Bekçisi veya eşdeğer boundary audit aşağıdaki noktalarda çalışt
 - [x] Stripe test-mode pilot öncesinde. Verified by `docs/evidence/STRIPE_CLI_CHECKOUT_2026-05-14.json`, `npm run test:pre-pilot-boundary-audit`, and `npm run test:checklist`; persisted Checkout flag remains disabled.
 - [x] Handoff/export flow tamamlandığında. Verified by `npm run test:handoff`; no export file or partner API was executed.
 - [x] Local dry-run boundary audit tamamlandığında. Verified by `docs/audits/2026-05-11_LOCAL_BOUNDARY_AUDIT.md`, `npm test`, and `npm run check:preflight`.
-- [ ] Staging pilot öncesinde. BLOCKED: pre-pilot code-boundary and protected preview smoke are complete, but PM production aggregate baseline, SFC certificate review, and owner pilot approval are still required.
+- [ ] Staging pilot öncesinde. BLOCKED: pre-pilot code-boundary, PM aggregate baseline, and protected preview smoke are complete, but SFC certificate review and owner pilot approval are still required.
 - [ ] Production go/no-go öncesinde. BLOCKED: staging pilot, final audit, and owner decision required.
 
 ## Completion Rule
 
-Nihai uygulama hazır sayılması için Phase 0-25 tamamlanmış, `Final Completion Plan` maddeleri tamamlanmış veya owner tarafından açıkça defer edilmiş, tüm regression'lar geçmiş, PM canlı Phase 1 akışı bozulmamış, Fulfillment PM Supabase'e bağlanmamış, canlı provider/payment/export/mutation sınırları owner onayı olmadan kapalı kalmış ve owner go/no-go onayı alınmış olmalı.
+Nihai uygulama hazır sayılması için Phase 0-28 tamamlanmış, `Final Completion Plan` maddeleri tamamlanmış veya owner tarafından açıkça defer edilmiş, tüm regression'lar geçmiş, PM canlı Phase 1 akışı bozulmamış, Fulfillment PM Supabase'e bağlanmamış, canlı provider/payment/export/mutation sınırları owner onayı olmadan kapalı kalmış ve owner go/no-go onayı alınmış olmalı.

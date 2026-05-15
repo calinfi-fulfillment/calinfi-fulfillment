@@ -1,12 +1,12 @@
 # Local Staging Without Vercel
 
-This runbook keeps ODUN Fulfillment V1 moving while Vercel Git integration is blocked by account mismatch.
+This runbook keeps ODUN Fulfillment V1 moving if Vercel preview/deploy automation is unavailable. The original account mismatch was resolved separately by importing the repo into a new Vercel account.
 
 ## Current Mode
 
 - Development runs local app + Fulfillment staging Supabase.
 - Vercel Git integration is not a development blocker.
-- Vercel remains a launch/pre-production blocker until the account/repo ownership mismatch is resolved.
+- Vercel Git integration is confirmed on the new account, but production env/custom domain rollout remains a separate launch gate.
 - No PM production mutation, Stripe live mode, provider live API, partner push, export, label, or Easyship action is allowed.
 
 ## Allowed Work
@@ -20,11 +20,11 @@ This runbook keeps ODUN Fulfillment V1 moving while Vercel Git integration is bl
 
 ## Disabled Work
 
-- Vercel production promotion or automatic PR preview dependency.
+- Vercel production promotion dependency when local/staging checks are sufficient.
 - Stripe live mode or real Checkout creation.
 - Provider API quote calls without sandbox credentials and explicit owner approval.
 - Partner API push, live exports, label creation, or tracking writes.
-- PM production baseline until owner-approved read-only aggregate scope is confirmed.
+- Additional PM production baseline runs beyond the recorded aggregate evidence unless owner-approved read-only aggregate scope is confirmed again.
 
 ## Verification
 

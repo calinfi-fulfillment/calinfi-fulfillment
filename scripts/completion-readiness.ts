@@ -32,6 +32,8 @@ const requiredDocs = [
   "docs/evidence/SFC_READ_ONLY_SMOKE_2026-05-14.json",
   "docs/evidence/STRIPE_CLI_CHECKOUT_2026-05-14.json",
   "docs/evidence/VERCEL_PROTECTED_PREVIEW_SMOKE_2026-05-15.json",
+  "docs/evidence/VERCEL_MAIN_GIT_DEPLOY_SMOKE_2026-05-15.json",
+  "docs/evidence/PM_PRODUCTION_AGGREGATE_BASELINE_2026-05-15.json",
   "docs/audits/2026-05-11_LOCAL_BOUNDARY_AUDIT.md",
   "docs/audits/2026-05-15_PRE_PILOT_BOUNDARY_AUDIT.md",
 ];
@@ -195,6 +197,85 @@ type VercelProtectedPreviewEvidence = {
   };
 };
 
+type VercelMainGitDeployEvidence = {
+  provider?: string;
+  checkedAt?: string;
+  project?: {
+    name?: string;
+    repository?: string;
+  };
+  deployment?: {
+    id?: string;
+    url?: string;
+    target?: string;
+    readyState?: string;
+    branch?: string;
+    commit?: string;
+    frameworkPreset?: string;
+    rootDirectory?: string;
+    customProductionDomainAttached?: boolean;
+  };
+  gitIntegration?: {
+    confirmed?: boolean;
+    source?: string;
+    productionBranch?: string;
+    rootDirectory?: string;
+  };
+  routes?: Array<{
+    path?: string;
+    status?: number;
+  }>;
+  health?: {
+    ok?: boolean;
+    blockedPmSupabase?: boolean;
+    liveFlagsOff?: boolean;
+    publicSupabaseConfigured?: boolean;
+    serviceRoleSupabaseConfigured?: boolean;
+  };
+  mutationBoundary?: {
+    externalActions?: string;
+    liveSupabaseMutation?: boolean;
+    providerMutation?: boolean;
+    stripeLiveAction?: boolean;
+    labelExportTrackingAction?: boolean;
+    customDomainAlias?: boolean;
+  };
+};
+
+type PmProductionAggregateBaselineEvidence = {
+  provider?: string;
+  checkedAt?: string;
+  scope?: {
+    ownerApproved?: boolean;
+    mode?: string;
+    aggregateOnly?: boolean;
+    rawRowsPrinted?: boolean;
+    sensitiveValuesPrinted?: boolean;
+    rawPiiStored?: boolean;
+    serviceKeysPrinted?: boolean;
+  };
+  phase2Safety?: {
+    liveMutationFlagsDisabled?: boolean;
+    stripeCheckoutFlagConsistent?: boolean;
+    fulfillmentSyncEnabled?: boolean;
+  };
+  pmBackersByInviteStatus?: Record<string, number>;
+  pmPledgesByStatus?: Record<string, number>;
+  tableCounts?: Record<string, number>;
+  fulfillmentIntakeLinks?: {
+    pmPledgesWithFulfillmentOrderId?: number;
+    fulfillmentBackers?: number;
+    fulfillmentOrders?: number;
+    fulfillmentOrderLines?: number;
+  };
+  boundary?: {
+    pmPhase1Ready?: boolean;
+    pmFulfillmentSyncDisabled?: boolean;
+    fulfillmentOperationalRowsZero?: boolean;
+    externalActions?: string;
+  };
+};
+
 function packageScripts() {
   const packageJson = JSON.parse(readFileSync("package.json", "utf8")) as { scripts?: Record<string, string> };
   return packageJson.scripts ?? {};
@@ -261,6 +342,56 @@ function loadVercelProtectedPreviewEvidence(): VercelProtectedPreviewEvidence | 
   } catch {
     return null;
   }
+}
+
+function loadVercelMainGitDeployEvidence(): VercelMainGitDeployEvidence | null {
+  const evidencePath = "docs/evidence/VERCEL_MAIN_GIT_DEPLOY_SMOKE_2026-05-15.json";
+  if (!existsSync(evidencePath)) return null;
+
+  try {
+    return JSON.parse(readFileSync(evidencePath, "utf8")) as VercelMainGitDeployEvidence;
+  } catch {
+    return null;
+  }
+}
+
+function loadPmProductionBaselineEvidence(): PmProductionAggregateBaselineEvidence | null {
+  const evidencePath = "docs/evidence/PM_PRODUCTION_AGGREGATE_BASELINE_2026-05-15.json";
+  if (!existsSync(evidencePath)) return null;
+
+  try {
+    return JSON.parse(readFileSync(evidencePath, "utf8")) as PmProductionAggregateBaselineEvidence;
+  } catch {
+    return null;
+  }
+}
+
+function pmProductionBaselineReady(evidence: PmProductionAggregateBaselineEvidence | null) {
+  if (!evidence) return false;
+
+  return Boolean(
+    evidence.provider === "calinfi-pledge-manager" &&
+      evidence.scope?.ownerApproved === true &&
+      evidence.scope.mode === "production_read_only_aggregate" &&
+      evidence.scope.aggregateOnly === true &&
+      evidence.scope.rawRowsPrinted === false &&
+      evidence.scope.sensitiveValuesPrinted === false &&
+      evidence.scope.rawPiiStored === false &&
+      evidence.scope.serviceKeysPrinted === false &&
+      evidence.phase2Safety?.liveMutationFlagsDisabled === true &&
+      evidence.phase2Safety?.stripeCheckoutFlagConsistent === true &&
+      evidence.phase2Safety?.fulfillmentSyncEnabled === false &&
+      evidence.tableCounts?.pm_backers === Object.values(evidence.pmBackersByInviteStatus ?? {}).reduce((sum, count) => sum + count, 0) &&
+      evidence.tableCounts?.pm_pledges === Object.values(evidence.pmPledgesByStatus ?? {}).reduce((sum, count) => sum + count, 0) &&
+      evidence.fulfillmentIntakeLinks?.pmPledgesWithFulfillmentOrderId === 0 &&
+      evidence.fulfillmentIntakeLinks?.fulfillmentBackers === 0 &&
+      evidence.fulfillmentIntakeLinks?.fulfillmentOrders === 0 &&
+      evidence.fulfillmentIntakeLinks?.fulfillmentOrderLines === 0 &&
+      evidence.boundary?.pmPhase1Ready === true &&
+      evidence.boundary?.pmFulfillmentSyncDisabled === true &&
+      evidence.boundary?.fulfillmentOperationalRowsZero === true &&
+      evidence.boundary?.externalActions === "pm_production_read_only_aggregate_only",
+  );
 }
 
 function sfcEvidenceReady(evidence: SfcReadOnlySmokeEvidence | null) {
@@ -388,6 +519,39 @@ function vercelProtectedPreviewReady(evidence: VercelProtectedPreviewEvidence | 
   );
 }
 
+function vercelMainGitDeployReady(evidence: VercelMainGitDeployEvidence | null) {
+  if (!evidence) return false;
+
+  const requiredRoutes = new Set(["/api/health", "/", "/shipping", "/quotes", "/payments", "/handoffs", "/reports"]);
+  const routeStatuses = new Map((evidence.routes ?? []).map((route) => [route.path, route.status]));
+
+  return Boolean(
+    evidence.provider === "vercel" &&
+      evidence.project?.name === "calinfi-fulfillment-5idm" &&
+      evidence.project?.repository === "github.com/calinfi-fulfillment/calinfi-fulfillment" &&
+      evidence.deployment?.target === "production" &&
+      evidence.deployment?.readyState === "READY" &&
+      evidence.deployment?.branch === "main" &&
+      evidence.deployment?.frameworkPreset === "Next.js" &&
+      evidence.deployment?.rootDirectory === "repository root" &&
+      evidence.deployment?.customProductionDomainAttached === false &&
+      evidence.gitIntegration?.confirmed === true &&
+      evidence.gitIntegration?.productionBranch === "main" &&
+      evidence.gitIntegration?.rootDirectory === "repository root" &&
+      [...requiredRoutes].every((path) => routeStatuses.get(path) === 200) &&
+      evidence.health?.ok === true &&
+      evidence.health?.blockedPmSupabase === false &&
+      evidence.health?.liveFlagsOff === true &&
+      evidence.health?.serviceRoleSupabaseConfigured === false &&
+      evidence.mutationBoundary?.externalActions === "public_route_smoke_only" &&
+      evidence.mutationBoundary?.liveSupabaseMutation === false &&
+      evidence.mutationBoundary?.providerMutation === false &&
+      evidence.mutationBoundary?.stripeLiveAction === false &&
+      evidence.mutationBoundary?.labelExportTrackingAction === false &&
+      evidence.mutationBoundary?.customDomainAlias === false,
+  );
+}
+
 const scripts = packageScripts();
 const docChecks: Check[] = requiredDocs.map((path) => ({
   name: `doc:${path}`,
@@ -412,6 +576,10 @@ const sfcSmokeEvidence = loadSfcSmokeEvidence();
 const sfcSmokeEvidenceReady = sfcEvidenceReady(sfcSmokeEvidence);
 const vercelPreviewEvidence = loadVercelProtectedPreviewEvidence();
 const vercelPreviewEvidenceReady = vercelProtectedPreviewReady(vercelPreviewEvidence);
+const vercelMainGitDeployEvidence = loadVercelMainGitDeployEvidence();
+const vercelMainGitDeployEvidenceReady = vercelMainGitDeployReady(vercelMainGitDeployEvidence);
+const pmBaselineEvidence = loadPmProductionBaselineEvidence();
+const pmBaselineReady = pmProductionBaselineReady(pmBaselineEvidence);
 const liveMutationSafe = areLiveMutationFlagsDisabled(process.env);
 const pmSupabaseSafe = !isPledgeManagerSupabaseUrl(envValue("NEXT_PUBLIC_SUPABASE_URL"), process.env);
 const easyshipShipmentSafe = envValue("EASYSHIP_ENABLE_SHIPMENTS") !== "true";
@@ -473,6 +641,20 @@ const checks: Check[] = [
       : "Protected Vercel preview smoke evidence is missing or incomplete.",
   },
   {
+    name: "vercel-main-git-deploy-evidence",
+    ok: vercelMainGitDeployEvidenceReady,
+    detail: vercelMainGitDeployEvidenceReady
+      ? `Git-connected Vercel main deployment present from ${vercelMainGitDeployEvidence?.checkedAt}; deployment ${vercelMainGitDeployEvidence?.deployment?.id} passed 7 public routes with live flags off.`
+      : "Git-connected Vercel main deployment evidence is missing or incomplete.",
+  },
+  {
+    name: "pm-production-aggregate-baseline",
+    ok: pmBaselineReady,
+    detail: pmBaselineReady
+      ? `PM production aggregate-only baseline present from ${pmBaselineEvidence?.checkedAt}; raw PII and sensitive values were not printed/stored.`
+      : "PM production aggregate-only baseline evidence is missing or incomplete.",
+  },
+  {
     name: "sfc-mutations-disabled",
     ok: sfcMutationSafe && sfcReadiness.code !== "sfc_mutation_blocked",
     detail: sfcMutationSafe ? "SFC mutation flag is disabled." : "SFC mutation flag is enabled.",
@@ -498,9 +680,9 @@ const launchBlockers = [
     : gitAheadCount > 0
       ? [`Current branch ${gitBranch || "(unknown)"} is ${gitAheadCount} commit(s) ahead of ${gitUpstream}; push is still required.`]
       : []),
-  "Vercel Git integration/account alignment is not confirmed.",
+  ...(!vercelMainGitDeployEvidenceReady ? ["Vercel Git integration/account alignment is not confirmed."] : []),
   ...(!vercelPreviewEvidenceReady ? ["Protected preview smoke must be rerun after the latest changes are deployed."] : []),
-  "PM production read-only aggregate baseline still requires approved scope.",
+  ...(!pmBaselineReady ? ["PM production read-only aggregate baseline still requires approved scope."] : []),
   ...(!stripeTestEvidenceReady ? ["Stripe test checkout evidence is still pending."] : []),
   ...(!easyshipRatesEvidenceReady
     ? [
@@ -564,6 +746,28 @@ console.log(
                 ok: vercelPreviewEvidenceReady,
                 deploymentId: vercelPreviewEvidence.deployment?.id ?? null,
                 url: vercelPreviewEvidence.deployment?.url ?? null,
+              }
+            : null,
+        },
+        vercelMainGitDeploy: {
+          evidence: vercelMainGitDeployEvidence
+            ? {
+                checkedAt: vercelMainGitDeployEvidence.checkedAt,
+                ok: vercelMainGitDeployEvidenceReady,
+                deploymentId: vercelMainGitDeployEvidence.deployment?.id ?? null,
+                url: vercelMainGitDeployEvidence.deployment?.url ?? null,
+                gitIntegrationConfirmed: vercelMainGitDeployEvidence.gitIntegration?.confirmed ?? false,
+              }
+            : null,
+        },
+        pmProductionBaseline: {
+          evidence: pmBaselineEvidence
+            ? {
+                checkedAt: pmBaselineEvidence.checkedAt,
+                ok: pmBaselineReady,
+                pmBackers: pmBaselineEvidence.tableCounts?.pm_backers ?? 0,
+                pmPledges: pmBaselineEvidence.tableCounts?.pm_pledges ?? 0,
+                fulfillmentOrders: pmBaselineEvidence.fulfillmentIntakeLinks?.fulfillmentOrders ?? 0,
               }
             : null,
         },

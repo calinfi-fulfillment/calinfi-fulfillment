@@ -5,6 +5,8 @@ const checklist = readFileSync("docs/PROJECT_CHECKLIST.md", "utf8");
 
 assert.match(checklist, /^Last updated: 2026-05-15$/m);
 assert.match(checklist, /docs\/audits\/2026-05-15_PRE_PILOT_BOUNDARY_AUDIT\.md/);
+assert.match(checklist, /Vercel Git integration confirmed\. Verified by `docs\/evidence\/VERCEL_MAIN_GIT_DEPLOY_SMOKE_2026-05-15\.json`/);
+assert.match(checklist, /PM production read-only aggregate baseline alındı\. Verified by `docs\/evidence\/PM_PRODUCTION_AGGREGATE_BASELINE_2026-05-15\.json`/);
 assert.match(checklist, /- \[x\] Stripe test-mode pilot öncesinde\./);
 assert.doesNotMatch(
   checklist,
@@ -12,8 +14,6 @@ assert.doesNotMatch(
 );
 
 const allowedOpenItems = [
-  /Vercel Git integration confirmed/,
-  /PM production read-only aggregate baseline/,
   /Sınır Bekçisi pre-pilot audit geçti/,
   /1-2 allowlisted staging pilot order run completed/,
   /Production environment configured/,
@@ -24,7 +24,6 @@ const allowedOpenItems = [
   /Owner go\/no-go/,
   /Production smoke passed/,
   /All `Final Completion Plan` items/,
-  /PM baseline\/audit still blocked/,
   /Production env checklist tamam/,
   /Production launch readiness true/,
   /SFC API certificate rotate\/review confirmed/,

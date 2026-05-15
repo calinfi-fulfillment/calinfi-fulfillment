@@ -129,6 +129,80 @@ type VercelPreviewEvidence = {
   mutationBoundary?: Record<string, boolean>;
 };
 
+type VercelMainGitDeployEvidence = {
+  provider?: string;
+  project?: {
+    name?: string;
+    repository?: string;
+  };
+  deployment?: {
+    target?: string;
+    readyState?: string;
+    branch?: string;
+    frameworkPreset?: string;
+    rootDirectory?: string;
+    customProductionDomainAttached?: boolean;
+  };
+  gitIntegration?: {
+    confirmed?: boolean;
+    productionBranch?: string;
+    rootDirectory?: string;
+  };
+  routes?: Array<{
+    path?: string;
+    status?: number;
+  }>;
+  health?: {
+    ok?: boolean;
+    blockedPmSupabase?: boolean;
+    liveFlagsOff?: boolean;
+    serviceRoleSupabaseConfigured?: boolean;
+  };
+  mutationBoundary?: {
+    externalActions?: string;
+    liveSupabaseMutation?: boolean;
+    providerMutation?: boolean;
+    stripeLiveAction?: boolean;
+    labelExportTrackingAction?: boolean;
+    customDomainAlias?: boolean;
+  };
+};
+
+type PmProductionAggregateBaselineEvidence = {
+  provider?: string;
+  checkedAt?: string;
+  scope?: {
+    ownerApproved?: boolean;
+    mode?: string;
+    aggregateOnly?: boolean;
+    rawRowsPrinted?: boolean;
+    sensitiveValuesPrinted?: boolean;
+    rawPiiStored?: boolean;
+    serviceKeysPrinted?: boolean;
+  };
+  phase2Safety?: {
+    liveMutationFlagsDisabled?: boolean;
+    stripeCheckoutFlagConsistent?: boolean;
+    fulfillmentSyncEnabled?: boolean;
+  };
+  pmBackersByInviteStatus?: Record<string, number>;
+  pmPledgesByStatus?: Record<string, number>;
+  pmPledgesByFulfillmentSyncStatus?: Record<string, number>;
+  tableCounts?: Record<string, number>;
+  fulfillmentIntakeLinks?: {
+    pmPledgesWithFulfillmentOrderId?: number;
+    fulfillmentBackers?: number;
+    fulfillmentOrders?: number;
+    fulfillmentOrderLines?: number;
+  };
+  boundary?: {
+    pmPhase1Ready?: boolean;
+    pmFulfillmentSyncDisabled?: boolean;
+    fulfillmentOperationalRowsZero?: boolean;
+    externalActions?: string;
+  };
+};
+
 function loadJson<T>(path: string): T | null {
   if (!existsSync(path)) return null;
   try {
@@ -146,10 +220,13 @@ const stripe = loadJson<StripeEvidence>("docs/evidence/STRIPE_CLI_CHECKOUT_2026-
 const easyship = loadJson<EasyshipEvidence>("docs/evidence/EASYSHIP_SANDBOX_RATES_2026-05-14.json");
 const sfc = loadJson<SfcEvidence>("docs/evidence/SFC_READ_ONLY_SMOKE_2026-05-14.json");
 const vercelPreview = loadJson<VercelPreviewEvidence>("docs/evidence/VERCEL_PROTECTED_PREVIEW_SMOKE_2026-05-15.json");
+const vercelMainGitDeploy = loadJson<VercelMainGitDeployEvidence>("docs/evidence/VERCEL_MAIN_GIT_DEPLOY_SMOKE_2026-05-15.json");
+const pmBaseline = loadJson<PmProductionAggregateBaselineEvidence>(
+  "docs/evidence/PM_PRODUCTION_AGGREGATE_BASELINE_2026-05-15.json",
+);
 const checklist = text("docs/PROJECT_CHECKLIST.md");
 const envExample = text(".env.example");
 const stagingPilot = text("docs/runbooks/STAGING_PILOT.md");
-const vercelStaging = text("docs/runbooks/VERCEL_STAGING.md");
 
 const stripeReady = Boolean(
   stripe?.provider === "stripe" &&
@@ -235,6 +312,60 @@ const vercelPreviewReady = Boolean(
     Object.values(vercelPreview.mutationBoundary ?? {}).every((value) => value === false),
 );
 
+const vercelMainGitDeployReady = Boolean(
+  vercelMainGitDeploy?.provider === "vercel" &&
+    vercelMainGitDeploy.project?.name === "calinfi-fulfillment-5idm" &&
+    vercelMainGitDeploy.project?.repository === "github.com/calinfi-fulfillment/calinfi-fulfillment" &&
+    vercelMainGitDeploy.deployment?.target === "production" &&
+    vercelMainGitDeploy.deployment?.readyState === "READY" &&
+    vercelMainGitDeploy.deployment?.branch === "main" &&
+    vercelMainGitDeploy.deployment?.frameworkPreset === "Next.js" &&
+    vercelMainGitDeploy.deployment?.rootDirectory === "repository root" &&
+    vercelMainGitDeploy.deployment?.customProductionDomainAttached === false &&
+    vercelMainGitDeploy.gitIntegration?.confirmed === true &&
+    vercelMainGitDeploy.gitIntegration?.productionBranch === "main" &&
+    vercelMainGitDeploy.gitIntegration?.rootDirectory === "repository root" &&
+    ["/api/health", "/", "/shipping", "/quotes", "/payments", "/handoffs", "/reports"].every((path) =>
+      vercelMainGitDeploy.routes?.some((route) => route.path === path && route.status === 200),
+    ) &&
+    vercelMainGitDeploy.health?.ok === true &&
+    vercelMainGitDeploy.health?.blockedPmSupabase === false &&
+    vercelMainGitDeploy.health?.liveFlagsOff === true &&
+    vercelMainGitDeploy.health?.serviceRoleSupabaseConfigured === false &&
+    vercelMainGitDeploy.mutationBoundary?.externalActions === "public_route_smoke_only" &&
+    vercelMainGitDeploy.mutationBoundary?.liveSupabaseMutation === false &&
+    vercelMainGitDeploy.mutationBoundary?.providerMutation === false &&
+    vercelMainGitDeploy.mutationBoundary?.stripeLiveAction === false &&
+    vercelMainGitDeploy.mutationBoundary?.labelExportTrackingAction === false &&
+    vercelMainGitDeploy.mutationBoundary?.customDomainAlias === false,
+);
+
+const pmBaselineReady = Boolean(
+  pmBaseline?.provider === "calinfi-pledge-manager" &&
+    pmBaseline.scope?.ownerApproved === true &&
+    pmBaseline.scope.mode === "production_read_only_aggregate" &&
+    pmBaseline.scope.aggregateOnly === true &&
+    pmBaseline.scope.rawRowsPrinted === false &&
+    pmBaseline.scope.sensitiveValuesPrinted === false &&
+    pmBaseline.scope.rawPiiStored === false &&
+    pmBaseline.scope.serviceKeysPrinted === false &&
+    pmBaseline.phase2Safety?.liveMutationFlagsDisabled === true &&
+    pmBaseline.phase2Safety?.stripeCheckoutFlagConsistent === true &&
+    pmBaseline.phase2Safety?.fulfillmentSyncEnabled === false &&
+    pmBaseline.tableCounts?.pm_backers ===
+      Object.values(pmBaseline.pmBackersByInviteStatus ?? {}).reduce((sum, count) => sum + count, 0) &&
+    pmBaseline.tableCounts?.pm_pledges ===
+      Object.values(pmBaseline.pmPledgesByStatus ?? {}).reduce((sum, count) => sum + count, 0) &&
+    pmBaseline.fulfillmentIntakeLinks?.pmPledgesWithFulfillmentOrderId === 0 &&
+    pmBaseline.fulfillmentIntakeLinks?.fulfillmentBackers === 0 &&
+    pmBaseline.fulfillmentIntakeLinks?.fulfillmentOrders === 0 &&
+    pmBaseline.fulfillmentIntakeLinks?.fulfillmentOrderLines === 0 &&
+    pmBaseline.boundary?.pmPhase1Ready === true &&
+    pmBaseline.boundary?.pmFulfillmentSyncDisabled === true &&
+    pmBaseline.boundary?.fulfillmentOperationalRowsZero === true &&
+    pmBaseline.boundary?.externalActions === "pm_production_read_only_aggregate_only",
+);
+
 const checks: AuditCheck[] = [
   {
     name: "pm-supabase-blocklist",
@@ -276,9 +407,11 @@ const checks: AuditCheck[] = [
   },
   {
     name: "pm-production-aggregate-baseline",
-    ok: false,
+    ok: pmBaselineReady,
     blocking: true,
-    detail: "Blocked until owner-approved PM production aggregate-only baseline is taken; no raw PII rows.",
+    detail: pmBaselineReady
+      ? "PM production aggregate-only baseline is present; no raw PII rows or sensitive values were printed/stored."
+      : "Blocked until owner-approved PM production aggregate-only baseline is taken; no raw PII rows.",
   },
   {
     name: "sfc-certificate-review",
@@ -288,9 +421,11 @@ const checks: AuditCheck[] = [
   },
   {
     name: "vercel-git-integration",
-    ok: !vercelStaging.includes("GitHub integration is blocked"),
+    ok: vercelMainGitDeployReady,
     blocking: false,
-    detail: "Automatic PR previews remain a pre-production operations blocker; manual/local staging can continue.",
+    detail: vercelMainGitDeployReady
+      ? "Git-connected Vercel main deployment is confirmed on the new account; no custom production domain or live mutation flag is enabled."
+      : "Automatic PR previews remain a pre-production operations blocker; manual/local staging can continue.",
   },
 ];
 
@@ -298,6 +433,11 @@ const failedBlocking = checks.filter((check) => check.blocking && !check.ok);
 const failedCodeEvidence = checks.filter((check) => check.blocking && !check.ok && !check.name.match(/protected-preview|pm-production|sfc-certificate/));
 const okForCodeBoundary = failedCodeEvidence.length === 0;
 const okForPrePilot = failedBlocking.length === 0;
+const medium = [
+  ...(!checks.find((check) => check.name === "vercel-git-integration")?.ok
+    ? ["Vercel Git integration evidence is missing or stale; manual/local staging remains the safe fallback path."]
+    : []),
+];
 
 assert.equal(okForCodeBoundary, true, `Code/provider evidence blockers remain: ${failedCodeEvidence.map((check) => check.name).join(", ")}`);
 
@@ -312,7 +452,7 @@ console.log(
       blockingBeforePilot: failedBlocking.map((check) => check.name),
       critical: failedBlocking.map((check) => check.detail),
       high: [],
-      medium: ["Vercel Git integration remains blocked by account alignment; manual/local staging remains the safe continuation path."],
+      medium,
       low: [],
       externalActions: "none",
     },

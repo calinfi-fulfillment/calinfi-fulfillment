@@ -1,0 +1,79 @@
+{
+  "provider": "calinfi-pledge-manager",
+  "checkedAt": "2026-05-15",
+  "source": {
+    "repo": "/Users/ersin/Documents/New project/pledge-manager-prototype",
+    "command": "npm run verify:live plus aggregate count probes",
+    "supabaseProjectRef": "cjygwbfjekhhvwlyujyj"
+  },
+  "scope": {
+    "ownerApproved": true,
+    "mode": "production_read_only_aggregate",
+    "aggregateOnly": true,
+    "rawRowsPrinted": false,
+    "sensitiveValuesPrinted": false,
+    "rawPiiStored": false,
+    "serviceKeysPrinted": false
+  },
+  "phase2Safety": {
+    "liveMutationFlagsDisabled": true,
+    "stripeCheckoutFlagConsistent": true,
+    "fulfillmentSyncEnabled": false
+  },
+  "pmBackersByInviteStatus": {
+    "pending": 362,
+    "sent": 42,
+    "accepted": 42,
+    "disabled": 0
+  },
+  "pmPledgesByStatus": {
+    "draft": 1,
+    "selection_submitted": 27,
+    "fulfillment_ready": 0,
+    "manual_hold": 0,
+    "payment_pending": 0,
+    "locked_for_fulfillment": 0,
+    "submitted": 0,
+    "locked": 0,
+    "cancelled": 0
+  },
+  "pmPledgesByFulfillmentSyncStatus": {
+    "not_synced": 27,
+    "synced": 0,
+    "failed": 0,
+    "skipped": 1
+  },
+  "tableCounts": {
+    "pm_backers": 446,
+    "pm_pledges": 28,
+    "pm_pledge_items": 76,
+    "pm_addresses": 28,
+    "pm_email_events": 93,
+    "pm_audit_events": 201,
+    "pm_items": 34,
+    "pm_reward_catalog": 45,
+    "pm_reward_items": 250,
+    "pm_addon_offers": 35,
+    "backers": 0,
+    "orders": 0,
+    "order_lines": 0,
+    "excluded_builtin_items": 0
+  },
+  "fulfillmentIntakeLinks": {
+    "pmPledgesWithFulfillmentOrderId": 0,
+    "fulfillmentBackers": 0,
+    "fulfillmentOrders": 0,
+    "fulfillmentOrderLines": 0
+  },
+  "optionalPhase2Tables": {
+    "pm_delivery_decisions": 0,
+    "pm_payment_events": 0,
+    "pm_order_amendments": 0
+  },
+  "boundary": {
+    "pmPhase1Ready": true,
+    "pmFulfillmentSyncDisabled": true,
+    "fulfillmentOperationalRowsZero": true,
+    "externalActions": "pm_production_read_only_aggregate_only"
+  }
+}
