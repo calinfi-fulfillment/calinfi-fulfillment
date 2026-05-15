@@ -5,14 +5,17 @@ const VALUE_LABELS: Record<string, string> = {
   "CHINA_HK_DIRECT_DDP": "Çin/HK direkt DDP",
   DIRECT_DDP_PROVIDER: "DDP sağlayıcısı",
   EU_3PL: "Avrupa deposu",
+  "FACTORY-CN-01": "Çin üretim",
   MANUAL_SPECIAL: "Özel manuel yol",
   PARTNER_MANAGED: "Partner yönetir",
   REGIONAL_3PL: "Bölgesel depo",
   SFC_ASIA_DIRECT_DDP: "SFC Asya direkt DDP",
+  "SFC-CN-01": "SFC Çin hub",
   SFC_CHINA: "SFC Çin ana depo",
   SFC_DIRECT: "SFC direkt gönderim",
   SFC_TO_EU_FREIGHT_EASYSHIP: "SFC Avrupa freight + Easyship",
   SFC_TO_US_FREIGHT_EASYSHIP: "SFC Amerika freight + Easyship",
+  "US-3PL-01": "Amerika 3PL",
   US_3PL: "Amerika deposu",
   accepted: "Kabul edildi",
   all: "Tümü",
@@ -33,7 +36,9 @@ const VALUE_LABELS: Record<string, string> = {
   "easyship_token_missing": "Easyship token eksik",
   exported: "Dışa aktarıldı",
   failed: "Hata",
+  "feed_ready": "Feed hazır",
   fresh: "Güncel fiyat",
+  incoming: "Yolda",
   "local_staging_without_vercel_git": "Yerel + staging modu",
   "lock_ready": "Kilit hazır",
   "manual DDP review": "Manuel DDP kontrolü",
@@ -49,7 +54,9 @@ const VALUE_LABELS: Record<string, string> = {
   "not dev blocker": "Geliştirmeyi durdurmaz",
   "not needed": "Gerekmez",
   none: "Yok",
+  "no_demand": "Talep yok",
   pending: "Bekliyor",
+  partial: "Kısmi stok",
   "payment_amount_mismatch": "Ödeme tutarı uyuşmuyor",
   "payment_pending": "Ödeme bekliyor",
   "label_pending": "Etiket bekliyor",
@@ -71,6 +78,7 @@ const VALUE_LABELS: Record<string, string> = {
   required: "Gerekli",
   "safe preview": "Güvenli önizleme",
   "selection_submitted": "Seçim kaydedildi",
+  short: "Stok açık",
   "sfc_credentials_missing": "SFC anahtarları eksik",
   "sfc_mock_only": "SFC maket modda",
   "sfc_mutation_blocked": "SFC canlı işlem kapalı",
@@ -79,6 +87,7 @@ const VALUE_LABELS: Record<string, string> = {
   "sfc_read_only_plan_ready": "SFC smoke plan hazır",
   "sfc_read_only_ready": "SFC read-only hazır",
   "staging_ready": "Staging hazır",
+  "stock_ready": "Stok hazır",
   "local_preview": "Yerel önizleme",
   "blocking": "Blokaj",
   "warning": "Uyarı",
@@ -121,8 +130,10 @@ const COLUMN_LABELS: Record<string, string> = {
   action: "Sıradaki iş",
   address: "Adres",
   age: "Bekleme",
+  amountDelta: "Tutar farkı",
   code: "Sorun",
   country: "Ülke",
+  currentAmount: "Güncel tutar",
   customs: "Gümrük",
   exportType: "Dosya türü",
   destination: "Varış",
@@ -131,6 +142,7 @@ const COLUMN_LABELS: Record<string, string> = {
   item: "İş",
   metric: "Özet",
   mode: "Kargo modu",
+  originalAmount: "Orijinal tutar",
   owner: "Sorumlu",
   packaging: "Paket bilgisi",
   package: "Paket",
@@ -147,6 +159,11 @@ const COLUMN_LABELS: Record<string, string> = {
   status: "Durum",
   title: "Ürün",
   value: "Adet",
+  available: "Ayrılabilir",
+  demand: "Talep",
+  onHand: "Eldeki",
+  produced: "Üretilen",
+  shortage: "Açık",
 };
 
 export function formatColumnLabel(column: string) {
@@ -160,11 +177,15 @@ export function formatOpsValue(_column: string, value: string) {
 export function opsStatusTone(label: string) {
   const normalized = label.toLowerCase();
 
-  if (["ready", "quote ready", "completed", "dev ready", "test ready", "safe preview", "lock_ready"].includes(normalized)) return "good";
+  if (["ready", "quote ready", "completed", "dev ready", "test ready", "safe preview", "lock_ready", "feed_ready", "stock_ready"].includes(normalized)) {
+    return "good";
+  }
   if (["hazır", "güvenli", "tamam", "test hazır", "geliştirmeye hazır"].some((value) => normalized.includes(value))) return "good";
-  if (["blocker", "blocked", "missing hs/origin/value", "payment_review_required"].some((value) => normalized.includes(value))) return "danger";
+  if (["blocker", "blocked", "missing hs/origin/value", "payment_review_required", "short"].some((value) => normalized.includes(value))) return "danger";
   if (["blokaj", "hata", "uyuşmuyor", "canlı kapalı"].some((value) => normalized.includes(value))) return "danger";
-  if (["review", "pending", "approval", "missing", "draft", "disabled", "not connected"].some((value) => normalized.includes(value))) return "warning";
+  if (["review", "pending", "approval", "missing", "draft", "disabled", "not connected", "incoming", "partial"].some((value) => normalized.includes(value))) {
+    return "warning";
+  }
   if (["kontrol", "bekliyor", "eksik", "taslak", "kapalı", "bağlı değil", "onay"].some((value) => normalized.includes(value))) return "warning";
 
   return "neutral";

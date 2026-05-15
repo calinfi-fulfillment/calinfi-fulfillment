@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 
 import {
   BUILT_IN_SKUS,
@@ -7,6 +8,9 @@ import {
   DECISION_STATUSES,
   FULFILLMENT_ROUTE_TYPES,
   HANDOFF_STATUSES,
+  INVENTORY_BATCH_STATUSES,
+  INVENTORY_LOCATION_TYPES,
+  INVENTORY_RESERVATION_STATUSES,
   ORDER_STATUSES,
   PAYMENT_EVENT_STATUSES,
   PRODUCT_READINESS_STATUSES,
@@ -14,7 +18,11 @@ import {
   SHIPPING_MODES,
 } from "../src/lib/domain";
 
-const migration = readFileSync("supabase/migrations/0001_fulfillment_v1_core.sql", "utf8");
+const migration = readdirSync("supabase/migrations")
+  .filter((file) => file.endsWith(".sql"))
+  .sort()
+  .map((file) => readFileSync(join("supabase/migrations", file), "utf8"))
+  .join("\n");
 const hardeningMigration = readFileSync("supabase/migrations/0002_staging_schema_hardening.sql", "utf8");
 
 const requiredTables = [
@@ -31,6 +39,9 @@ const requiredTables = [
   "handoff_status_events",
   "issues",
   "audit_log",
+  "inventory_locations",
+  "inventory_batches",
+  "inventory_reservations",
 ];
 
 for (const table of requiredTables) {
@@ -48,6 +59,9 @@ const requiredEnumValues = [
   ...QUOTE_STATUSES,
   ...PAYMENT_EVENT_STATUSES,
   ...HANDOFF_STATUSES,
+  ...INVENTORY_LOCATION_TYPES,
+  ...INVENTORY_BATCH_STATUSES,
+  ...INVENTORY_RESERVATION_STATUSES,
 ];
 
 for (const value of requiredEnumValues) {
@@ -61,6 +75,10 @@ for (const sku of BUILT_IN_SKUS) {
 assert.match(migration, /unique \(order_id, source_line_key\)/);
 assert.match(migration, /unique \(order_line_id\)/);
 assert.match(migration, /total_cents integer generated always as \(amount_cents \+ buffer_cents\) stored/);
+assert.match(migration, /create view public\.fulfillment_stock_feed/);
+assert.match(migration, /with \(security_invoker = true\)/);
+assert.match(migration, /inventory_batches_reserved_not_exceed_on_hand/);
+assert.match(migration, /inventory_reservations_active_line_idx/);
 assert.doesNotMatch(migration, /\bpm_backers\b|\bpm_pledges\b|\bpm_pledge_items\b|\bpm_addresses\b/);
 
 assert.match(hardeningMigration, /set search_path = public/);

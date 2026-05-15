@@ -1108,6 +1108,213 @@ td input[type="radio"] {
   gap: 16px;
 }
 
+.inventory-console {
+  display: grid;
+  gap: 16px;
+}
+
+.inventory-safety-banner {
+  align-items: center;
+  background: var(--warning-soft);
+  border: 1px solid #ffb783;
+  border-radius: 8px;
+  color: var(--warning);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px 14px;
+}
+
+.inventory-safety-banner span {
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid rgba(113, 61, 16, 0.18);
+  border-radius: 999px;
+  color: var(--warning);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 8px;
+}
+
+.inventory-hero {
+  align-items: center;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 16px;
+}
+
+.inventory-hero h2 {
+  font-size: 22px;
+  line-height: 1.25;
+}
+
+.inventory-hero p:not(.eyebrow) {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.45;
+  margin-top: 6px;
+  max-width: 680px;
+}
+
+.inventory-metrics {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.inventory-metric {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: grid;
+  gap: 6px;
+  min-height: 118px;
+  padding: 14px;
+}
+
+.inventory-metric span,
+.inventory-metric small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.inventory-metric strong {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.inventory-grid {
+  align-items: start;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1fr) 320px;
+}
+
+.inventory-selector {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(220px, 1fr) 260px;
+}
+
+.inventory-side-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.feed-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+}
+
+.feed-card > div:first-child {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.feed-card > div:first-child span {
+  align-items: center;
+  color: var(--foreground);
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 800;
+  gap: 7px;
+}
+
+.feed-card dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.feed-card dl div {
+  border-bottom: 1px solid var(--surface-mid);
+  display: grid;
+  gap: 3px;
+  padding-bottom: 7px;
+}
+
+.feed-card dt,
+.feed-card small,
+.feed-card li {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.feed-card dd {
+  color: var(--foreground);
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.feed-card ol {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.inventory-bars {
+  background: var(--surface-low);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  height: 12px;
+  overflow: hidden;
+}
+
+.inventory-bars span {
+  background: var(--accent-strong);
+  display: block;
+  height: 100%;
+}
+
+.inventory-batch-list {
+  display: grid;
+  gap: 8px;
+}
+
+.inventory-batch-list section {
+  border: 1px solid var(--surface-mid);
+  border-radius: 8px;
+  display: grid;
+  gap: 3px;
+  padding: 10px;
+}
+
+.inventory-batch-list strong {
+  font-size: 13px;
+}
+
+.inventory-batch-list span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.inventory-event-bar {
+  align-items: center;
+  background: var(--accent-soft);
+  border: 1px solid #90d3cb;
+  border-radius: 8px;
+  color: var(--accent);
+  display: flex;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 10px 12px;
+}
+
 .ship-safety-banner {
   align-items: center;
   background: var(--warning-soft);
@@ -1446,6 +1653,9 @@ td input[type="radio"] {
   }
 
   .shipping-hero,
+  .inventory-hero,
+  .inventory-grid,
+  .inventory-selector,
   .shipping-shortcut,
   .ship-workspace,
   .ship-side-panel,
@@ -1455,6 +1665,10 @@ td input[type="radio"] {
   .ship-stepper,
   .ship-hero-actions {
     grid-template-columns: 1fr;
+  }
+
+  .inventory-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .ship-safety-banner {
@@ -1469,6 +1683,11 @@ td input[type="radio"] {
 
   .ship-safety-banner strong {
     margin-left: 0;
+  }
+
+  .inventory-safety-banner {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .dashboard-grid {
@@ -1505,5 +1724,11 @@ td input[type="radio"] {
 
   .table-actions {
     justify-content: start;
+  }
+}
+
+@media (max-width: 520px) {
+  .inventory-metrics {
+    grid-template-columns: 1fr;
   }
 }

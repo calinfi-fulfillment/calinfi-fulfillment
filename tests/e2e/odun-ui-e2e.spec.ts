@@ -3,6 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 const routes = [
   { path: "/", heading: "Bugün ne yapacağız?", nav: "Kontrol Paneli" },
   { path: "/shipping", heading: "Kargo merkezi", nav: "Kargo Merkezi" },
+  { path: "/inventory", heading: "Üretim ve stok", nav: "Üretim & Stok" },
   { path: "/orders", heading: "Sipariş hazırlığı", nav: "Siparişler" },
   { path: "/quotes", heading: "Kargo ücreti çıkar", nav: "Kargo Ücreti" },
   { path: "/payments", heading: "Ödeme kontrolü", nav: "Ödemeler" },
@@ -71,6 +72,21 @@ test.describe("ODUN UI synthetic end-to-end", () => {
     await expect(page.getByRole("textbox", { name: "Varış" })).toHaveValue("Hong Kong");
     await expect(page.getByRole("textbox", { name: "Kargo yolu" })).toHaveValue("Çin/HK direkt DDP");
     await expect(page.getByRole("button", { name: "Canlı etiket bas" })).toBeDisabled();
+  });
+
+  test("inventory flow prepares a local fulfillment stock feed without warehouse mutation", async ({ page }) => {
+    await page.goto("/inventory");
+
+    await expect(page.getByText("+USD 3,956.00")).toBeVisible();
+    await page.getByLabel("Stok SKU").selectOption("CLF-ACC-DDP");
+    await expect(page.getByText("0 / 12 ayrılabilir")).toBeVisible();
+
+    await page.getByRole("button", { name: "SFC stok kontrolü" }).click();
+    await expect(page.getByText("CLF-ACC-DDP için getStockBySKU read-only planlandı")).toBeVisible();
+
+    await page.getByRole("button", { name: "Fulfillment feed hazırla" }).click();
+    await expect(page.getByText("SKU için rezerve edilebilir stok fulfillment planına")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Canlı depo güncelle" })).toBeDisabled();
   });
 
   test("quote, payment, handoff, exception, and report controls behave locally", async ({ page }) => {

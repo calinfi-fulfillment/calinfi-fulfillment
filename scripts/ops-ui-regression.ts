@@ -16,10 +16,10 @@ import { OPS_NAV_ITEMS } from "../src/lib/ops-ui/navigation";
 
 assert.deepEqual(
   OPS_NAV_ITEMS.map((item) => item.label),
-  ["Kontrol Paneli", "Kargo Merkezi", "Siparişler", "Kargo Ücreti", "Ödemeler", "Kargoya Hazır", "Sorunlar", "Raporlar"],
+  ["Kontrol Paneli", "Kargo Merkezi", "Üretim & Stok", "Siparişler", "Kargo Ücreti", "Ödemeler", "Kargoya Hazır", "Sorunlar", "Raporlar"],
 );
 
-for (const route of ["shipping", "orders", "quotes", "payments", "handoffs", "exceptions", "reports"]) {
+for (const route of ["shipping", "inventory", "orders", "quotes", "payments", "handoffs", "exceptions", "reports"]) {
   assert.equal(existsSync(`src/app/${route}/page.tsx`), true, `${route} page must exist`);
 }
 
@@ -38,6 +38,7 @@ for (const component of [
   "src/components/data-table.tsx",
   "src/components/exception-triage.tsx",
   "src/components/handoff-workbench.tsx",
+  "src/components/inventory-workbench.tsx",
   "src/components/local-staging-mode-readiness.tsx",
   "src/components/manual-ddp-quote.tsx",
   "src/components/network-readiness.tsx",
@@ -56,6 +57,7 @@ for (const component of [
 const dataTableSource = readFileSync("src/components/data-table.tsx", "utf8");
 const cockpitSource = readFileSync("src/app/page.tsx", "utf8");
 const handoffsSource = readFileSync("src/app/handoffs/page.tsx", "utf8");
+const inventorySource = readFileSync("src/components/inventory-workbench.tsx", "utf8");
 const ordersSource = readFileSync("src/app/orders/page.tsx", "utf8");
 const paymentsSource = readFileSync("src/app/payments/page.tsx", "utf8");
 const quotesSource = readFileSync("src/app/quotes/page.tsx", "utf8");
@@ -94,6 +96,11 @@ assert.match(cockpitSource, /shipping-shortcut/);
 assert.match(cockpitSource, /Bugün ne yapacağız/);
 assert.match(handoffsSource, /HandoffWorkbench/);
 assert.match(handoffsSource, /ProviderApiReadiness/);
+assert.match(inventorySource, /data-testid="inventory-workbench"/);
+assert.match(inventorySource, /Fulfillment feed hazırla/);
+assert.match(inventorySource, /Canlı depo güncelle/);
+assert.match(inventorySource, /buildFulfillmentStockFeed/);
+assert.match(inventorySource, /buildSfcStockPlan/);
 assert.match(ordersSource, /OrdersWorkbench/);
 assert.match(paymentsSource, /PaymentEventWorkbench/);
 assert.match(paymentsSource, /StripeCheckoutReadinessPanel/);

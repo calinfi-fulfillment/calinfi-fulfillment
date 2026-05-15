@@ -23,6 +23,9 @@ const requiredTables = [
   "handoff_status_events",
   "issues",
   "audit_log",
+  "inventory_locations",
+  "inventory_batches",
+  "inventory_reservations",
 ] as const;
 
 type TableCheck = {

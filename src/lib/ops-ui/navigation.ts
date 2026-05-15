@@ -3,15 +3,17 @@ import {
   ClipboardList,
   CreditCard,
   FileBarChart,
-  PlaneTakeoff,
   PackageCheck,
+  PlaneTakeoff,
   ReceiptText,
   Truck,
+  Warehouse,
 } from "lucide-react";
 
 export const OPS_NAV_ITEMS = [
   { href: "/", label: "Kontrol Paneli", icon: ClipboardList },
   { href: "/shipping", label: "Kargo Merkezi", icon: PlaneTakeoff },
+  { href: "/inventory", label: "Üretim & Stok", icon: Warehouse },
   { href: "/orders", label: "Siparişler", icon: PackageCheck },
   { href: "/quotes", label: "Kargo Ücreti", icon: ReceiptText },
   { href: "/payments", label: "Ödemeler", icon: CreditCard },

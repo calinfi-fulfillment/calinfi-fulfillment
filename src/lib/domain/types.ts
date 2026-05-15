@@ -58,6 +58,20 @@ export const ISSUE_STATUSES = ["open", "resolved", "voided"] as const;
 
 export const LINE_ROLES = ["reward", "addon", "prepaid", "builtin"] as const;
 
+export const INVENTORY_LOCATION_TYPES = ["factory", "sfc_warehouse", "regional_3pl", "internal", "partner"] as const;
+
+export const INVENTORY_BATCH_STATUSES = [
+  "planned",
+  "in_production",
+  "produced",
+  "in_transit",
+  "received",
+  "quarantined",
+  "closed",
+] as const;
+
+export const INVENTORY_RESERVATION_STATUSES = ["planned", "reserved", "released", "consumed", "voided"] as const;
+
 export const BUILT_IN_SKUS = [
   "CLF-ACC-UNI-HND",
   "CLF-ACC-UNI-TNG",
@@ -80,6 +94,9 @@ export const HandoffStatusSchema = z.enum(HANDOFF_STATUSES);
 export const IssueSeveritySchema = z.enum(ISSUE_SEVERITIES);
 export const IssueStatusSchema = z.enum(ISSUE_STATUSES);
 export const LineRoleSchema = z.enum(LINE_ROLES);
+export const InventoryLocationTypeSchema = z.enum(INVENTORY_LOCATION_TYPES);
+export const InventoryBatchStatusSchema = z.enum(INVENTORY_BATCH_STATUSES);
+export const InventoryReservationStatusSchema = z.enum(INVENTORY_RESERVATION_STATUSES);
 export const BuiltInSkuSchema = z.enum(BUILT_IN_SKUS);
 
 export type OrderStatus = z.infer<typeof OrderStatusSchema>;
@@ -95,6 +112,9 @@ export type HandoffStatus = z.infer<typeof HandoffStatusSchema>;
 export type IssueSeverity = z.infer<typeof IssueSeveritySchema>;
 export type IssueStatus = z.infer<typeof IssueStatusSchema>;
 export type LineRole = z.infer<typeof LineRoleSchema>;
+export type InventoryLocationType = z.infer<typeof InventoryLocationTypeSchema>;
+export type InventoryBatchStatus = z.infer<typeof InventoryBatchStatusSchema>;
+export type InventoryReservationStatus = z.infer<typeof InventoryReservationStatusSchema>;
 export type BuiltInSku = z.infer<typeof BuiltInSkuSchema>;
 
 export const ProductSchema = z.object({
