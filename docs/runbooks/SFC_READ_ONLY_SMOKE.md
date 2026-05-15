@@ -54,7 +54,7 @@ Expected safe behavior:
 - Prints only presence/length checks, not credential values.
 - Confirms `SFC_MODE=read_only`, read-only flag, mutation flag, warehouse ID, stock SKU, rate action, known WSDL host, and SOAP service endpoint.
 - Requires `SFC_CERT_ROTATED_CONFIRMED=true` or approved redacted certificate-review evidence before reporting that the real read-only API smoke is safe to run.
-- `npm run test:sfc-certificate-review` validates that the review packet is redacted even while it remains pending.
+- `npm run test:sfc-certificate-review` validates that the review packet is redacted; approved status additionally requires owner approval and certificate-source review fields.
 
 ## Planning Command
 

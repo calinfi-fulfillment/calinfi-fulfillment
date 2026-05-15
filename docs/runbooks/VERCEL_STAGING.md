@@ -122,4 +122,4 @@ npm run test:no-secrets
 - GitHub integration is confirmed on the new Vercel account; keep production env/custom domain rollout gated separately from this Git connection.
 - Stripe CLI test account/webhook smoke and app-specific `rk_test_` restricted-key Checkout smoke are complete; persisted Checkout flag remains disabled until explicit staged checkout approval.
 - PM production read-only aggregate baseline is complete in aggregate/count-only mode; see `docs/evidence/PM_PRODUCTION_AGGREGATE_BASELINE_2026-05-15.json`.
-- Formal Sınır Bekçisi pre-pilot audit remains pending until SFC certificate review is ready.
+- Formal Sınır Bekçisi pre-pilot audit is complete; next execution gate is the explicit 1-2 allowlisted staging pilot order run approval.

@@ -1,13 +1,13 @@
 {
   "provider": "sendfromchina",
   "checkedAt": "2026-05-15",
-  "status": "pending_owner_confirmation",
+  "status": "approved",
   "approval": {
-    "ownerApproved": false,
-    "certificateSourceReviewed": false,
+    "ownerApproved": true,
+    "certificateSourceReviewed": true,
     "credentialsRotated": false,
-    "approvedAt": null,
-    "reviewer": "pending"
+    "approvedAt": "2026-05-15T14:01:36+08:00",
+    "reviewer": "owner"
   },
   "scope": {
     "redacted": true,

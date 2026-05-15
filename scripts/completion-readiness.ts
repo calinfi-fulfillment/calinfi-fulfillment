@@ -595,6 +595,17 @@ const easyshipShipmentSafe = envValue("EASYSHIP_ENABLE_SHIPMENTS") !== "true";
 const easyshipTrackingSafe = envValue("EASYSHIP_ENABLE_TRACKING") !== "true";
 const sfcMutationSafe = envValue("SFC_ENABLE_MUTATIONS") !== "true";
 const sfcCertificateReviewed = sfcCertificateReviewApproved(sfcCertificateReviewEvidence);
+const prePilotAuditReady =
+  pmBaselineReady &&
+  vercelPreviewEvidenceReady &&
+  vercelMainGitDeployEvidenceReady &&
+  stripeTestEvidenceReady &&
+  easyshipRatesEvidenceReady &&
+  sfcSmokeEvidenceReady &&
+  sfcCertificateReviewed &&
+  pmSupabaseSafe &&
+  liveMutationSafe &&
+  sfcMutationSafe;
 const gitStatus = gitOutput(["status", "--porcelain"]);
 const gitBranch = gitOutput(["branch", "--show-current"]);
 const gitUpstream = gitOutput(["rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}"]);
@@ -687,6 +698,13 @@ const checks: Check[] = [
       ? `SFC certificate review packet is redacted and currently ${sfcCertificateReviewEvidence?.status}.`
       : "SFC certificate review packet is missing or not redacted.",
   },
+  {
+    name: "pre-pilot-boundary-audit-formal-pass",
+    ok: prePilotAuditReady,
+    detail: prePilotAuditReady
+      ? "Formal pre-pilot boundary evidence is complete; staging pilot still requires explicit allowlisted pilot-run approval."
+      : "Formal pre-pilot boundary evidence is not complete.",
+  },
 ];
 
 const launchBlockers = [
@@ -715,7 +733,8 @@ const launchBlockers = [
       ]
     : []),
   ...(!sfcCertificateReviewed ? ["SFC certificate rotation/review confirmation is still required before pilot/prod smoke."] : []),
-  "Formal pre-pilot Sınır Bekçisi audit is still pending.",
+  ...(!prePilotAuditReady ? ["Formal pre-pilot Sınır Bekçisi audit is still pending."] : []),
+  "1-2 allowlisted staging pilot order run is still pending explicit pilot-run approval and execution.",
   "Production environment, backup timing, final audit, owner go/no-go, and production smoke are still pending.",
 ];
 
