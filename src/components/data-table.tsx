@@ -154,7 +154,12 @@ export function DataTable<T extends Record<string, string>>({ columns, rows }: D
         <div>
           {stringColumns.map((column) => (
             <label className="checkbox-control" key={column}>
-              <input checked={visibleColumns.includes(column)} onChange={() => toggleColumn(column)} type="checkbox" />
+              <input
+                aria-label={`Sütun: ${formatColumnLabel(column)}`}
+                checked={visibleColumns.includes(column)}
+                onChange={() => toggleColumn(column)}
+                type="checkbox"
+              />
               {formatColumnLabel(column)}
             </label>
           ))}
@@ -189,7 +194,7 @@ export function DataTable<T extends Record<string, string>>({ columns, rows }: D
               >
                 <td>
                   <input
-                    aria-label={`${formatOpsValue("sourceOrderKey", id)} seç`}
+                    aria-label={`Kayıt seç: ${formatOpsValue("sourceOrderKey", id)}`}
                     checked={id === selectedRow?.id}
                     onChange={() => setSelectedId(id)}
                     type="radio"

@@ -11,8 +11,8 @@ export function ManualDdpQuote() {
   const [stagedQuote, setStagedQuote] = useState("Henüz fiyat önizlemesi hazırlanmadı");
 
   const quoteMath = useMemo(() => {
-    const baseAmount = Number.parseFloat(amount) || 0;
-    const percent = Number.parseFloat(bufferPercent) || 0;
+    const baseAmount = Math.max(Number.parseFloat(amount) || 0, 0);
+    const percent = Math.max(Number.parseFloat(bufferPercent) || 0, 0);
     const buffer = Math.max(baseAmount * (percent / 100), 3);
     const total = Math.ceil((baseAmount + buffer) * 100) / 100;
 

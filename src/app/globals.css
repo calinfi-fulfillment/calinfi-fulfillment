@@ -124,8 +124,10 @@ textarea {
 .content {
   display: grid;
   gap: 18px;
+  grid-template-columns: minmax(0, 1fr);
   justify-self: center;
   min-width: 0;
+  overflow-x: clip;
   padding: 28px;
   width: min(100%, 1200px);
 }
@@ -444,6 +446,7 @@ label {
   display: grid;
   font-size: 13px;
   gap: 6px;
+  min-width: 0;
 }
 
 input,
@@ -454,7 +457,9 @@ textarea {
   border-radius: 8px;
   color: var(--foreground);
   min-height: 40px;
+  min-width: 0;
   padding: 8px 10px;
+  width: 100%;
 }
 
 input[type="checkbox"],
@@ -779,7 +784,7 @@ td input[type="radio"] {
 }
 
 .field-grid.two {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 
 .workflow-grid {
@@ -787,6 +792,13 @@ td input[type="radio"] {
   display: grid;
   gap: 16px;
   grid-template-columns: minmax(0, 1fr) minmax(320px, 0.42fr);
+}
+
+.dashboard-grid > *,
+.split > *,
+.workflow-grid > *,
+.ship-workspace > * {
+  min-width: 0;
 }
 
 .side-stack {
@@ -1421,6 +1433,8 @@ td input[type="radio"] {
 
   .content {
     padding: 20px;
+    justify-self: stretch;
+    width: 100%;
   }
 
   .split {

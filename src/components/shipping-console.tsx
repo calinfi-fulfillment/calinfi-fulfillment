@@ -98,7 +98,7 @@ export function ShippingConsole() {
           <div className="ship-form-grid">
             <label>
               Sipariş
-              <select onChange={(event) => setActiveOrder(event.target.value)} value={activeOrder}>
+              <select aria-label="Gönderi siparişi" onChange={(event) => setActiveOrder(event.target.value)} value={activeOrder}>
                 {shipmentConsoleRows.map((row) => (
                   <option key={row.sourceOrderKey} value={row.sourceOrderKey}>
                     {formatOpsValue("sourceOrderKey", row.sourceOrderKey)}

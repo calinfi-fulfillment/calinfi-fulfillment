@@ -47,7 +47,7 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/s
 ### D. Final Acceptance Criteria
 
 - [ ] All `Final Completion Plan` items are complete or explicitly deferred by owner. BLOCKED: external launch gates remain open; no owner deferral/go-live decision has been recorded.
-- [x] `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run test:no-secrets` pass on the final package. Verified by 2026-05-15 local regression including `test:pre-pilot-boundary-audit` and `test:checklist`.
+- [x] `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, `npm run test:no-secrets`, and `npm run test:ui` pass on the final package. Verified by 2026-05-15 local regression including `test:pre-pilot-boundary-audit`, `test:checklist`, and synthetic UI E2E.
 - [x] Fulfillment remains disconnected from PM Supabase except approved, read-only PM aggregate checks. Verified by `npm run test:pm-supabase-guard` and `npm run check:completion-readiness`.
 - [x] No raw backer PII, secrets, OTPs, auth links, service-role keys, Stripe live keys, Easyship tokens, or SFC credentials are committed. Verified by `npm run test:no-secrets`.
 - [x] Live label, shipment, tracking, export, partner push, SFC mutation, and Stripe live payment are impossible unless explicitly approved flags/credentials are present. Verified by `npm run test:live-flags`, `npm run test:sfc-network`, `npm run test:easyship-adapter`, and `npm run check:completion-readiness`.
@@ -238,6 +238,7 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/s
 - 2026-05-14 continuation packaging pass verified the Stripe/Easyship/SFC smoke evidence through completion readiness and reran `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run test:no-secrets`. No external provider request, deploy, migration, label, shipment, export, tracking, payment capture, SFC mutation, secret value, or PII example was added.
 - 2026-05-15 checklist closure pass added `test:pre-pilot-boundary-audit` and `test:checklist`, recorded `docs/audits/2026-05-15_PRE_PILOT_BOUNDARY_AUDIT.md`, and updated stale Stripe/Easyship/SFC audit gates. Local code-boundary readiness is true; PM aggregate baseline, SFC certificate review, pilot approval, and production gates remain blocked.
 - 2026-05-15 protected preview smoke passed on Vercel deployment `dpl_59MCgMUs4zHAKVbLkv7tcsQpiYYH`: `/api/health`, `/`, `/shipping`, `/quotes`, `/payments`, `/handoffs`, and `/reports` returned HTTP 200 through `vercel curl`; anonymous direct access returned HTTP 401; health reported PM Supabase not blocked, live flags off, public Supabase configured, and service-role Supabase not configured. No production deploy, alias, live mutation, provider mutation, payment capture, label, export, or tracking action was run.
+- 2026-05-15 synthetic UI E2E pass added `test:ui` with Chrome-driven coverage for `/`, `/shipping`, `/orders`, `/quotes`, `/payments`, `/handoffs`, `/exceptions`, and `/reports`; fixed order route sync, negative manual DDP input handling, table/form accessibility label collisions, responsive grid overflow, and missing app icon resource. Verified by `npm run test:ui`, `npm run typecheck`, `npm run lint`, `npm run build`, `npm run test:no-secrets`, and `npm test`.
 
 ## 13. Staging Pilot
 
@@ -384,6 +385,7 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-25 yerel/s
 - [x] Filtered table selection no longer points at hidden rows. Verified by `src/components/data-table.tsx` source review and `npm run test:ops-ui`.
 - [x] Live/provider/label/export/payment disabled messaging remained visible. Verified by source inspection and `npm run test:ops-ui`.
 - [x] UX/UI polish checks passed. Verified by `npm run test:ops-ui`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run test:no-secrets`.
+- [x] Synthetic UI E2E tarayıcı testi eklendi. Verified by `npm run test:ui` covering fake-data flows across all core ops routes, desktop/mobile overflow, console errors, local-only actions, and disabled live controls.
 - [x] Local smoke for `/shipping` and `/quotes` passed. Verified by HTTP 200 smoke on the preview server.
 
 ## 23. SFC Read-only Smoke Planning

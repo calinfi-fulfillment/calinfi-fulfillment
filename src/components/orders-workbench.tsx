@@ -22,7 +22,7 @@ const routeOptions = ["REGIONAL_3PL", "CHINA_HK_DIRECT_DDP", "PARTNER_MANAGED", 
 
 export function OrdersWorkbench({ rows }: OrdersWorkbenchProps) {
   const [selectedOrderKey, setSelectedOrderKey] = useState(rows[0]?.sourceOrderKey ?? "");
-  const [route, setRoute] = useState(rows[0]?.route ?? routeOptions[0]);
+  const [routeByOrder, setRouteByOrder] = useState<Record<string, string>>({});
   const [holdReason, setHoldReason] = useState("Adres veya ürün kodu kontrolü");
   const [events, setEvents] = useState<string[]>(["Sipariş kontrol ekranı güvenli önizleme modunda"]);
 
@@ -30,6 +30,8 @@ export function OrdersWorkbench({ rows }: OrdersWorkbenchProps) {
     () => rows.find((row) => row.sourceOrderKey === selectedOrderKey) ?? rows[0],
     [rows, selectedOrderKey],
   );
+  const route = routeByOrder[selectedOrderKey] ?? selectedOrder?.route ?? routeOptions[0];
+
   const checks = useMemo(
     () => [
       { label: "Adres tamam", status: selectedOrder?.address === "complete" ? "ready" : "review" },
@@ -59,7 +61,7 @@ export function OrdersWorkbench({ rows }: OrdersWorkbenchProps) {
       <div className="field-grid">
         <label>
           Sipariş
-          <select onChange={(event) => setSelectedOrderKey(event.target.value)} value={selectedOrderKey}>
+          <select aria-label="Kontrol siparişi" onChange={(event) => setSelectedOrderKey(event.target.value)} value={selectedOrderKey}>
             {rows.map((row) => (
               <option key={row.sourceOrderKey} value={row.sourceOrderKey}>
                 {formatOpsValue("sourceOrderKey", row.sourceOrderKey)}
@@ -69,7 +71,15 @@ export function OrdersWorkbench({ rows }: OrdersWorkbenchProps) {
         </label>
         <label>
           Kargo yolu
-          <select onChange={(event) => setRoute(event.target.value)} value={route}>
+          <select
+            onChange={(event) =>
+              setRouteByOrder((currentRoutes) => ({
+                ...currentRoutes,
+                [selectedOrderKey]: event.target.value,
+              }))
+            }
+            value={route}
+          >
             {routeOptions.map((option) => (
               <option key={option} value={option}>
                 {formatOpsValue("route", option)}
