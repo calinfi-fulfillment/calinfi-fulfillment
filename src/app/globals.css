@@ -1804,6 +1804,38 @@ td input[type="radio"] {
   max-width: 680px;
 }
 
+.inventory-demand-card {
+  align-items: center;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.74fr) auto;
+}
+
+.demand-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.demand-chip {
+  background: var(--accent-soft);
+  border: 1px solid rgba(34, 118, 126, 0.22);
+  border-radius: 8px;
+  display: grid;
+  gap: 4px;
+  min-width: 190px;
+  padding: 10px 12px;
+}
+
+.demand-chip strong {
+  color: var(--accent);
+  font-size: 15px;
+}
+
+.demand-chip small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .inventory-metrics {
   display: grid;
   gap: 12px;
@@ -2616,6 +2648,7 @@ td input[type="radio"] {
   .shipping-hero,
   .decision-lead-grid,
   .guided-quote-hero,
+  .inventory-demand-card,
   .inventory-hero,
   .inventory-grid,
   .inventory-selector,

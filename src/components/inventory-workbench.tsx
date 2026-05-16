@@ -42,6 +42,16 @@ function toTableRow(line: InventoryAvailabilityLine) {
   };
 }
 
+function toDemandTableRow(row: FulfillmentDemandInput) {
+  return {
+    sourceOrderKey: row.sourceOrderKey,
+    sku: row.sku,
+    title: row.title,
+    quantity: String(row.quantity),
+    reservation: row.reservationRequired === false ? "Stok gerekmez" : "Stok gerekir",
+  };
+}
+
 type InventoryWorkbenchProps = {
   demandRows: readonly FulfillmentDemandInput[];
   supplyRows: readonly InventorySupplyInput[];
@@ -58,6 +68,34 @@ export function InventoryWorkbench({ demandRows, supplyRows }: InventoryWorkbenc
   const selectedFeed = feed.find((line) => line.sku === selectedLine?.sku);
   const stockPlan = selectedLine ? buildSfcStockPlan({ sku: selectedLine.sku, warehouseId: 1 }) : null;
   const tableRows = availability.map(toTableRow);
+  const demandTableRows = demandRows.map(toDemandTableRow);
+  const demandSummaries = useMemo(() => {
+    const summaryByOrder = new Map<
+      string,
+      { lineCount: number; reservableQuantity: number; skuSet: Set<string>; sourceOrderKey: string; totalQuantity: number }
+    >();
+
+    for (const row of demandRows) {
+      const key = row.sourceOrderKey || "PM siparişi";
+      const current =
+        summaryByOrder.get(key) ?? { lineCount: 0, reservableQuantity: 0, skuSet: new Set<string>(), sourceOrderKey: key, totalQuantity: 0 };
+      const rowQuantity = Math.max(0, Math.trunc(row.quantity));
+      current.lineCount += 1;
+      current.skuSet.add(row.sku);
+      current.totalQuantity += rowQuantity;
+      if (row.reservationRequired !== false) current.reservableQuantity += rowQuantity;
+      summaryByOrder.set(key, current);
+    }
+
+    return Array.from(summaryByOrder.values()).map((summary) => ({
+      lineCount: summary.lineCount,
+      reservableQuantity: summary.reservableQuantity,
+      skuCount: summary.skuSet.size,
+      sourceOrderKey: summary.sourceOrderKey,
+      totalQuantity: summary.totalQuantity,
+    }));
+  }, [demandRows]);
+  const primaryDemand = demandSummaries[0];
 
   function stageFulfillmentFeed() {
     setEvent(`${feed.length} SKU için ayrılabilir stok güvenli önizleme olarak hazırlandı`);
@@ -99,6 +137,40 @@ export function InventoryWorkbench({ demandRows, supplyRows }: InventoryWorkbenc
           </button>
         </div>
       </div>
+
+      <section className="connection-card inventory-demand-card" aria-label="PM sipariş talebi">
+        <div>
+          <p className="eyebrow">PM sipariş talebi</p>
+          <h2>{primaryDemand?.sourceOrderKey ?? "Henüz PM siparişi yok"}</h2>
+          <p>
+            {primaryDemand
+              ? `${quantity(primaryDemand.skuCount)} SKU, ${quantity(primaryDemand.totalQuantity)} adet PM siparişi stok kontrolüne alındı.`
+              : "Pledge Manager üzerinden Fulfillment'a aktarılmış sipariş bulunmuyor."}
+          </p>
+        </div>
+        <div className="demand-chip-row">
+          {demandSummaries.length ? (
+            demandSummaries.slice(0, 4).map((summary) => (
+              <span className="demand-chip" key={summary.sourceOrderKey}>
+                <strong>{summary.sourceOrderKey}</strong>
+                <small>
+                  {quantity(summary.skuCount)} SKU / {quantity(summary.reservableQuantity)} ayrılacak adet
+                </small>
+              </span>
+            ))
+          ) : (
+            <span className="demand-chip">
+              <strong>PM intake boş</strong>
+              <small>Önce PM üzerinden manuel onaylı aktarım gerekir</small>
+            </span>
+          )}
+        </div>
+        {demandRows.length > 0 ? (
+          <DetailPopup buttonLabel="PM talep satırlarını aç" size="wide" title="PM sipariş talebi">
+            <DataTable columns={["sourceOrderKey", "sku", "title", "quantity", "reservation"]} rows={demandTableRows} />
+          </DetailPopup>
+        ) : null}
+      </section>
 
       <div className="inventory-metrics" aria-label="Stok özeti">
         <article className="inventory-metric">
