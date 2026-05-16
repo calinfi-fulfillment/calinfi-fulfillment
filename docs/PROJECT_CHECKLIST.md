@@ -1,6 +1,6 @@
 # ODUN Fulfillment V1 Project Checklist
 
-Last updated: 2026-05-15
+Last updated: 2026-05-16
 
 ## Kullanım Kuralı
 
@@ -14,7 +14,7 @@ Bu dosya ODUN Fulfillment V1 için canonical proje checklist'idir. Her implement
 
 ## Final Completion Plan
 
-Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-28 yerel/staging ürün yüzeyi ve güvenlik hazırlığı olarak tamamlanmış kabul edilir; kalan işler canlıya geçiş kapılarıdır.
+Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-28 yerel/staging ürün yüzeyi ve güvenlik hazırlığı olarak tamamlanmış kabul edilir. Phase 29 package planning/pre-payment pricing işi başlatıldı; canlıya geçiş kapıları ayrı kalır.
 
 ### A. Repo / PR Paketleme
 
@@ -33,8 +33,20 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-28 yerel/s
 - [x] SFC read-only smoke geçti. Verified on 2026-05-14 with owner-provided read-only credentials via local command env: `getWarehouse`, `getShippingMethod`, `getStockBySKU`, and `getRates` returned SOAP responses without faults, credential echo, WSDL document response, or mutation.
 - [x] Sınır Bekçisi pre-pilot audit geçti. Verified by owner-approved SFC certificate review evidence, `docs/audits/2026-05-15_PRE_PILOT_BOUNDARY_AUDIT.md`, and `npm run test:pre-pilot-boundary-audit` returning `okForPrePilot=true`.
 - [x] 1-2 allowlisted staging pilot order run completed. Verified by `docs/evidence/STAGING_PILOT_ORDER_RUN_2026-05-15.json`, `npm run check:staging-prep`, `npm run test:pilot-dry-run`, and `npm run test:staging-pilot-run`; no live provider/payment/label/export mutation was run.
+- [x] Single local test backer E2E launch rehearsal completed. Verified by `npm run test:fulfillment-test-backer`; it exercises signed Fulfillment intake, synthetic persistence planning, Product Master readiness, stock availability, package planning, local quote, payment lock, mock handoff/tracking, and PII-safe reports with `externalActions=none`.
 
-### C. Production Launch Gate
+### C. Package Planning & Pre-payment Pricing Gate
+
+- [x] Angela/SFC paketleme kapasite teyidi kaydedildi. Verified by `docs/architecture/SHIPPING_DDP_PRICING_RESEARCH_2026-05-15.md`; SFC pre-order auto cartonization yok, post-upload channel estimate, final measurement, and tracking availability confirmed.
+- [x] PM Product Master fulfillment/box alanları domain modeline eklendi. Verified by `src/lib/domain/types.ts`, `src/lib/package-plan/types.ts`, and `npm run test:package-plan`.
+- [x] Box Catalog + Package Unit modeli eklendi. Verified by `src/lib/package-plan/types.ts` and `npm run test:package-plan`.
+- [x] Deterministic Package Plan motoru eklendi. Verified by `src/lib/package-plan/planner.ts`; main box bundling, built-in exclusion, accessory bundle split, missing SKU blocker, SFC box SKU instruction, and `externalActions=none` are covered by `npm run test:package-plan`.
+- [x] Quote engine package-unit fiyat hesaplamasına bağlandı. Verified by `QuoteRequest.packageUnits`, `local3plFakeQuoteAdapter`, and `npm run test:package-plan`; provider calls remain synthetic/local.
+- [x] Admin Package Plan Preview UI hazır. Verified by `/shipping`, `PackagePlanPreview`, `createSyntheticPackagePlanPreview`, `npm run test:ops-ui`, and `npm run test:ui`; live SFC order creation remains disabled.
+- [x] SFC packing instruction/export mapping hazır. Verified by `createSfcPackingInstructionExport`, `/shipping` SFC export preview, `npm run test:package-plan`, and `npm run test:ui`; no live SFC order creation or export was run.
+- [x] SFC estimate/final measurement/tracking variance capture hazır. Verified by `createSfcFulfillmentVarianceReport`, synthetic read-only SFC snapshot, `/shipping` variance report UI, `npm run test:package-plan`, and `npm run test:ui`; real SFC field-name mapping remains a provider launch detail, with no live SFC mutation.
+
+### D. Production Launch Gate
 
 - [ ] Production environment configured. BLOCKED: production Supabase/env/Vercel/custom domain/secrets not configured or approved.
 - [ ] Production flags reviewed and only approved flags enabled. BLOCKED: requires owner launch scope; live provider/export/payment flags remain default `false`.
@@ -44,10 +56,11 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-28 yerel/s
 - [ ] Owner go/no-go kararı alındı. BLOCKED: explicit owner launch decision required.
 - [ ] Production smoke passed after launch. BLOCKED: requires owner go/no-go and approved deployment.
 
-### D. Final Acceptance Criteria
+### E. Final Acceptance Criteria
 
 - [ ] All `Final Completion Plan` items are complete or explicitly deferred by owner. BLOCKED: production launch gates remain open; no owner deferral/go-live decision has been recorded.
 - [x] `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, `npm run test:no-secrets`, and `npm run test:ui` pass on the final package. Verified by 2026-05-15 local regression including `test:pre-pilot-boundary-audit`, `test:checklist`, and synthetic UI E2E.
+- [x] A single test backer can complete the production-like Fulfillment path without production side effects. Verified by `npm run test:fulfillment-test-backer`.
 - [x] Fulfillment remains disconnected from PM Supabase except approved, read-only PM aggregate checks. Verified by `npm run test:pm-supabase-guard` and `npm run check:completion-readiness`.
 - [x] No raw backer PII, secrets, OTPs, auth links, service-role keys, Stripe live keys, Easyship tokens, or SFC credentials are committed. Verified by `npm run test:no-secrets`.
 - [x] Live label, shipment, tracking, export, partner push, SFC mutation, and Stripe live payment are impossible unless explicitly approved flags/credentials are present. Verified by `npm run test:live-flags`, `npm run test:sfc-network`, `npm run test:easyship-adapter`, and `npm run check:completion-readiness`.
@@ -244,6 +257,8 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-28 yerel/s
 - 2026-05-15 production/stock module pass added a Fulfillment-owned `/inventory` tab for produced, on-hand, reserved, available, demand, shortage, batch, total amount delta, and local fulfillment stock-feed visibility. Added inventory domain enums, static migration `0003_inventory_module.sql`, synthetic fixture calculations, `test:inventory`, and UI E2E coverage. No live migration, staging mutation, provider mutation, label, export, PM production read, PM mutation, or SFC stock write was run.
 - 2026-05-15 allowlisted staging pilot closure pass recorded `docs/evidence/STAGING_PILOT_ORDER_RUN_2026-05-15.json` and added `test:staging-pilot-run`; the two synthetic staging pilot orders are covered by prior staging aggregate import evidence plus the current synthetic dry-run, with provider/payment/label/export mutations still disabled.
 - 2026-05-15 staging inventory schema pass applied `0003_inventory_module.sql` only to non-PM staging project `mgdsvapgltzwhsioccqd`, recorded `docs/evidence/STAGING_INVENTORY_SCHEMA_2026-05-15.json`, and expanded `npm run test:staging-schema-public` to cover `fulfillment_stock_feed`. No production migration, real stock seed/import, PM read/write, provider mutation, label, export, tracking, payment capture, or raw PII access was run.
+- 2026-05-15 SFC sales confirmed no pre-order auto cartonization/package planning before order creation. SFC can show estimated shipping cost after orders are uploaded and matched with shipping channels, then final measurement and tracking are available after packing/shipping. ODUN/CALINFI Package Plan ownership remains required before backer payment.
+- 2026-05-15 package planning implementation pass added PM Product Master fulfillment/package fields, a Box Catalog + Package Unit model, deterministic local Package Plan motor, package-unit-aware local quote calculation, `/shipping` Package Plan Preview UI, and SFC packing instruction/export preview mapping. Verified by `npm run test:package-plan`; no live SFC/Easyship/order/label/export/tracking/payment action was run.
 
 ## 13. Staging Pilot
 
@@ -464,6 +479,23 @@ Bu bölüm projenin bitmesi için kalan canonical planıdır. Phase 0-28 yerel/s
 - [x] UI E2E stok akışı eklendi. Verified by `npm run test:ui` covering `/inventory`, total amount delta, local SFC `getStockBySKU` planning, fulfillment feed preview, and disabled live warehouse mutation.
 - [x] Güvenlik sınırı korundu: PM production verisi okunmadı/değişmedi, SFC/Easyship/3PL canlı stok yazımı veya export çalışmadı. Verified by `npm run test:no-secrets`, disabled controls, and implementation scope.
 
+## 29. Package Planning & Pre-payment Pricing
+
+- [x] PM Product Master package planning direction documented. Verified by `docs/architecture/PM_PRODUCT_MASTER_AND_PACKAGE_PLAN_NOTES.md`.
+- [x] SFC/Easyship pricing research documented. Verified by `docs/architecture/SHIPPING_DDP_PRICING_RESEARCH_2026-05-15.md`.
+- [x] Angela/SFC sales confirmation recorded: no pre-order cartonization, post-upload shipping-channel estimate, final measurement, and tracking. Verified by `docs/architecture/SHIPPING_DDP_PRICING_RESEARCH_2026-05-15.md`.
+- [x] PM Product Master fulfillment fields modeled locally: product type, bundle rules, package constraints, preferred box SKU, ship group, and manual review flag. Verified by `ProductSchema`, `FulfillmentProductSnapshot`, and `npm run test:package-plan`.
+- [x] Box Catalog modeled locally: box SKU, SFC box SKU, dimensions, tare weight, max weight, capacity, packaging cost, and direct-shipment readiness. Verified by `BoxCatalogEntry` and `npm run test:package-plan`.
+- [x] Package Plan output modeled locally: package units, customs lines, declared value, total weight, packing instruction, fingerprint, and `externalActions=none`. Verified by `PackagePlanResult` and `npm run test:package-plan`.
+- [x] Deterministic synthetic package planner implemented. Verified by `buildPackagePlan` and `npm run test:package-plan`.
+- [x] Built-in main-box items stay visible order lines but are excluded from physical packages. Verified by `npm run test:package-plan`.
+- [x] Accessory bundle split works without treating each accessory as a separate order. Verified by 7-pipe synthetic split in `npm run test:package-plan`.
+- [x] Missing Product Master SKU produces blocker. Verified by `npm run test:package-plan`.
+- [x] Quote engine consumes Package Plan units. Verified by `QuoteRequest.packageUnits`, `local3plFakeQuoteAdapter`, and `npm run test:package-plan`; provider calls stay mocked/local.
+- [x] Admin Package Plan Preview UI implemented. Verified by `src/components/package-plan-preview.tsx`, `/shipping`, `npm run test:ops-ui`, and `npm run test:ui`.
+- [x] SFC packing instruction/export mapping implemented. Verified by `createSfcPackingInstructionExport`, redacted/PII-free CSV preview rows, `/shipping` SFC export preview, and `npm run test:package-plan`; no live SFC order creation approved or run.
+- [x] SFC estimate/final actual/tracking variance report implemented. Verified by `SfcFulfillmentReadOnlySnapshot`, `createSfcFulfillmentVarianceReport`, synthetic post-upload estimate/final measurement/tracking capture, `/shipping` variance report UI, and `npm run test:package-plan`; real SFC field-name mapping remains provider confirmation work before live launch.
+
 ## Audit Gates
 
 Sınır Bekçisi veya eşdeğer boundary audit aşağıdaki noktalarda çalıştırılmalı:
@@ -478,4 +510,4 @@ Sınır Bekçisi veya eşdeğer boundary audit aşağıdaki noktalarda çalışt
 
 ## Completion Rule
 
-Nihai uygulama hazır sayılması için Phase 0-28 tamamlanmış, `Final Completion Plan` maddeleri tamamlanmış veya owner tarafından açıkça defer edilmiş, tüm regression'lar geçmiş, PM canlı Phase 1 akışı bozulmamış, Fulfillment PM Supabase'e bağlanmamış, canlı provider/payment/export/mutation sınırları owner onayı olmadan kapalı kalmış ve owner go/no-go onayı alınmış olmalı.
+Nihai uygulama hazır sayılması için Phase 0-29 tamamlanmış veya owner tarafından açıkça defer edilmiş, `Final Completion Plan` maddeleri tamamlanmış, tüm regression'lar geçmiş, PM canlı Phase 1 akışı bozulmamış, Fulfillment PM Supabase'e bağlanmamış, canlı provider/payment/export/mutation sınırları owner onayı olmadan kapalı kalmış ve owner go/no-go onayı alınmış olmalı.

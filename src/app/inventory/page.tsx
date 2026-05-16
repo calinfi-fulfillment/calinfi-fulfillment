@@ -1,15 +1,20 @@
 import { AppShell } from "@/components/app-shell";
 import { InventoryWorkbench } from "@/components/inventory-workbench";
+import { getOpsUiData } from "@/lib/ops-ui/live-data";
 
-export default function InventoryPage() {
+export const dynamic = "force-dynamic";
+
+export default async function InventoryPage() {
+  const data = await getOpsUiData();
+
   return (
     <AppShell
-      active="Üretim & Stok"
+      active="Stok"
       title="Üretim ve stok"
       subtitle="Üretilen, elde olan, rezerve edilen ve fulfillment planına ayrılabilecek SKU adetlerini kontrol edersin."
-      steps={["SKU seç", "Üretim ve stok bak", "Talebi karşılaştır", "Fulfillment feed hazırla"]}
+      steps={["SKU seç", "Stoka bak", "Talebi karşılaştır", "Ayrılabilir stoku önizle"]}
     >
-      <InventoryWorkbench />
+      <InventoryWorkbench demandRows={data.inventoryDemandRows} supplyRows={data.inventorySupplyRows} />
     </AppShell>
   );
 }

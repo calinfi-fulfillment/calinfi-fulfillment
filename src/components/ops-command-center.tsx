@@ -56,7 +56,7 @@ export function OpsCommandCenter({ actions, queues, routes }: OpsCommandCenterPr
         </div>
         <span>
           <ShieldCheck aria-hidden="true" size={16} />
-          Sadece test verisi
+          PM intake verisi
         </span>
       </div>
 
@@ -124,8 +124,8 @@ export function OpsCommandCenter({ actions, queues, routes }: OpsCommandCenterPr
       </div>
 
       <ol className="activity-feed" aria-live="polite">
-        {activityFeed.map((event) => (
-          <li key={event}>{event}</li>
+        {activityFeed.map((event, index) => (
+          <li key={`${event}:${index}`}>{event}</li>
         ))}
       </ol>
     </section>

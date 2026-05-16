@@ -4,6 +4,7 @@ import { BarChart3, Download, RefreshCw, ShieldCheck } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { DataTable } from "@/components/data-table";
+import { DetailPopup } from "@/components/detail-popup";
 import { formatOpsValue } from "@/lib/ops-ui/labels";
 
 type ReportRow = {
@@ -80,18 +81,14 @@ export function ReportsDashboard({ rows }: ReportsDashboardProps) {
         })}
       </section>
 
-      <section className="panel">
-        <div className="control-rail">
-          <div>
-            <p className="eyebrow">Güvenli özet</p>
-            <h2>Toplamlar</h2>
-          </div>
-          <span>
-            <ShieldCheck aria-hidden="true" size={16} />
-            {previewState}
-          </span>
-        </div>
-        <DataTable columns={["metric", "value"]} rows={rows} />
+      <section className="report-summary-line">
+        <span>
+          <ShieldCheck aria-hidden="true" size={16} />
+          {previewState}
+        </span>
+        <DetailPopup buttonLabel="Toplamları aç" title="Güvenli özet">
+          <DataTable columns={["metric", "value"]} rows={rows} />
+        </DetailPopup>
       </section>
     </div>
   );

@@ -7,7 +7,6 @@ import {
   PackageCheck,
   PlaneTakeoff,
   RefreshCw,
-  Search,
   ShieldCheck,
   TriangleAlert,
   Truck,
@@ -15,30 +14,48 @@ import {
 import { useMemo, useState } from "react";
 
 import { DataTable } from "@/components/data-table";
+import { DetailPopup } from "@/components/detail-popup";
 import { StatusBadge } from "@/components/status-badge";
 import { formatOpsValue } from "@/lib/ops-ui/labels";
-import { shipmentConsoleRows, shippingGuardRows, shippingOverviewRows, shippingRateRows } from "@/lib/ops-ui/fixtures";
+import type { OpsGuardRow, OpsShipmentRow, OpsShippingOverviewRow, OpsShippingRateRow } from "@/lib/ops-ui/live-data";
 
 const shipmentSteps = ["Sipariş", "Paket", "Fiyat", "Etiket"];
 
-export function ShippingConsole() {
-  const [activeOrder, setActiveOrder] = useState<string>(shipmentConsoleRows[0]?.sourceOrderKey ?? "");
-  const [activeRate, setActiveRate] = useState<string>(shippingRateRows[0]?.id ?? "");
+type ShippingConsoleProps = {
+  guardRows: readonly OpsGuardRow[];
+  overviewRows: readonly OpsShippingOverviewRow[];
+  rateRows: readonly OpsShippingRateRow[];
+  shipmentRows: readonly OpsShipmentRow[];
+};
+
+export function ShippingConsole({ guardRows, overviewRows, rateRows, shipmentRows }: ShippingConsoleProps) {
+  const [activeOrder, setActiveOrder] = useState<string>(shipmentRows[0]?.sourceOrderKey ?? "");
+  const [activeRate, setActiveRate] = useState<string>(rateRows[0]?.id ?? "");
   const [packageWeight, setPackageWeight] = useState("1.20");
   const [boxSize, setBoxSize] = useState("30 x 20 x 12 cm");
   const [event, setEvent] = useState("Kargo merkezi güvenli önizleme modunda");
 
   const selectedOrder = useMemo(
-    () => shipmentConsoleRows.find((row) => row.sourceOrderKey === activeOrder) ?? shipmentConsoleRows[0],
-    [activeOrder],
+    () => shipmentRows.find((row) => row.sourceOrderKey === activeOrder) ?? shipmentRows[0],
+    [activeOrder, shipmentRows],
   );
-  const selectedRate = useMemo(() => shippingRateRows.find((rate) => rate.id === activeRate) ?? shippingRateRows[0], [activeRate]);
+  const selectedRate = useMemo(() => rateRows.find((rate) => rate.id === activeRate) ?? rateRows[0], [activeRate, rateRows]);
 
   function stageRateCheck() {
-    setEvent(`${formatOpsValue("sourceOrderKey", activeOrder)} için ${selectedRate?.carrier ?? "seçili fiyat"} önizlendi`);
+    if (!selectedOrder || !selectedRate) {
+      setEvent("Bu PM siparişi için henüz kargo fiyat kaydı yok; önce Fiyat ekranında hazırlık yap.");
+      return;
+    }
+
+    setEvent(`${formatOpsValue("sourceOrderKey", activeOrder)} için ${selectedRate.carrier} kontrol edildi`);
   }
 
   function copySafeSummary() {
+    if (!selectedOrder) {
+      setEvent("PM intake'te gönderi hazırlanacak sipariş yok.");
+      return;
+    }
+
     setEvent(`${formatOpsValue("sourceOrderKey", activeOrder)} için güvenli kargo özeti hazırlandı; token ve PII yok`);
   }
 
@@ -48,8 +65,8 @@ export function ShippingConsole() {
         <TriangleAlert aria-hidden="true" size={18} />
         <strong>Canlı kargo aksiyonları kapalı.</strong>
         <span>Canlı etiket kapalı</span>
-        <span>PM verisi korunuyor</span>
-        <span>Sandbox fiyat denemesi</span>
+        <span>PM intake okunuyor</span>
+        <span>Provider gönderimi kapalı</span>
       </div>
 
       <div className="shipping-hero">
@@ -61,7 +78,7 @@ export function ShippingConsole() {
         <div className="ship-hero-actions">
           <button onClick={stageRateCheck} type="button">
             <RefreshCw aria-hidden="true" size={16} />
-            Sandbox fiyatı dene
+            Fiyatı kontrol et
           </button>
           <button className="button-secondary" onClick={copySafeSummary} type="button">
             <Copy aria-hidden="true" size={16} />
@@ -75,7 +92,7 @@ export function ShippingConsole() {
       </div>
 
       <div className="ship-overview">
-        {shippingOverviewRows.map((row) => (
+        {overviewRows.map((row) => (
           <article className="ship-metric" key={row.label}>
             <span>{row.label}</span>
             <strong>{row.value}</strong>
@@ -99,7 +116,7 @@ export function ShippingConsole() {
             <label>
               Sipariş
               <select aria-label="Gönderi siparişi" onChange={(event) => setActiveOrder(event.target.value)} value={activeOrder}>
-                {shipmentConsoleRows.map((row) => (
+                {shipmentRows.map((row) => (
                   <option key={row.sourceOrderKey} value={row.sourceOrderKey}>
                     {formatOpsValue("sourceOrderKey", row.sourceOrderKey)}
                   </option>
@@ -129,7 +146,7 @@ export function ShippingConsole() {
           </div>
 
           <div className="rate-board">
-            {shippingRateRows.map((rate) => (
+            {rateRows.map((rate) => (
               <button
                 aria-pressed={activeRate === rate.id}
                 className="rate-card"
@@ -147,6 +164,13 @@ export function ShippingConsole() {
                 <em>{rate.score}</em>
               </button>
             ))}
+            {rateRows.length === 0 ? (
+              <div className="empty-state compact">
+                <p className="eyebrow">Fiyat kaydı</p>
+                <h2>Henüz fiyat yok</h2>
+                <p>Provider ve canlı Easyship kapalı olduğu için bu panel sadece PM siparişini hazırlar.</p>
+              </div>
+            ) : null}
           </div>
         </section>
 
@@ -158,7 +182,7 @@ export function ShippingConsole() {
           </div>
 
           <div className="ship-guard-list">
-            {shippingGuardRows.map((row) => (
+            {guardRows.map((row) => (
               <article key={row.label}>
                 <span>
                   <ShieldCheck aria-hidden="true" size={15} />
@@ -177,7 +201,7 @@ export function ShippingConsole() {
             </span>
             <ol>
               <li>Canlı PM verisine dokunma.</li>
-              <li>Önce sandbox fiyatı dene.</li>
+              <li>Önce Fiyat ekranında güvenli fiyat kaydı hazırla.</li>
               <li>Ödeme kilidi olmadan etiket basma.</li>
               <li>Owner onayı olmadan partnere gönderme.</li>
             </ol>
@@ -185,19 +209,11 @@ export function ShippingConsole() {
         </aside>
       </div>
 
-      <section className="ship-table-panel">
-        <div className="control-rail">
-          <div>
-            <p className="eyebrow">Gönderi kuyruğu</p>
-            <h2>Hangi sipariş hangi aşamada?</h2>
-          </div>
-          <span>
-            <Search aria-hidden="true" size={16} />
-            Filtrele, seç, önizle
-          </span>
-        </div>
-        <DataTable columns={["sourceOrderKey", "destination", "package", "route", "quote", "label"]} rows={shipmentConsoleRows} />
-      </section>
+      <div className="popup-row">
+        <DetailPopup buttonLabel="Gönderi kuyruğunu aç" size="wide" title="Gönderi kuyruğu">
+          <DataTable columns={["sourceOrderKey", "destination", "package", "route", "quote", "label"]} rows={shipmentRows} />
+        </DetailPopup>
+      </div>
 
       <div className="ship-event-bar" aria-live="polite">
         <CheckCircle2 aria-hidden="true" size={16} />

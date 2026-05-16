@@ -3,15 +3,25 @@ import { readFileSync } from "node:fs";
 
 const checklist = readFileSync("docs/PROJECT_CHECKLIST.md", "utf8");
 
-assert.match(checklist, /^Last updated: 2026-05-15$/m);
+assert.match(checklist, /^Last updated: 2026-05-16$/m);
 assert.match(checklist, /docs\/audits\/2026-05-15_PRE_PILOT_BOUNDARY_AUDIT\.md/);
 assert.match(checklist, /Vercel Git integration confirmed\. Verified by `docs\/evidence\/VERCEL_MAIN_GIT_DEPLOY_SMOKE_2026-05-15\.json`/);
 assert.match(checklist, /PM production read-only aggregate baseline alındı\. Verified by `docs\/evidence\/PM_PRODUCTION_AGGREGATE_BASELINE_2026-05-15\.json`/);
 assert.match(checklist, /SFC API certificate rotate\/review confirmed\. Verified by owner-approved `docs\/evidence\/SFC_CERTIFICATE_REVIEW_2026-05-15\.json`/);
 assert.match(checklist, /Sınır Bekçisi pre-pilot audit geçti\. Verified by owner-approved SFC certificate review evidence/);
 assert.match(checklist, /1-2 allowlisted staging pilot order run completed\. Verified by `docs\/evidence\/STAGING_PILOT_ORDER_RUN_2026-05-15\.json`/);
+assert.match(checklist, /Single local test backer E2E launch rehearsal completed\. Verified by `npm run test:fulfillment-test-backer`/);
 assert.match(checklist, /Inventory staging schema drift kapandı\. Verified by owner-approved `docs\/evidence\/STAGING_INVENTORY_SCHEMA_2026-05-15\.json`/);
+assert.match(checklist, /Angela\/SFC paketleme kapasite teyidi kaydedildi\./);
+assert.match(checklist, /Deterministic Package Plan motoru eklendi\./);
+assert.match(checklist, /Quote engine package-unit fiyat hesaplamasına bağlandı\./);
+assert.match(checklist, /Admin Package Plan Preview UI hazır\./);
+assert.match(checklist, /SFC packing instruction\/export mapping hazır\./);
+assert.match(checklist, /SFC estimate\/final measurement\/tracking variance capture hazır\./);
+assert.match(checklist, /SFC estimate\/final actual\/tracking variance report implemented\./);
+assert.match(checklist, /`npm run test:package-plan`/);
 assert.match(checklist, /`test:staging-pilot-run`/);
+assert.match(checklist, /`npm run test:fulfillment-test-backer`/);
 assert.match(checklist, /`npm run test:staging-schema-public` to cover `fulfillment_stock_feed`/);
 assert.match(checklist, /- \[x\] Stripe test-mode pilot öncesinde\./);
 assert.doesNotMatch(

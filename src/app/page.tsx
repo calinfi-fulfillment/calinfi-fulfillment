@@ -1,48 +1,49 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-
 import Link from "next/link";
 
-import { ActionList } from "@/components/action-list";
 import { AppShell } from "@/components/app-shell";
 import { DataTable } from "@/components/data-table";
+import { DetailPopup } from "@/components/detail-popup";
 import { LocalStagingModeReadiness } from "@/components/local-staging-mode-readiness";
 import { OpsCommandCenter } from "@/components/ops-command-center";
 import { QueueCard } from "@/components/queue-card";
-import { StagingPilotReadiness } from "@/components/staging-pilot-readiness";
-import { cockpitQueues, nextActionRows, readinessRows, routeReviewRows } from "@/lib/ops-ui/fixtures";
-import { areLiveMutationFlagsDisabled, hasFulfillmentSupabasePublicConfig, isPledgeManagerSupabaseUrl } from "@/lib/safety";
-import { createStagingPrepReport, createSyntheticPilotImportPlan } from "@/lib/staging-prep";
+import { getOpsUiData } from "@/lib/ops-ui/live-data";
+import { hasFulfillmentSupabasePublicConfig, isPledgeManagerSupabaseUrl, liveMutationFlags } from "@/lib/safety";
 import { createVercelBypassReport } from "@/lib/vercel-bypass";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const data = await getOpsUiData();
   const blockedPmSupabase = isPledgeManagerSupabaseUrl();
-  const liveFlagsOff = areLiveMutationFlagsDisabled();
+  const flags = liveMutationFlags();
+  const downstreamFlagsOff =
+    !flags.FULFILLMENT_ENABLE_PROVIDER_API_QUOTES &&
+    !flags.FULFILLMENT_ENABLE_STRIPE_CHECKOUT &&
+    !flags.FULFILLMENT_ENABLE_HANDOFF_EXPORTS &&
+    !flags.FULFILLMENT_ENABLE_PARTNER_API_PUSH;
   const publicSupabaseReady = hasFulfillmentSupabasePublicConfig();
-  const stagingPrep = createStagingPrepReport();
   const vercelBypass = createVercelBypassReport();
-  const stagingImportPlan = createSyntheticPilotImportPlan(readFileSync(join(process.cwd(), "fixtures/synthetic-pilot-orders.json"), "utf8"));
   const readinessCounts = {
-    blocked: readinessRows.filter((row) => row.status === "blocker").length,
-    ready: readinessRows.filter((row) => row.status === "ready").length,
-    review: readinessRows.filter((row) => row.status === "review").length,
+    blocked: data.readinessRows.filter((row) => row.status === "blocked").length,
+    ready: data.readinessRows.filter((row) => row.status === "ready").length,
+    review: data.readinessRows.filter((row) => row.status === "needs_review").length,
   };
 
   return (
     <AppShell
-      active="Kontrol Paneli"
+      active="Bugün"
       title="Bugün ne yapacağız?"
       subtitle="Bu ekran siparişleri basit sıraya dizer: önce eksikleri çöz, sonra kargo fiyatı çıkar, ödeme tamamlanınca kargoya hazırla."
       steps={["Eksikleri bul", "Kargo fiyatını hazırla", "Ödeme durumunu kontrol et", "Kargoya verilecekleri ayır"]}
     >
-      <section className="safety-strip" data-danger={blockedPmSupabase || !liveFlagsOff ? "true" : "false"}>
-        <span>{blockedPmSupabase ? "PM verisi korunuyor" : liveFlagsOff ? "Canlı değişiklikler kapalı" : "Canlı ayarlar kontrol edilmeli"}</span>
-        <span>{publicSupabaseReady ? "Fulfillment test veritabanı bağlı" : "Yerel önizleme modu"}</span>
+      <section className="safety-strip" data-danger={blockedPmSupabase || !downstreamFlagsOff ? "true" : "false"}>
+        <span>{data.connection.mode === "live" ? "PM intake bağlı" : data.connection.message}</span>
+        <span>{publicSupabaseReady ? "Fulfillment staging veritabanı bağlı" : "Fulfillment veritabanı bağlı değil"}</span>
         <span>Kargo firması, dışa aktarım ve partner gönderimi kapalı</span>
       </section>
 
       <section className="queue-grid">
-        {cockpitQueues.map((queue) => (
+        {data.cockpitQueues.map((queue) => (
           <QueueCard count={queue.count} detail={queue.detail} key={queue.label} label={queue.label} tone={queue.tone} />
         ))}
         <QueueCard
@@ -56,7 +57,7 @@ export default function Home() {
       <section className="panel shipping-shortcut">
         <div>
           <p className="eyebrow">Kargo Merkezi</p>
-          <h2>Easyship tarzı akış ayrı ekranda</h2>
+          <h2>Kargo hazırlığı ayrı ekranda</h2>
           <p>Sipariş seçme, paket ölçüsü, kargo fiyat kartları ve canlı etiket güvenlik kontrolleri tek sayfada toplandı.</p>
         </div>
         <Link className="button-link" href="/shipping">
@@ -64,38 +65,32 @@ export default function Home() {
         </Link>
       </section>
 
-      <OpsCommandCenter actions={nextActionRows} queues={cockpitQueues} routes={routeReviewRows} />
+      <OpsCommandCenter actions={data.nextActionRows} queues={data.cockpitQueues} routes={data.routeReviewRows} />
 
-      <div className="dashboard-grid">
-        <LocalStagingModeReadiness report={vercelBypass} />
-        <StagingPilotReadiness checks={stagingPrep.checks} importPlan={stagingImportPlan} mode={stagingPrep.mode} ok={stagingPrep.ok} />
+      <div className="popup-row">
+        <DetailPopup buttonLabel="Rota detayları" size="wide" title="Manuel kontrol isteyen rotalar">
+          <DataTable columns={["sourceOrderKey", "country", "route", "payment", "action"]} rows={data.routeReviewRows} />
+        </DetailPopup>
+        <DetailPopup buttonLabel="Ürün detayları" size="wide" title="Ürün bilgi eksikleri">
+          <DataTable columns={["sku", "title", "status", "packaging", "customs"]} rows={data.readinessRows} />
+        </DetailPopup>
+        <DetailPopup
+          buttonLabel="Test ortamı detayları"
+          intro="Bu kontroller canlı kargo, ödeme veya partner işlemi açmaz; Fulfillment bağlantı ve güvenlik kapılarını gösterir."
+          size="wide"
+          title="Test ortamı"
+        >
+          <div className="modal-stack">
+            <section className="connection-card">
+              <p className="eyebrow">Veri kaynağı</p>
+              <h2>{data.connection.source}</h2>
+              <p>{data.connection.message}</p>
+              <strong>{data.connection.orderCount} PM siparişi okunuyor</strong>
+            </section>
+            <LocalStagingModeReadiness report={vercelBypass} />
+          </div>
+        </DetailPopup>
       </div>
-
-      <section className="dashboard-grid">
-        <div className="panel">
-          <div className="panel-header">
-            <p className="eyebrow">Next safe action</p>
-            <h2>Sıradaki güvenli iş</h2>
-          </div>
-          <ActionList rows={nextActionRows} />
-        </div>
-
-        <div className="panel">
-          <div className="panel-header">
-            <p className="eyebrow">Route review</p>
-            <h2>Manuel kontrol isteyen rotalar</h2>
-          </div>
-          <DataTable columns={["sourceOrderKey", "country", "route", "payment", "action"]} rows={routeReviewRows} />
-        </div>
-      </section>
-
-      <section className="panel">
-        <div className="panel-header">
-          <p className="eyebrow">Product Master</p>
-          <h2>Ürün bilgi eksikleri</h2>
-        </div>
-        <DataTable columns={["sku", "title", "status", "packaging", "customs"]} rows={readinessRows} />
-      </section>
     </AppShell>
   );
 }

@@ -8,16 +8,28 @@ function expiresAtFrom(now: Date) {
 }
 
 function totalWeightGrams(request: QuoteRequest) {
+  if (request.packageUnits?.length) {
+    return request.packageUnits.reduce((sum, unit) => sum + unit.totalWeightGrams, 0);
+  }
+
   return request.lines.reduce((sum, line) => sum + (line.weightGrams ?? 0) * line.quantity, 0);
+}
+
+function quoteUnitCount(request: QuoteRequest) {
+  return request.packageUnits?.length || request.lines.length;
+}
+
+function packagePlanCostCents(request: QuoteRequest) {
+  return request.packageUnits?.reduce((sum, unit) => sum + (unit.packagingCostCents ?? 0), 0) ?? 0;
 }
 
 export const local3plFakeQuoteAdapter: QuoteAdapter = {
   name: "local_3pl_fake",
   quote(request) {
     const baseCents = 1200;
-    const perLineCents = request.lines.length * 250;
+    const perLineCents = quoteUnitCount(request) * 250;
     const weightCents = Math.ceil(totalWeightGrams(request) / 100) * 35;
-    const amountCents = baseCents + perLineCents + weightCents;
+    const amountCents = baseCents + perLineCents + weightCents + packagePlanCostCents(request);
     const bufferCents = calculateQuoteBufferCents(amountCents);
 
     return {

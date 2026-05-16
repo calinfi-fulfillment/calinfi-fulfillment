@@ -1,0 +1,220 @@
+import { local3plFakeQuoteAdapter } from "../route-quote";
+import { buildPackagePlan } from "./planner";
+import { createSfcPackingInstructionExport } from "./sfc-export";
+import { createSfcFulfillmentVarianceReport } from "./sfc-variance";
+import type { BoxCatalogEntry, FulfillmentProductSnapshot, PackagePlanInput } from "./types";
+
+const demoProducts: FulfillmentProductSnapshot[] = [
+  {
+    sku: "CLF-ODN-CORE",
+    title: "ODUN Core Box",
+    productType: "main_box",
+    weightGrams: 23000,
+    lengthMm: 500,
+    widthMm: 500,
+    heightMm: 550,
+    hsCode: "9503.00",
+    countryOfOrigin: "CN",
+    customsDescription: "Wood construction toy kit",
+    declaredValueCents: 12000,
+    declaredValueCurrency: "USD",
+    preferredBoxSku: "ODUN_MAIN_BOX",
+    capacityUnits: 0,
+  },
+  {
+    sku: "CLF-ACC-UNI-HND",
+    title: "Universal Handle",
+    productType: "accessory",
+    isBuiltinMainBoxItem: true,
+  },
+  {
+    sku: "CLF-ACC-TOKEN",
+    title: "Small Token Add-on",
+    productType: "accessory",
+    weightGrams: 100,
+    lengthMm: 80,
+    widthMm: 40,
+    heightMm: 20,
+    hsCode: "9503.00",
+    countryOfOrigin: "CN",
+    customsDescription: "Wood game accessory token",
+    declaredValueCents: 500,
+    declaredValueCurrency: "USD",
+    canBundleWithMainBox: true,
+    canBundleWithAccessories: true,
+    bundleGroup: "small_accessory",
+    capacityUnits: 1,
+  },
+  {
+    sku: "CLF-ACC-PIPE",
+    title: "Pipe Accessory",
+    productType: "accessory",
+    weightGrams: 200,
+    lengthMm: 160,
+    widthMm: 40,
+    heightMm: 40,
+    hsCode: "9503.00",
+    countryOfOrigin: "CN",
+    customsDescription: "Wood game pipe accessory",
+    declaredValueCents: 600,
+    declaredValueCurrency: "USD",
+    canBundleWithMainBox: false,
+    canBundleWithAccessories: true,
+    bundleGroup: "pipes",
+    capacityUnits: 1,
+  },
+];
+
+const demoBoxes: BoxCatalogEntry[] = [
+  {
+    boxSku: "ODUN_MAIN_BOX",
+    sfcBoxSku: "SFC_ODUN_MAIN_BOX",
+    title: "ODUN Main Shipper",
+    boxType: "main",
+    outerLengthMm: 500,
+    outerWidthMm: 500,
+    outerHeightMm: 550,
+    tareWeightGrams: 800,
+    maxWeightGrams: 28000,
+    maxAccessoryCapacityUnits: 2,
+    allowedBundleGroups: ["small_accessory"],
+    packagingCostCents: 500,
+    currency: "USD",
+    readyForDirectShipment: true,
+    priority: 10,
+  },
+  {
+    boxSku: "PIPE_BUNDLE_BOX_6",
+    sfcBoxSku: "SFC_PIPE_BUNDLE_BOX_6",
+    title: "Pipe Bundle Box",
+    boxType: "accessory_bundle",
+    outerLengthMm: 220,
+    outerWidthMm: 120,
+    outerHeightMm: 120,
+    tareWeightGrams: 200,
+    maxWeightGrams: 3000,
+    maxAccessoryCapacityUnits: 6,
+    allowedBundleGroups: ["pipes"],
+    packagingCostCents: 150,
+    currency: "USD",
+    readyForDirectShipment: true,
+    priority: 20,
+  },
+];
+
+export const demoPackagePlanInput = {
+  orderId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  sourceOrderKey: "pm:synthetic-package-plan-001",
+  catalogVersion: "pm-catalog-2026-05-15",
+  packagePlanVersion: "package-rules-1",
+  currency: "USD",
+  destinationCountryCode: "US",
+  products: demoProducts,
+  boxes: demoBoxes,
+  lines: [
+    {
+      sourceLineKey: "line-core",
+      sku: "CLF-ODN-CORE",
+      title: "ODUN Core Box",
+      quantity: 1,
+      lineRole: "reward",
+    },
+    {
+      sourceLineKey: "line-built-in",
+      sku: "CLF-ACC-UNI-HND",
+      title: "Universal Handle",
+      quantity: 1,
+      lineRole: "builtin",
+      isBuiltinMainBoxItem: true,
+    },
+    {
+      sourceLineKey: "line-token",
+      sku: "CLF-ACC-TOKEN",
+      title: "Small Token Add-on",
+      quantity: 2,
+      lineRole: "addon",
+    },
+    {
+      sourceLineKey: "line-pipe",
+      sku: "CLF-ACC-PIPE",
+      title: "Pipe Accessory",
+      quantity: 6,
+      lineRole: "addon",
+    },
+  ],
+} satisfies PackagePlanInput;
+
+export function createSyntheticPackagePlanPreview() {
+  const plan = buildPackagePlan(demoPackagePlanInput);
+  const quote = local3plFakeQuoteAdapter.quote({
+    orderId: plan.orderId,
+    currency: plan.summary.currency,
+    countryCode: plan.destinationCountryCode,
+    routeType: "REGIONAL_3PL",
+    shippingMode: "3PL_INTERNAL_LABEL",
+    lines: [],
+    packageUnits: plan.packageUnits.map((unit) => ({
+      packageId: unit.packageId,
+      boxSku: unit.boxSku,
+      totalWeightGrams: unit.totalWeightGrams,
+      outerLengthMm: unit.outerLengthMm,
+      outerWidthMm: unit.outerWidthMm,
+      outerHeightMm: unit.outerHeightMm,
+      packagingCostCents: unit.packagingCostCents,
+      declaredValueCents: unit.declaredValueCents,
+    })),
+    orderFingerprint: plan.fingerprint,
+    now: new Date("2026-05-15T00:00:00.000Z"),
+  });
+  const sfcExport = createSfcPackingInstructionExport(plan);
+  const sfcVarianceReport = createSfcFulfillmentVarianceReport({
+    plan,
+    quote,
+    snapshot: {
+      provider: "sendfromchina",
+      sourceOrderKey: plan.sourceOrderKey,
+      referenceNo: sfcExport.referenceNo,
+      packagePlanFingerprint: plan.fingerprint,
+      capturedAtIso: "2026-05-15T10:00:00.000Z",
+      estimate: {
+        channelName: "SFC synthetic DDP channel",
+        methodCode: "SFC-DDP-SYNTH",
+        estimatedShippingFeeCents: quote.totalCents - 160,
+        currency: quote.currency,
+        matchedAtIso: "2026-05-15T10:05:00.000Z",
+      },
+      actual: {
+        finalShippingFeeCents: quote.totalCents - 80,
+        currency: quote.currency,
+        measuredAtIso: "2026-05-15T14:00:00.000Z",
+        parcels: plan.packageUnits.map((unit, index) => ({
+          packageId: unit.packageId,
+          parcelNo: index + 1,
+          trackingNumber: `SFC-SYNTH-${String(index + 1).padStart(4, "0")}`,
+          actualWeightGrams: unit.totalWeightGrams + (index === 0 ? 250 : 30),
+          outerLengthMm: unit.outerLengthMm + (index === 0 ? 0 : 1),
+          outerWidthMm: unit.outerWidthMm,
+          outerHeightMm: unit.outerHeightMm + (index === 0 ? 2 : 2),
+          finalShippingFeeCents: index === 0 ? quote.totalCents - 760 : 680,
+          measuredAtIso: "2026-05-15T14:00:00.000Z",
+        })),
+      },
+      mutation: false,
+      containsBackerPii: false,
+      externalActions: "none",
+    },
+  });
+
+  return {
+    plan,
+    quote,
+    sfcExport,
+    sfcVarianceReport,
+    sfcConfirmation: {
+      preOrderCartonization: false,
+      postUploadEstimate: true,
+      finalMeasurement: true,
+      trackingNumber: true,
+    },
+  };
+}

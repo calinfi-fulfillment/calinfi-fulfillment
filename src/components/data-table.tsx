@@ -1,8 +1,9 @@
 "use client";
 
-import { CheckCircle2, ClipboardCheck, Columns3, Filter, Search, X } from "lucide-react";
+import { Eye, Filter, Search, X } from "lucide-react";
 import { type KeyboardEvent, useMemo, useState } from "react";
 
+import { OpsModal } from "@/components/ops-modal";
 import { StatusBadge } from "@/components/status-badge";
 import { formatColumnLabel, formatOpsValue } from "@/lib/ops-ui/labels";
 
@@ -20,7 +21,9 @@ type IndexedRow<T extends Record<string, string>> = {
 const filterColumnHints = ["status", "severity", "route", "payment", "guard", "products", "address", "quote", "customs", "owner"];
 
 function rowId(row: Record<string, string>, index: number) {
-  return row.sourceOrderKey ?? row.sku ?? row.code ?? row.metric ?? `${index + 1}`;
+  const primary = row.sourceOrderKey ?? row.sku ?? row.code ?? row.metric ?? "row";
+  const secondary = row.sku ?? row.code ?? row.metric ?? "";
+  return secondary && secondary !== primary ? `${primary}:${secondary}:${index + 1}` : `${primary}:${index + 1}`;
 }
 
 function shouldBadge(column: string, value: string) {
@@ -62,7 +65,7 @@ export function DataTable<T extends Record<string, string>>({ columns, rows }: D
   const [localEvent, setLocalEvent] = useState("Henüz güvenli önizleme yok");
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(indexedRows[0]?.id ?? null);
-  const [visibleColumns, setVisibleColumns] = useState<string[]>(stringColumns);
+  const [detailOpen, setDetailOpen] = useState(false);
 
   const filteredRows = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -83,16 +86,6 @@ export function DataTable<T extends Record<string, string>>({ columns, rows }: D
 
   const selectedRow = filteredRows.find(({ id }) => id === selectedId) ?? filteredRows[0] ?? null;
   const selectedCount = selectedRow ? 1 : 0;
-
-  function toggleColumn(column: string) {
-    setVisibleColumns((currentColumns) => {
-      if (currentColumns.includes(column)) {
-        return currentColumns.length === 1 ? currentColumns : currentColumns.filter((currentColumn) => currentColumn !== column);
-      }
-
-      return stringColumns.filter((currentColumn) => currentColumns.includes(currentColumn) || currentColumn === column);
-    });
-  }
 
   function stageAction(action: string) {
     const target = selectedRow ? formatOpsValue("sourceOrderKey", selectedRow.id) : "filtrelenen liste";
@@ -131,13 +124,9 @@ export function DataTable<T extends Record<string, string>>({ columns, rows }: D
           </select>
         </label>
         <div className="table-actions" aria-label="Güvenli yerel tablo işlemleri">
-          <button className="button-secondary" onClick={() => stageAction("Kontrol")} type="button">
-            <ClipboardCheck aria-hidden="true" size={16} />
-            Kontrol et
-          </button>
-          <button className="button-secondary" onClick={() => stageAction("Güvenli önizleme")} type="button">
-            <CheckCircle2 aria-hidden="true" size={16} />
-            Önizle
+          <button className="button-secondary" disabled={!selectedRow} onClick={() => setDetailOpen(true)} type="button">
+            <Eye aria-hidden="true" size={16} />
+            Detay
           </button>
           <button className="button-ghost" onClick={() => setSelectedId(filteredRows[0]?.id ?? null)} type="button">
             <X aria-hidden="true" size={16} />
@@ -145,26 +134,6 @@ export function DataTable<T extends Record<string, string>>({ columns, rows }: D
           </button>
         </div>
       </div>
-
-      <details className="column-picker">
-        <summary>
-          <Columns3 aria-hidden="true" size={16} />
-          Tablo sütunları
-        </summary>
-        <div>
-          {stringColumns.map((column) => (
-            <label className="checkbox-control" key={column}>
-              <input
-                aria-label={`Sütun: ${formatColumnLabel(column)}`}
-                checked={visibleColumns.includes(column)}
-                onChange={() => toggleColumn(column)}
-                type="checkbox"
-              />
-              {formatColumnLabel(column)}
-            </label>
-          ))}
-        </div>
-      </details>
 
       <div className="table-status-line" aria-live="polite">
         <span>{filteredRows.length} kayıt</span>
@@ -177,7 +146,7 @@ export function DataTable<T extends Record<string, string>>({ columns, rows }: D
           <thead>
             <tr>
               <th>Seç</th>
-              {visibleColumns.map((column) => (
+              {stringColumns.map((column) => (
                 <th key={column}>{formatColumnLabel(column)}</th>
               ))}
             </tr>
@@ -200,7 +169,7 @@ export function DataTable<T extends Record<string, string>>({ columns, rows }: D
                     type="radio"
                   />
                 </td>
-                {visibleColumns.map((column) => (
+                {stringColumns.map((column) => (
                   <td key={column}>
                     {shouldBadge(column, row[column]) ? <StatusBadge label={row[column]} /> : formatOpsValue(column, row[column])}
                   </td>
@@ -209,34 +178,40 @@ export function DataTable<T extends Record<string, string>>({ columns, rows }: D
             ))}
             {filteredRows.length === 0 ? (
               <tr>
-                <td colSpan={visibleColumns.length + 1}>Bu filtrelerle eşleşen kayıt yok.</td>
+                <td colSpan={stringColumns.length + 1}>Bu filtrelerle eşleşen kayıt yok.</td>
               </tr>
             ) : null}
           </tbody>
         </table>
       </div>
 
-      {selectedRow ? (
-        <aside className="row-inspector" aria-label="Seçili kayıt detayı">
-          <div>
-            <p className="eyebrow">Seçili kayıt</p>
-            <h2>{formatOpsValue("sourceOrderKey", selectedRow.id)}</h2>
+      {detailOpen && selectedRow ? (
+        <OpsModal onClose={() => setDetailOpen(false)} title={formatOpsValue("sourceOrderKey", selectedRow.id)}>
+          <div className="row-detail-modal">
+            <dl>
+              {stringColumns.map((column) => (
+                <div key={column}>
+                  <dt>{formatColumnLabel(column)}</dt>
+                  <dd>
+                    {shouldBadge(column, selectedRow.row[column]) ? (
+                      <StatusBadge label={selectedRow.row[column]} />
+                    ) : (
+                      formatOpsValue(column, selectedRow.row[column])
+                    )}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+            <div className="modal-action-row">
+              <button className="button-secondary" onClick={() => stageAction("Kontrol")} type="button">
+                Kontrol hazırla
+              </button>
+              <button className="button-secondary" onClick={() => stageAction("Güvenli önizleme")} type="button">
+                Önizleme hazırla
+              </button>
+            </div>
           </div>
-          <dl>
-            {stringColumns.map((column) => (
-              <div key={column}>
-                <dt>{formatColumnLabel(column)}</dt>
-                <dd>
-                  {shouldBadge(column, selectedRow.row[column]) ? (
-                    <StatusBadge label={selectedRow.row[column]} />
-                  ) : (
-                    formatOpsValue(column, selectedRow.row[column])
-                  )}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </aside>
+        </OpsModal>
       ) : null}
     </section>
   );

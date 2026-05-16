@@ -4,6 +4,11 @@ import { liveMutationFlags } from "@/lib/safety";
 import { buildPmIntakePlan } from "@/lib/pm-intake/processor";
 import { PmIntakePayloadSchema } from "@/lib/pm-intake/schema";
 import { verifyPmIntakeSignature } from "@/lib/pm-intake/signature";
+import { getSupabaseServiceRoleClient, hasFulfillmentSupabaseServiceRoleConfig } from "@/lib/supabase/server";
+import {
+  isPmIntakeSupabasePersistenceEnabled,
+  persistPmIntakePayloadWithSupabase,
+} from "@/lib/pm-intake/supabase-persistence";
 
 export const runtime = "nodejs";
 
@@ -42,15 +47,43 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const dryRunPlan = buildPmIntakePlan(parsed.data, []);
+  if (!isPmIntakeSupabasePersistenceEnabled()) {
+    const dryRunPlan = buildPmIntakePlan(parsed.data, []);
 
-  return NextResponse.json(
-    {
-      ok: false,
-      code: "persistence_not_enabled",
-      message: "PM intake contract is validated, but persistence is intentionally gated until Fulfillment Supabase is configured.",
-      dryRunPlan,
-    },
-    { status: 503 },
-  );
+    return NextResponse.json(
+      {
+        ok: false,
+        code: "persistence_not_enabled",
+        message: hasFulfillmentSupabaseServiceRoleConfig()
+          ? "PM intake contract is validated, but live Supabase mutations are disabled."
+          : "PM intake contract is validated, but Fulfillment Supabase service-role persistence is not configured.",
+        dryRunPlan,
+      },
+      { status: 503 },
+    );
+  }
+
+  const result = await persistPmIntakePayloadWithSupabase(getSupabaseServiceRoleClient(), parsed.data);
+
+  if (!result.ok) {
+    return NextResponse.json(
+      {
+        ok: false,
+        blocked: result.blocked,
+        code: result.code,
+        plan: result.plan,
+        sourceOrderKey: result.sourceOrderKey,
+      },
+      { status: result.blocked ? 409 : 500 },
+    );
+  }
+
+  return NextResponse.json({
+    ok: true,
+    code: result.code,
+    excludedBuiltinItemCount: result.excludedBuiltinItemCount,
+    orderId: result.orderId,
+    orderLineCount: result.orderLineCount,
+    sourceOrderKey: result.sourceOrderKey,
+  });
 }

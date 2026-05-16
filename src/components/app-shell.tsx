@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { PageGuidePopup } from "@/components/page-guide-popup";
 import { OPS_NAV_ITEMS, type OpsNavLabel } from "@/lib/ops-ui/navigation";
 
 type AppShellProps = {
@@ -38,17 +39,8 @@ export function AppShell({ active, children, steps, subtitle, title }: AppShellP
             <h1>{title}</h1>
             <p>{subtitle}</p>
           </div>
+          <PageGuidePopup steps={steps ?? []} />
         </header>
-        {steps ? (
-          <section className="page-guide" aria-label="Sayfa adımları">
-            {steps.map((step, index) => (
-              <article key={step}>
-                <strong>{index + 1}</strong>
-                <span>{step}</span>
-              </article>
-            ))}
-          </section>
-        ) : null}
         {children}
       </section>
     </main>

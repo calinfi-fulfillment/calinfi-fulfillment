@@ -57,6 +57,7 @@ const requiredScripts = [
   "test:checklist",
   "test:pre-pilot-boundary-audit",
   "test:staging-pilot-run",
+  "test:fulfillment-test-backer",
   "test:sfc-certificate-review",
   "test:sfc-network",
   "smoke:easyship-sandbox-rates",

@@ -27,6 +27,17 @@ export type QuoteRequestLine = {
   weightGrams?: number;
 };
 
+export type QuoteRequestPackageUnit = {
+  packageId: string;
+  boxSku: string;
+  totalWeightGrams: number;
+  outerLengthMm: number;
+  outerWidthMm: number;
+  outerHeightMm: number;
+  packagingCostCents?: number;
+  declaredValueCents?: number;
+};
+
 export type QuoteRequest = {
   orderId: string;
   currency: string;
@@ -34,6 +45,7 @@ export type QuoteRequest = {
   routeType: FulfillmentRouteType;
   shippingMode: ShippingMode;
   lines: QuoteRequestLine[];
+  packageUnits?: QuoteRequestPackageUnit[];
   orderFingerprint: string;
   now: Date;
 };

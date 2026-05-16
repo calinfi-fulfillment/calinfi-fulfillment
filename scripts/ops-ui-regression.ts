@@ -1,165 +1,114 @@
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 
-import {
-  cockpitQueues,
-  exceptionRows,
-  nextActionRows,
-  orderRows,
-  paymentRows,
-  quoteRows,
-  readinessRows,
-  reportRows,
-  routeReviewRows,
-} from "../src/lib/ops-ui/fixtures";
 import { OPS_NAV_ITEMS } from "../src/lib/ops-ui/navigation";
 
 assert.deepEqual(
   OPS_NAV_ITEMS.map((item) => item.label),
-  ["Kontrol Paneli", "Kargo Merkezi", "Üretim & Stok", "Siparişler", "Kargo Ücreti", "Ödemeler", "Kargoya Hazır", "Sorunlar", "Raporlar"],
+  ["Bugün", "Siparişler", "Stok", "Kargo", "Fiyat", "Ödeme", "Teslim", "Sorunlar", "Raporlar"],
 );
 
 for (const route of ["shipping", "inventory", "orders", "quotes", "payments", "handoffs", "exceptions", "reports"]) {
   assert.equal(existsSync(`src/app/${route}/page.tsx`), true, `${route} page must exist`);
 }
 
-assert.equal(cockpitQueues.length >= 4, true);
-assert.equal(orderRows.length > 0, true);
-assert.equal(quoteRows.some((row) => row.route === "CHINA_HK_DIRECT_DDP"), true);
-assert.equal(paymentRows.length > 0, true);
-assert.equal(exceptionRows.some((row) => row.severity === "blocker"), true);
-assert.equal(nextActionRows.some((row) => row.status === "blocker"), true);
-assert.equal(readinessRows.some((row) => row.status === "blocker"), true);
-assert.equal(readinessRows.filter((row) => row.status === "blocker").length, 1);
-assert.equal(routeReviewRows.some((row) => row.route === "CHINA_HK_DIRECT_DDP"), true);
-assert.equal(reportRows.some((row) => Number.parseInt(row.value, 10) > 0), true);
-
 for (const component of [
+  "src/components/app-shell.tsx",
   "src/components/data-table.tsx",
+  "src/components/detail-popup.tsx",
   "src/components/exception-triage.tsx",
+  "src/components/guided-quote-workflow.tsx",
   "src/components/handoff-workbench.tsx",
   "src/components/inventory-workbench.tsx",
-  "src/components/local-staging-mode-readiness.tsx",
   "src/components/manual-ddp-quote.tsx",
-  "src/components/network-readiness.tsx",
-  "src/components/orders-workbench.tsx",
   "src/components/ops-command-center.tsx",
+  "src/components/ops-modal.tsx",
+  "src/components/orders-workbench.tsx",
   "src/components/payment-event-workbench.tsx",
-  "src/components/provider-api-readiness.tsx",
   "src/components/reports-dashboard.tsx",
-  "src/components/sfc-agreement-brief.tsx",
-  "src/components/staging-pilot-readiness.tsx",
+  "src/components/shipping-console.tsx",
+  "src/components/status-badge.tsx",
   "src/components/stripe-checkout-readiness.tsx",
 ]) {
   assert.equal(existsSync(component), true, `${component} must exist`);
 }
 
+const liveDataSource = readFileSync("src/lib/ops-ui/live-data.ts", "utf8");
+const appShellSource = readFileSync("src/components/app-shell.tsx", "utf8");
 const dataTableSource = readFileSync("src/components/data-table.tsx", "utf8");
 const cockpitSource = readFileSync("src/app/page.tsx", "utf8");
-const handoffsSource = readFileSync("src/app/handoffs/page.tsx", "utf8");
-const inventorySource = readFileSync("src/components/inventory-workbench.tsx", "utf8");
-const ordersSource = readFileSync("src/app/orders/page.tsx", "utf8");
-const paymentsSource = readFileSync("src/app/payments/page.tsx", "utf8");
-const quotesSource = readFileSync("src/app/quotes/page.tsx", "utf8");
-const reportsSource = readFileSync("src/components/reports-dashboard.tsx", "utf8");
-const stagingReadinessSource = readFileSync("src/components/staging-pilot-readiness.tsx", "utf8");
-const localStagingSource = readFileSync("src/components/local-staging-mode-readiness.tsx", "utf8");
-const networkReadinessSource = readFileSync("src/components/network-readiness.tsx", "utf8");
-const providerReadinessSource = readFileSync("src/components/provider-api-readiness.tsx", "utf8");
-const sfcAgreementBriefSource = readFileSync("src/components/sfc-agreement-brief.tsx", "utf8");
-const stripeCheckoutReadinessSource = readFileSync("src/components/stripe-checkout-readiness.tsx", "utf8");
-const appShellSource = readFileSync("src/components/app-shell.tsx", "utf8");
-const labelsSource = readFileSync("src/lib/ops-ui/labels.ts", "utf8");
-const shippingConsoleSource = readFileSync("src/components/shipping-console.tsx", "utf8");
+const ordersPageSource = readFileSync("src/app/orders/page.tsx", "utf8");
 const shippingPageSource = readFileSync("src/app/shipping/page.tsx", "utf8");
-const stitchPromptSource = readFileSync("docs/design/STITCH_APP_PROMPT.md", "utf8");
+const quotesPageSource = readFileSync("src/app/quotes/page.tsx", "utf8");
+const paymentsPageSource = readFileSync("src/app/payments/page.tsx", "utf8");
+const handoffsPageSource = readFileSync("src/app/handoffs/page.tsx", "utf8");
+const inventoryPageSource = readFileSync("src/app/inventory/page.tsx", "utf8");
+const exceptionsPageSource = readFileSync("src/app/exceptions/page.tsx", "utf8");
+const reportsPageSource = readFileSync("src/app/reports/page.tsx", "utf8");
+const guidedQuoteSource = readFileSync("src/components/guided-quote-workflow.tsx", "utf8");
+const inventorySource = readFileSync("src/components/inventory-workbench.tsx", "utf8");
+const manualDdpSource = readFileSync("src/components/manual-ddp-quote.tsx", "utf8");
+const ordersSource = readFileSync("src/components/orders-workbench.tsx", "utf8");
+const shippingConsoleSource = readFileSync("src/components/shipping-console.tsx", "utf8");
+const reportsSource = readFileSync("src/components/reports-dashboard.tsx", "utf8");
+const labelsSource = readFileSync("src/lib/ops-ui/labels.ts", "utf8");
 
-assert.match(dataTableSource, /data-testid="interactive-data-table"/);
-assert.match(dataTableSource, /type="search"/);
-assert.match(dataTableSource, /type="radio"/);
-assert.match(dataTableSource, /Sipariş, ürün veya durum ara/);
-assert.match(appShellSource, /page-guide/);
+assert.match(liveDataSource, /getOpsUiData/);
+assert.match(liveDataSource, /order_snapshot/);
+assert.match(liveDataSource, /source === "pledge_manager"/);
+assert.match(liveDataSource, /hasFulfillmentSupabaseServiceRoleConfig/);
+assert.match(liveDataSource, /Provider fiyat API flag/);
+assert.match(liveDataSource, /Stripe checkout flag/);
+assert.match(liveDataSource, /Partner push/);
+
+for (const source of [
+  cockpitSource,
+  ordersPageSource,
+  shippingPageSource,
+  quotesPageSource,
+  paymentsPageSource,
+  handoffsPageSource,
+  inventoryPageSource,
+  exceptionsPageSource,
+  reportsPageSource,
+]) {
+  assert.match(source, /getOpsUiData/);
+  assert.match(source, /force-dynamic/);
+  assert.doesNotMatch(source, /ops-ui\/fixtures/);
+}
+
+assert.match(appShellSource, /PageGuidePopup/);
 assert.match(appShellSource, /ODUN Kargo Paneli/);
+assert.match(dataTableSource, /data-testid="interactive-data-table"/);
+assert.match(dataTableSource, /OpsModal/);
+assert.match(dataTableSource, /Sipariş, ürün veya durum ara/);
+assert.match(guidedQuoteSource, /data-testid="guided-quote-workflow"/);
+assert.match(guidedQuoteSource, /Fiyatı hazırla/);
+assert.doesNotMatch(guidedQuoteSource, /Sandbox fiyatı seç/);
+assert.match(inventorySource, /demandRows/);
+assert.match(inventorySource, /supplyRows/);
+assert.match(manualDdpSource, /orders = \[\]/);
+assert.match(ordersSource, /Henüz aktarılmış sipariş yok/);
+assert.match(shippingConsoleSource, /shipmentRows/);
+assert.match(shippingConsoleSource, /Provider gönderimi kapalı/);
+assert.match(shippingPageSource, /orderLineRows/);
+assert.doesNotMatch(shippingPageSource, /createSyntheticPackagePlanPreview/);
+assert.doesNotMatch(shippingPageSource, /PackagePlanPreview/);
+assert.doesNotMatch(quotesPageSource, /NetworkReadiness/);
+assert.doesNotMatch(quotesPageSource, /ProviderApiReadiness/);
+assert.match(paymentsPageSource, /Gelişmiş Stripe kontrolleri/);
+assert.match(handoffsPageSource, /shippingGuardRows/);
+assert.match(reportsSource, /data-testid="reports-dashboard"/);
 assert.match(labelsSource, /Sipariş/);
 assert.match(labelsSource, /Blokaj/);
-assert.match(shippingConsoleSource, /data-testid="shipping-console"/);
-assert.match(shippingConsoleSource, /Easyship tarzı kargo akışı/);
-assert.match(shippingConsoleSource, /Canlı etiket bas/);
-assert.match(shippingConsoleSource, /Canlı etiket, canlı gönderi ve canlı takip hâlâ kapalıdır/);
-assert.match(shippingPageSource, /Kargo merkezi/);
-assert.match(shippingPageSource, /NetworkReadiness/);
-assert.match(shippingPageSource, /SfcAgreementBriefPanel/);
-assert.match(stitchPromptSource, /ODUN Fulfillment V1/);
-assert.match(stitchPromptSource, /PM verisi korunuyor/);
-assert.match(cockpitSource, /OpsCommandCenter/);
-assert.match(cockpitSource, /shipping-shortcut/);
-assert.match(cockpitSource, /Bugün ne yapacağız/);
-assert.match(handoffsSource, /HandoffWorkbench/);
-assert.match(handoffsSource, /ProviderApiReadiness/);
-assert.match(inventorySource, /data-testid="inventory-workbench"/);
-assert.match(inventorySource, /Fulfillment feed hazırla/);
-assert.match(inventorySource, /Canlı depo güncelle/);
-assert.match(inventorySource, /buildFulfillmentStockFeed/);
-assert.match(inventorySource, /buildSfcStockPlan/);
-assert.match(ordersSource, /OrdersWorkbench/);
-assert.match(paymentsSource, /PaymentEventWorkbench/);
-assert.match(paymentsSource, /StripeCheckoutReadinessPanel/);
-assert.match(paymentsSource, /Ödeme kontrolü/);
-assert.match(quotesSource, /ManualDdpQuote/);
-assert.match(quotesSource, /NetworkReadiness/);
-assert.match(quotesSource, /ProviderApiReadiness/);
-assert.match(quotesSource, /Kargo ücreti çıkar/);
-assert.match(handoffsSource, /Kargoya teslim hazırlığı/);
-assert.match(reportsSource, /data-testid="reports-dashboard"/);
-assert.match(cockpitSource, /StagingPilotReadiness/);
-assert.match(cockpitSource, /LocalStagingModeReadiness/);
-assert.match(stagingReadinessSource, /data-testid="staging-pilot-readiness"/);
-assert.match(stagingReadinessSource, /Test Supabase bağla/);
-assert.match(stagingReadinessSource, /Firmaya canlı gönder/);
-assert.match(localStagingSource, /data-testid="vercel-bypass-readiness"/);
-assert.match(localStagingSource, /Yerel test modu/);
-assert.match(networkReadinessSource, /data-testid="network-readiness"/);
-assert.match(networkReadinessSource, /data-testid="sfc-hub-preview"/);
-assert.match(networkReadinessSource, /data-testid="sfc-read-only-smoke-plan"/);
-assert.match(networkReadinessSource, /data-testid="sfc-product-customs-preview"/);
-assert.match(networkReadinessSource, /data-testid="freight-batch-preview"/);
-assert.match(networkReadinessSource, /data-testid="easyship-last-mile-preview"/);
-assert.match(networkReadinessSource, /SFC \+ Easyship ağı/);
-assert.match(networkReadinessSource, /SFC China Hub/);
-assert.match(networkReadinessSource, /SFC read-only smoke/);
-assert.match(networkReadinessSource, /createSfcReadOnlySmokePlan/);
-assert.match(networkReadinessSource, /Product\/customs/);
-assert.match(networkReadinessSource, /Freight batch/);
-assert.match(networkReadinessSource, /Easyship last-mile/);
-assert.match(networkReadinessSource, /SFC stock\/customs payload PII ve secret içermez/);
-assert.match(networkReadinessSource, /US\/EU freight manifestinde final backer adresi yoktur/);
-assert.match(networkReadinessSource, /createFreightBatchPlan/);
-assert.match(networkReadinessSource, /Canlı sağlayıcıya gönder/);
-assert.match(sfcAgreementBriefSource, /data-testid="sfc-agreement-brief"/);
-assert.match(sfcAgreementBriefSource, /Bugün SFC&apos;den ne istemeliyiz/);
-assert.match(sfcAgreementBriefSource, /data-testid=\{`sfc-agreement-\$\{item\.id\}`\}/);
-assert.match(sfcAgreementBriefSource, /"api-access": ClipboardCheck/);
-assert.match(sfcAgreementBriefSource, /credentials: KeyRound/);
-assert.match(sfcAgreementBriefSource, /warehouse: Warehouse/);
-assert.match(sfcAgreementBriefSource, /data-testid="sfc-agreement-boundary"/);
-assert.match(sfcAgreementBriefSource, /createSfcAgreementBrief/);
-assert.match(providerReadinessSource, /Maket fiyat/);
-assert.match(providerReadinessSource, /Maket teslim/);
-assert.match(providerReadinessSource, /Maket takip/);
-assert.match(providerReadinessSource, /Easyship fiyat planı/);
-assert.match(providerReadinessSource, /Easyship teslim kilidi/);
-assert.match(providerReadinessSource, /Easyship durumu/);
-assert.match(stripeCheckoutReadinessSource, /data-testid="stripe-checkout-readiness"/);
-assert.match(stripeCheckoutReadinessSource, /Test ödemesi aç/);
-assert.match(stripeCheckoutReadinessSource, /Canlı ödeme/);
 
 console.log(
   JSON.stringify(
     {
-      ok: true,
       checked: "ops-ui",
+      mode: "pm-intake-live-data",
       navItems: OPS_NAV_ITEMS.map((item) => item.label),
-      mode: "synthetic-only",
+      ok: true,
     },
     null,
     2,

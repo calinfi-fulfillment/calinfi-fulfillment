@@ -58,6 +58,8 @@ export const ISSUE_STATUSES = ["open", "resolved", "voided"] as const;
 
 export const LINE_ROLES = ["reward", "addon", "prepaid", "builtin"] as const;
 
+export const PACKAGE_PRODUCT_TYPES = ["main_box", "accessory", "replacement", "packaging"] as const;
+
 export const INVENTORY_LOCATION_TYPES = ["factory", "sfc_warehouse", "regional_3pl", "internal", "partner"] as const;
 
 export const INVENTORY_BATCH_STATUSES = [
@@ -94,6 +96,7 @@ export const HandoffStatusSchema = z.enum(HANDOFF_STATUSES);
 export const IssueSeveritySchema = z.enum(ISSUE_SEVERITIES);
 export const IssueStatusSchema = z.enum(ISSUE_STATUSES);
 export const LineRoleSchema = z.enum(LINE_ROLES);
+export const PackageProductTypeSchema = z.enum(PACKAGE_PRODUCT_TYPES);
 export const InventoryLocationTypeSchema = z.enum(INVENTORY_LOCATION_TYPES);
 export const InventoryBatchStatusSchema = z.enum(INVENTORY_BATCH_STATUSES);
 export const InventoryReservationStatusSchema = z.enum(INVENTORY_RESERVATION_STATUSES);
@@ -112,6 +115,7 @@ export type HandoffStatus = z.infer<typeof HandoffStatusSchema>;
 export type IssueSeverity = z.infer<typeof IssueSeveritySchema>;
 export type IssueStatus = z.infer<typeof IssueStatusSchema>;
 export type LineRole = z.infer<typeof LineRoleSchema>;
+export type PackageProductType = z.infer<typeof PackageProductTypeSchema>;
 export type InventoryLocationType = z.infer<typeof InventoryLocationTypeSchema>;
 export type InventoryBatchStatus = z.infer<typeof InventoryBatchStatusSchema>;
 export type InventoryReservationStatus = z.infer<typeof InventoryReservationStatusSchema>;
@@ -131,6 +135,15 @@ export const ProductSchema = z.object({
   customsDescription: z.string().nullable().optional(),
   declaredValueCents: z.number().int().nonnegative().nullable().optional(),
   declaredValueCurrency: z.string().length(3).nullable().optional(),
+  productType: PackageProductTypeSchema.default("accessory").optional(),
+  canBundleWithMainBox: z.boolean().nullable().optional(),
+  canBundleWithAccessories: z.boolean().nullable().optional(),
+  requiresSeparateBox: z.boolean().nullable().optional(),
+  bundleGroup: z.string().nullable().optional(),
+  capacityUnits: z.number().int().nonnegative().nullable().optional(),
+  shipGroup: z.string().nullable().optional(),
+  preferredBoxSku: z.string().nullable().optional(),
+  manualReviewRequired: z.boolean().nullable().optional(),
 });
 
 export const OrderLineSchema = z.object({

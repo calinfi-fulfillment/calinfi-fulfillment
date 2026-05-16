@@ -1,9 +1,12 @@
 import { AppShell } from "@/components/app-shell";
-import { DataTable } from "@/components/data-table";
 import { OrdersWorkbench } from "@/components/orders-workbench";
-import { orderRows } from "@/lib/ops-ui/fixtures";
+import { getOpsUiData } from "@/lib/ops-ui/live-data";
 
-export default function OrdersPage() {
+export const dynamic = "force-dynamic";
+
+export default async function OrdersPage() {
+  const data = await getOpsUiData();
+
   return (
     <AppShell
       active="Siparişler"
@@ -11,10 +14,7 @@ export default function OrdersPage() {
       subtitle="Burada her siparişin kargoya hazırlanması için adres, ürün ve rota durumunu kontrol edersin."
       steps={["Siparişi seç", "Adres ve ürün hazır mı bak", "Kargo yolunu seç", "Blokaj varsa beklet"]}
     >
-      <div className="workflow-grid">
-        <DataTable columns={["sourceOrderKey", "status", "address", "products", "route"]} rows={orderRows} />
-        <OrdersWorkbench rows={orderRows} />
-      </div>
+      <OrdersWorkbench rows={data.orderRows} />
     </AppShell>
   );
 }

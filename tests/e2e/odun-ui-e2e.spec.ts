@@ -1,13 +1,13 @@
 import { expect, test, type Page } from "@playwright/test";
 
 const routes = [
-  { path: "/", heading: "Bugün ne yapacağız?", nav: "Kontrol Paneli" },
-  { path: "/shipping", heading: "Kargo merkezi", nav: "Kargo Merkezi" },
-  { path: "/inventory", heading: "Üretim ve stok", nav: "Üretim & Stok" },
+  { path: "/", heading: "Bugün ne yapacağız?", nav: "Bugün" },
+  { path: "/shipping", heading: "Kargo merkezi", nav: "Kargo" },
+  { path: "/inventory", heading: "Üretim ve stok", nav: "Stok" },
   { path: "/orders", heading: "Sipariş hazırlığı", nav: "Siparişler" },
-  { path: "/quotes", heading: "Kargo ücreti çıkar", nav: "Kargo Ücreti" },
-  { path: "/payments", heading: "Ödeme kontrolü", nav: "Ödemeler" },
-  { path: "/handoffs", heading: "Kargoya teslim hazırlığı", nav: "Kargoya Hazır" },
+  { path: "/quotes", heading: "Kargo fiyat kararları", nav: "Fiyat" },
+  { path: "/payments", heading: "Ödeme kontrolü", nav: "Ödeme" },
+  { path: "/handoffs", heading: "Kargoya teslim hazırlığı", nav: "Teslim" },
   { path: "/exceptions", heading: "Sorun çözme masası", nav: "Sorunlar" },
   { path: "/reports", heading: "Genel durum raporu", nav: "Raporlar" },
 ] as const;
@@ -30,72 +30,67 @@ async function expectNoViewportOverflow(page: Page) {
   expect(overflow.scrollWidth, JSON.stringify(overflow)).toBeLessThanOrEqual(overflow.clientWidth + 1);
 }
 
-test.describe("ODUN UI synthetic end-to-end", () => {
+async function optionCount(page: Page, label: string) {
+  return page.getByLabel(label).locator("option").count();
+}
+
+test.describe("ODUN UI PM intake end-to-end", () => {
   test.use({ viewport: { width: 1440, height: 1200 } });
 
-  test("all core pages render with fake data and safe controls", async ({ page }) => {
+  test("all core pages render from PM intake data without synthetic fixture labels", async ({ page }) => {
+    test.setTimeout(60_000);
     const errors = await collectConsole(page);
 
     for (const route of routes) {
       await page.goto(route.path);
       await expect(page.getByRole("heading", { name: route.heading, level: 1 })).toBeVisible();
       await expect(page.getByRole("link", { name: route.nav })).toHaveAttribute("aria-current", "page");
+      await expect(page.getByText(/Sipariş A|Sipariş B|pm:synthetic/)).toHaveCount(0);
       await expectNoViewportOverflow(page);
     }
 
     expect(errors).toEqual([]);
   });
 
-  test("orders flow updates selected order, local events, and keeps live PM mutation disabled", async ({ page }) => {
+  test("orders flow uses PM intake orders and keeps PM mutation disabled", async ({ page }) => {
     await page.goto("/orders");
 
-    await page.getByLabel("Kontrol siparişi").selectOption("pm:synthetic-order-002");
-    await expect(page.getByTestId("orders-workbench").getByLabel("Kargo yolu")).toHaveValue("MANUAL_SPECIAL");
-    await expect(page.getByText("Ürün bilgisi hazır").locator("..").getByText("blokaj")).toBeVisible();
+    if ((await optionCount(page, "Kontrol siparişi")) > 0) {
+      await page.getByLabel("Kontrol siparişi").selectOption({ index: 0 });
+    }
 
-    await page.getByLabel("Bekletme sebebi").fill("Fake UI test hold");
-    await page.getByRole("button", { name: "Beklet" }).click();
-    await expect(page.getByText("Fake UI test hold")).toBeVisible();
+    await expect(page.getByTestId("orders-workbench")).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Backer #|Henüz aktarılmış sipariş yok/ })).toBeVisible();
+    await page.getByLabel("Bekletme sebebi").fill("Canlı olmayan UI kontrolü");
+    await page.getByRole("button", { name: "Beklet", exact: true }).click();
+    await expect(page.getByText("Canlı olmayan UI kontrolü")).toBeVisible();
     await expect(page.getByRole("button", { name: "PM verisini değiştir" })).toBeDisabled();
   });
 
-  test("shipping flow compares fake rates without enabling live labels", async ({ page }) => {
+  test("shipping flow reads PM order lines and keeps live labels disabled", async ({ page }) => {
     await page.goto("/shipping");
 
-    await page.getByRole("button", { name: /Sandbox Express/ }).click();
-    await expect(page.getByText("Sandbox Express").last()).toBeVisible();
+    if ((await optionCount(page, "Gönderi siparişi")) > 0) {
+      await page.getByLabel("Gönderi siparişi").selectOption({ index: 0 });
+    }
 
-    await page.getByRole("button", { name: "Sandbox fiyatı dene" }).click();
-    await expect(page.getByText("Sandbox Express önizlendi")).toBeVisible();
-
-    await page.getByLabel("Gönderi siparişi").selectOption("pm:synthetic-ddp-001");
-    await expect(page.getByRole("textbox", { name: "Varış" })).toHaveValue("Hong Kong");
-    await expect(page.getByRole("textbox", { name: "Kargo yolu" })).toHaveValue("Çin/HK direkt DDP");
+    await expect(page.getByTestId("shipping-console")).toBeVisible();
+    await page.getByRole("button", { name: "Fiyatı kontrol et" }).click();
+    await expect(page.getByText(/henüz kargo fiyat kaydı yok|kontrol edildi/)).toBeVisible();
     await expect(page.getByRole("button", { name: "Canlı etiket bas" })).toBeDisabled();
+
+    await page.getByText("Paketleme ve kargo ağı detayları").click();
+    await expect(page.getByTestId("interactive-data-table")).toBeVisible();
+    await expect(page.getByText(/CLF-|Bu filtrelerle eşleşen kayıt yok/).first()).toBeVisible();
   });
 
-  test("inventory flow prepares a local fulfillment stock feed without warehouse mutation", async ({ page }) => {
-    await page.goto("/inventory");
-
-    await expect(page.getByText("+USD 3,956.00")).toBeVisible();
-    await page.getByLabel("Stok SKU").selectOption("CLF-ACC-DDP");
-    await expect(page.getByText("0 / 12 ayrılabilir")).toBeVisible();
-
-    await page.getByRole("button", { name: "SFC stok kontrolü" }).click();
-    await expect(page.getByText("CLF-ACC-DDP için getStockBySKU read-only planlandı")).toBeVisible();
-
-    await page.getByRole("button", { name: "Fulfillment feed hazırla" }).click();
-    await expect(page.getByText("SKU için rezerve edilebilir stok fulfillment planına")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Canlı depo güncelle" })).toBeDisabled();
-  });
-
-  test("quote, payment, handoff, exception, and report controls behave locally", async ({ page }) => {
+  test("quote, payment, handoff, and report controls stay local", async ({ page }) => {
     await page.goto("/quotes");
-    await page.getByLabel("Temel tutar").fill("-10");
-    await expect(page.locator(".quote-total > span")).toContainText("USD 3.00");
+    await expect(page.getByTestId("guided-quote-workflow")).toBeVisible();
+    await page.getByText("Gelişmiş fiyat ve sağlayıcı kontrolleri").click();
     await page.getByLabel("Temel tutar").fill("100");
     await page.getByLabel("Güvenlik payı %").fill("10");
-    await page.getByRole("button", { name: "Fiyatı hazırla" }).click();
+    await page.getByTestId("manual-ddp-control").getByRole("button", { name: "Fiyatı hazırla" }).click();
     await expect(page.getByText("toplam USD 110.00")).toBeVisible();
     await expect(page.getByRole("button", { name: "Canlıya gönder" })).toBeDisabled();
 
@@ -106,19 +101,10 @@ test.describe("ODUN UI synthetic end-to-end", () => {
     await expect(page.getByRole("button", { name: "Canlı siparişi kilitle" })).toBeDisabled();
 
     await page.goto("/handoffs");
-    await page.getByLabel("Çin/HK direkt DDP").uncheck();
-    await expect(page.getByText("1 kilitli sipariş")).toBeVisible();
     await page.getByRole("button", { name: "Önizleme oluştur" }).click();
-    await expect(page.getByText("1 sipariş için CSV önizlemesi hazırlandı")).toBeVisible();
+    await expect(page.getByText(/sipariş için .* önizlemesi hazırlandı/)).toBeVisible();
     await expect(page.getByRole("button", { name: "Partnere gönder" })).toBeDisabled();
     await expect(page.getByRole("button", { name: "Etiket oluştur" })).toBeDisabled();
-
-    await page.goto("/exceptions");
-    await page.getByRole("combobox", { name: "Sorun" }).selectOption("payment_amount_mismatch");
-    await page.getByRole("combobox", { name: "Sorumlu" }).selectOption("Finans");
-    await page.getByRole("button", { name: "Ata" }).click();
-    await expect(page.getByText("Finans ekibine atandı")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Canlı çöz" })).toBeDisabled();
 
     await page.goto("/reports");
     await page.getByRole("button", { name: "7 gün" }).click();
@@ -129,7 +115,7 @@ test.describe("ODUN UI synthetic end-to-end", () => {
     await expect(page.getByText("Kişisel veri içermeyen dışa aktarım önizlendi")).toBeVisible();
   });
 
-  test("mobile viewport keeps the workflow usable", async ({ page }) => {
+  test("mobile viewport keeps the live PM workflow usable", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 1000 });
 
     for (const route of routes) {

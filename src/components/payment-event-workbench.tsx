@@ -23,7 +23,7 @@ export function PaymentEventWorkbench({ rows }: PaymentEventWorkbenchProps) {
   const [eventType, setEventType] = useState("stripe_checkout_completed");
   const [orderKey, setOrderKey] = useState(rows[0]?.sourceOrderKey ?? "");
   const [quoteTotal, setQuoteTotal] = useState("25.25");
-  const [sessionId, setSessionId] = useState("cs_test_mock_001");
+  const [sessionId, setSessionId] = useState("");
   const [result, setResult] = useState("Henüz ödeme olayı hazırlanmadı");
 
   const review = useMemo(() => {
@@ -65,13 +65,13 @@ export function PaymentEventWorkbench({ rows }: PaymentEventWorkbenchProps) {
         <label>
           Ödeme türü
           <select onChange={(event) => setEventType(event.target.value)} value={eventType}>
-            <option value="stripe_checkout_completed">Stripe test ödemesi tamamlandı</option>
+            <option value="stripe_checkout_completed">Stripe ödeme haberi</option>
             <option value="owner_covered_approved">Owner karşıladı</option>
             <option value="manual_review">Manuel kontrol</option>
           </select>
         </label>
         <label>
-          Test oturumu
+          Ödeme referansı
           <input onChange={(event) => setSessionId(event.target.value)} value={sessionId} />
         </label>
         <label>

@@ -4,13 +4,14 @@ import { Boxes, ClipboardCheck, LockKeyhole, PackageCheck, RefreshCw, ShieldChec
 import { useMemo, useState } from "react";
 
 import { DataTable } from "@/components/data-table";
+import { DetailPopup } from "@/components/detail-popup";
 import { StatusBadge } from "@/components/status-badge";
 import {
   buildFulfillmentStockFeed,
   buildInventoryAvailability,
-  fulfillmentDemandFixtures,
-  inventorySupplyFixtures,
   summarizeInventoryAvailability,
+  type FulfillmentDemandInput,
+  type InventorySupplyInput,
   type InventoryAvailabilityLine,
 } from "@/lib/inventory";
 import { formatOpsValue } from "@/lib/ops-ui/labels";
@@ -41,11 +42,16 @@ function toTableRow(line: InventoryAvailabilityLine) {
   };
 }
 
-export function InventoryWorkbench() {
-  const [activeSku, setActiveSku] = useState<string>(inventorySupplyFixtures[0]?.sku ?? "");
+type InventoryWorkbenchProps = {
+  demandRows: readonly FulfillmentDemandInput[];
+  supplyRows: readonly InventorySupplyInput[];
+};
+
+export function InventoryWorkbench({ demandRows, supplyRows }: InventoryWorkbenchProps) {
+  const [activeSku, setActiveSku] = useState<string>(demandRows[0]?.sku ?? supplyRows[0]?.sku ?? "");
   const [event, setEvent] = useState("Stok feed henüz sadece yerel önizlemede");
 
-  const availability = useMemo(() => buildInventoryAvailability(inventorySupplyFixtures, fulfillmentDemandFixtures), []);
+  const availability = useMemo(() => buildInventoryAvailability(supplyRows, demandRows), [demandRows, supplyRows]);
   const summary = useMemo(() => summarizeInventoryAvailability(availability), [availability]);
   const feed = useMemo(() => buildFulfillmentStockFeed(availability), [availability]);
   const selectedLine = availability.find((line) => line.sku === activeSku) ?? availability[0];
@@ -54,12 +60,12 @@ export function InventoryWorkbench() {
   const tableRows = availability.map(toTableRow);
 
   function stageFulfillmentFeed() {
-    setEvent(`${feed.length} SKU için rezerve edilebilir stok fulfillment planına güvenli önizleme olarak hazırlandı`);
+    setEvent(`${feed.length} SKU için ayrılabilir stok güvenli önizleme olarak hazırlandı`);
   }
 
   function stageStockCheck() {
     if (!stockPlan || !selectedLine) return;
-    setEvent(`${selectedLine.sku} için ${stockPlan.action} read-only planlandı; canlı stok yazımı yok`);
+    setEvent(`${selectedLine.sku} için depo stok kontrolü planlandı; canlı stok yazımı yok`);
   }
 
   return (
@@ -69,23 +75,23 @@ export function InventoryWorkbench() {
         <strong>Canlı depo mutasyonu kapalı.</strong>
         <span>Staging stok feed</span>
         <span>PM verisi değişmez</span>
-        <span>SFC read-only plan</span>
+        <span>Depo kontrolü önizleme</span>
       </div>
 
       <div className="inventory-hero">
         <div>
           <p className="eyebrow">Üretim ve stok</p>
-          <h2>SKU bazlı üretim, eldeki stok ve fulfillment beslemesi</h2>
+          <h2>Hangi SKU bugün ayrılabilir?</h2>
           <p>Üretilen, elde olan, rezerve edilen ve sipariş talebine ayrılabilecek adetleri aynı yerde kontrol et.</p>
         </div>
         <div className="button-row">
           <button onClick={stageFulfillmentFeed} type="button">
             <ClipboardCheck aria-hidden="true" size={16} />
-            Fulfillment feed hazırla
+            Ayrılabilir stok önizle
           </button>
           <button className="button-secondary" onClick={stageStockCheck} type="button">
             <RefreshCw aria-hidden="true" size={16} />
-            SFC stok kontrolü
+            Depo stok kontrolü
           </button>
           <button className="button-danger" disabled type="button">
             <LockKeyhole aria-hidden="true" size={16} />
@@ -126,8 +132,7 @@ export function InventoryWorkbench() {
         </article>
       </div>
 
-      <div className="inventory-grid">
-        <section className="workbench-panel">
+      <section className="workbench-panel">
           <div className="control-rail">
             <div>
               <p className="eyebrow">SKU stok durumu</p>
@@ -147,7 +152,7 @@ export function InventoryWorkbench() {
               </select>
             </label>
             <div className="decision-summary">
-              <span>Fulfillment feed</span>
+              <span>Ayrılabilir stok</span>
               <strong>
                 {selectedFeed
                   ? `${quantity(selectedFeed.reservableQuantity)} / ${quantity(selectedFeed.demandQuantity)} ayrılabilir`
@@ -156,17 +161,21 @@ export function InventoryWorkbench() {
               <small>{selectedFeed ? `${quantity(selectedFeed.shortageQuantity)} açık` : "Built-in veya talep dışı SKU"}</small>
             </div>
           </div>
+      </section>
+
+      <div className="popup-row">
+        <DetailPopup buttonLabel="Stok tablosunu aç" size="wide" title="SKU stok tablosu">
           <DataTable
             columns={["sku", "title", "produced", "onHand", "available", "demand", "shortage", "originalAmount", "currentAmount", "amountDelta", "status"]}
             rows={tableRows}
           />
-        </section>
-
-        <aside className="inventory-side-panel">
+        </DetailPopup>
+        <DetailPopup buttonLabel="Seçili SKU detayı" size="wide" title={selectedLine?.sku ?? "SKU detayı"}>
+          <aside className="inventory-side-panel">
           <article className="feed-card">
             <div>
               <PackageCheck aria-hidden="true" size={17} />
-              <span>Fulfillment stok feed</span>
+              <span>Ayrılabilir stok özeti</span>
               <StatusBadge label={selectedFeed?.status ?? "no_demand"} />
             </div>
             <dl>
@@ -183,7 +192,7 @@ export function InventoryWorkbench() {
                 <dd>{selectedLine?.batches.join(" / ") ?? "-"}</dd>
               </div>
               <div>
-                <dt>External action</dt>
+                <dt>Dış işlem</dt>
                 <dd>{selectedFeed?.externalActions ?? "none"}</dd>
               </div>
               <div>
@@ -205,7 +214,7 @@ export function InventoryWorkbench() {
               <StatusBadge label="safe preview" />
             </div>
             <div className="inventory-batch-list">
-              {inventorySupplyFixtures
+              {supplyRows
                 .filter((batch) => batch.sku === selectedLine?.sku)
                 .map((batch) => (
                   <section key={batch.batchCode}>
@@ -231,7 +240,8 @@ export function InventoryWorkbench() {
               <li>Canlı SFC/Easyship/3PL güncellemesi owner onayı olmadan kapalıdır.</li>
             </ol>
           </article>
-        </aside>
+          </aside>
+        </DetailPopup>
       </div>
 
       <div className="inventory-event-bar" aria-live="polite">

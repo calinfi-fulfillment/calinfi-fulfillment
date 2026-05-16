@@ -16,6 +16,7 @@ Launch readiness is not complete until the owner gives go/no-go approval.
 - `npm run typecheck`
 - `npm run lint`
 - `npm run build`
+- `npm run test:fulfillment-test-backer`
 - Sınır Bekçisi boundary audit
 - PM Phase 1 regression check
 - Fulfillment staging pilot with synthetic data
@@ -28,6 +29,7 @@ Go only when:
 - PM Phase 1 invite/save/login remains unchanged.
 - Fulfillment is not connected to PM Supabase.
 - Payment lock requires fresh quote and signed event.
+- A single local/staging test backer can pass intake, product readiness, inventory, package plan, quote, payment lock, handoff, tracking preview, and reports without production actions.
 - Handoff/export only includes locked and paid orders.
 - Rollback and backup procedures are ready.
 - Owner explicitly approves launch.

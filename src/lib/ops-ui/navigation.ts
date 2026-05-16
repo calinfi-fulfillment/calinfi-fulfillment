@@ -11,13 +11,13 @@ import {
 } from "lucide-react";
 
 export const OPS_NAV_ITEMS = [
-  { href: "/", label: "Kontrol Paneli", icon: ClipboardList },
-  { href: "/shipping", label: "Kargo Merkezi", icon: PlaneTakeoff },
-  { href: "/inventory", label: "Üretim & Stok", icon: Warehouse },
+  { href: "/", label: "Bugün", icon: ClipboardList },
   { href: "/orders", label: "Siparişler", icon: PackageCheck },
-  { href: "/quotes", label: "Kargo Ücreti", icon: ReceiptText },
-  { href: "/payments", label: "Ödemeler", icon: CreditCard },
-  { href: "/handoffs", label: "Kargoya Hazır", icon: Truck },
+  { href: "/inventory", label: "Stok", icon: Warehouse },
+  { href: "/shipping", label: "Kargo", icon: PlaneTakeoff },
+  { href: "/quotes", label: "Fiyat", icon: ReceiptText },
+  { href: "/payments", label: "Ödeme", icon: CreditCard },
+  { href: "/handoffs", label: "Teslim", icon: Truck },
   { href: "/exceptions", label: "Sorunlar", icon: AlertTriangle },
   { href: "/reports", label: "Raporlar", icon: FileBarChart },
 ] as const;
