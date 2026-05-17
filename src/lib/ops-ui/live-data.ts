@@ -1,6 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { createEasyshipReadiness } from "@/lib/easyship";
 import type { FulfillmentDemandInput, InventorySupplyInput } from "@/lib/inventory";
+import { liveMutationFlags } from "@/lib/safety";
+import { createStripeCheckoutReadiness } from "@/lib/stripe-checkout";
 import { getSupabaseServiceRoleClient, hasFulfillmentSupabaseServiceRoleConfig } from "@/lib/supabase/server";
 
 type AnyRow = Record<string, any>;
@@ -563,6 +566,13 @@ function buildData(orders: AnyRow[], inventorySupplyRows: InventorySupplyInput[]
     { metric: "Kargoya hazır", value: String(handoffReadyOrders.length) },
     { metric: "Kontrol gereken", value: String(blockedOrders.length) },
   ];
+  const flags = liveMutationFlags();
+  const easyshipReadiness = createEasyshipReadiness();
+  const stripeReadiness = createStripeCheckoutReadiness();
+  const providerSandboxReady = flags.FULFILLMENT_ENABLE_PROVIDER_API_QUOTES && easyshipReadiness.ok && easyshipReadiness.mode === "sandbox";
+  const stripeTestReady = flags.FULFILLMENT_ENABLE_STRIPE_CHECKOUT && stripeReadiness.ok;
+  const handoffSandboxReady = flags.FULFILLMENT_ENABLE_HANDOFF_EXPORTS;
+  const partnerSandboxReady = flags.FULFILLMENT_ENABLE_PARTNER_API_PUSH && easyshipReadiness.mode === "sandbox";
 
   return {
     cockpitQueues: [
@@ -592,9 +602,26 @@ function buildData(orders: AnyRow[], inventorySupplyRows: InventorySupplyInput[]
     shipmentConsoleRows,
     shippingGuardRows: [
       { detail: "PM V1 intake ve Fulfillment Supabase persistence açık.", label: "PM intake", status: "ready" },
-      { detail: "Provider fiyat API flag'i kapalı; canlı firma çağrısı yapılmaz.", label: "Kargo firması", status: "blocked" },
-      { detail: "Stripe checkout flag'i kapalı; ödeme alınmaz.", label: "Ödeme", status: "blocked" },
-      { detail: "Partner push, etiket ve tracking canlı aksiyonları kapalı.", label: "Teslim", status: "blocked" },
+      {
+        detail: providerSandboxReady
+          ? "Easyship sandbox fiyat API açık; üretim etiketi veya canlı shipment yok."
+          : "Provider fiyat API flag'i kapalı veya sandbox hazır değil; firma çağrısı yapılmaz.",
+        label: "Kargo firması",
+        status: providerSandboxReady ? "test ready" : "blocked",
+      },
+      {
+        detail: stripeTestReady ? "Stripe test checkout açık; live mode bloke edilir." : "Stripe checkout flag'i kapalı veya test anahtarı eksik; ödeme alınmaz.",
+        label: "Ödeme",
+        status: stripeTestReady ? "test ready" : "blocked",
+      },
+      {
+        detail:
+          handoffSandboxReady || partnerSandboxReady
+            ? "Sandbox teslim/export kapısı açık; üretim label ve tracking gerçek onay ister."
+            : "Partner push, etiket ve tracking aksiyonları kapalı.",
+        label: "Teslim",
+        status: handoffSandboxReady || partnerSandboxReady ? "test ready" : "blocked",
+      },
     ],
     shippingOverviewRows: [
       { detail: "Adres ve ürün hazır", label: "Fiyat alınabilir", value: String(quoteReadyOrders.length) },

@@ -21,6 +21,7 @@ export default async function Home() {
     !flags.FULFILLMENT_ENABLE_STRIPE_CHECKOUT &&
     !flags.FULFILLMENT_ENABLE_HANDOFF_EXPORTS &&
     !flags.FULFILLMENT_ENABLE_PARTNER_API_PUSH;
+  const downstreamSandboxOpen = !downstreamFlagsOff;
   const publicSupabaseReady = hasFulfillmentSupabasePublicConfig();
   const vercelBypass = createVercelBypassReport();
   const readinessCounts = {
@@ -36,10 +37,10 @@ export default async function Home() {
       subtitle="Bu ekran siparişleri basit sıraya dizer: önce eksikleri çöz, sonra kargo fiyatı çıkar, ödeme tamamlanınca kargoya hazırla."
       steps={["Eksikleri bul", "Kargo fiyatını hazırla", "Ödeme durumunu kontrol et", "Kargoya verilecekleri ayır"]}
     >
-      <section className="safety-strip" data-danger={blockedPmSupabase || !downstreamFlagsOff ? "true" : "false"}>
+      <section className="safety-strip" data-danger={blockedPmSupabase ? "true" : "false"}>
         <span>{data.connection.mode === "live" ? "PM intake bağlı" : data.connection.message}</span>
         <span>{publicSupabaseReady ? "Fulfillment staging veritabanı bağlı" : "Fulfillment veritabanı bağlı değil"}</span>
-        <span>Kargo firması, dışa aktarım ve partner gönderimi kapalı</span>
+        <span>{downstreamSandboxOpen ? "Sandbox kargo/ödeme/teslim kapıları açık" : "Kargo firması, dışa aktarım ve partner gönderimi kapalı"}</span>
       </section>
 
       <section className="queue-grid">

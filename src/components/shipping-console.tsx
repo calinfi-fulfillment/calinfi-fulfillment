@@ -40,6 +40,9 @@ export function ShippingConsole({ guardRows, overviewRows, rateRows, shipmentRow
     [activeOrder, shipmentRows],
   );
   const selectedRate = useMemo(() => rateRows.find((rate) => rate.id === activeRate) ?? rateRows[0], [activeRate, rateRows]);
+  const providerReady = guardRows.some((row) => row.label === "Kargo firması" && row.status === "test ready");
+  const paymentReady = guardRows.some((row) => row.label === "Ödeme" && row.status === "test ready");
+  const handoffReady = guardRows.some((row) => row.label === "Teslim" && row.status === "test ready");
 
   function stageRateCheck() {
     if (!selectedOrder || !selectedRate) {
@@ -63,10 +66,10 @@ export function ShippingConsole({ guardRows, overviewRows, rateRows, shipmentRow
     <section className="shipping-console" data-testid="shipping-console">
       <div className="ship-safety-banner" role="status" aria-label="Kargo güvenlik durumu">
         <TriangleAlert aria-hidden="true" size={18} />
-        <strong>Canlı kargo aksiyonları kapalı.</strong>
-        <span>Canlı etiket kapalı</span>
+        <strong>{providerReady || paymentReady || handoffReady ? "Sandbox akışları açık." : "Canlı kargo aksiyonları kapalı."}</strong>
+        <span>{providerReady ? "Easyship sandbox fiyat açık" : "Canlı etiket kapalı"}</span>
         <span>PM intake okunuyor</span>
-        <span>Provider gönderimi kapalı</span>
+        <span>{handoffReady ? "Teslim/export sandbox açık" : "Provider gönderimi kapalı"}</span>
       </div>
 
       <div className="shipping-hero">
