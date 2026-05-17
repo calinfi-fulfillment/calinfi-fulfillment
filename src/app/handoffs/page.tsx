@@ -14,9 +14,9 @@ export default async function HandoffsPage() {
       active="Teslim"
       title="Kargoya teslim hazırlığı"
       subtitle="Sadece ödemesi tamamlanmış ve kilitlenmiş siparişler burada kargo firmasına hazırlanır."
-      steps={["Kilitli siparişleri seç", "Dosya önizlemesi oluştur", "Partner şemasını kontrol et", "Canlı gönderimi kapalı tut"]}
+      steps={["Kilitli siparişleri seç", "Sandbox dosya hazırla", "Partner şemasını kontrol et", "Production etiketi ayrı kilitte tut"]}
     >
-      <HandoffWorkbench rows={data.handoffRows} />
+      <HandoffWorkbench guardRows={data.shippingGuardRows} rows={data.handoffRows} />
 
       <div className="popup-row">
         <DetailPopup buttonLabel="Teslim kuyruğu" size="wide" title="Kilitli siparişler">
@@ -24,7 +24,7 @@ export default async function HandoffsPage() {
         </DetailPopup>
         <DetailPopup
           buttonLabel="Gelişmiş firma bağlantı kontrolleri"
-          intro="Provider API gönderimi ve etiket oluşturma güvenlik kapısının arkasında kalır."
+          intro="Sandbox teslim/export kapısı açık; production partner push, etiket ve gerçek takip ayrı onay ister."
           title="Gelişmiş firma bağlantı kontrolleri"
         >
           <DataTable columns={["label", "status", "detail"]} rows={data.shippingGuardRows} />

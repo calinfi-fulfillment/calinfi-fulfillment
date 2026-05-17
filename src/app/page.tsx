@@ -77,7 +77,7 @@ export default async function Home() {
         </DetailPopup>
         <DetailPopup
           buttonLabel="Test ortamı detayları"
-          intro="Bu kontroller canlı kargo, ödeme veya partner işlemi açmaz; Fulfillment bağlantı ve güvenlik kapılarını gösterir."
+          intro="Bu kontroller sandbox kargo, test ödeme ve teslim kapılarını gösterir; production etiket ve gerçek takip ayrı onay ister."
           size="wide"
           title="Test ortamı"
         >

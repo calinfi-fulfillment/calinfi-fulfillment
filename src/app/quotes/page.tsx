@@ -15,7 +15,7 @@ export default async function QuotesPage() {
       active="Fiyat"
       title="Kargo fiyat kararları"
       subtitle="Siparişin kargo yolu sistem tarafından ayrılır; sen sadece fiyatı hazır olanı seçer veya DDP için bekleyen tek aksiyonu görürsün."
-      steps={["Fiyat bekleyenleri gör", "Sistem kararını kontrol et", "Güvenli fiyatı seç", "Canlı işlemi kapalı tut"]}
+      steps={["Fiyat bekleyenleri gör", "Sistem kararını kontrol et", "Sandbox fiyatı seç", "Live etiketi kilitli tut"]}
     >
       <GuidedQuoteWorkflow rows={data.quoteRows} />
 
@@ -25,7 +25,7 @@ export default async function QuotesPage() {
         </DetailPopup>
         <DetailPopup
           buttonLabel="Gelişmiş fiyat ve sağlayıcı kontrolleri"
-          intro="Manuel DDP, network ve provider kontrolleri burada durur; günlük akışı kalabalıklaştırmaz."
+          intro="Manuel DDP, network ve sandbox provider kontrolleri burada durur; production etiket ve takip açılmaz."
           size="wide"
           title="Gelişmiş fiyat ve sağlayıcı kontrolleri"
         >

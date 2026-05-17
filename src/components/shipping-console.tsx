@@ -76,7 +76,7 @@ export function ShippingConsole({ guardRows, overviewRows, rateRows, shipmentRow
         <div>
           <p className="eyebrow">Easyship tarzı kargo akışı</p>
           <h2>Kargo Merkezi</h2>
-          <p>Siparişi seç, paket ölçüsünü kontrol et, fiyatı karşılaştır, canlı etiket basmadan güvenli önizleme yap.</p>
+          <p>Siparişi seç, paket ölçüsünü kontrol et, sandbox fiyatı karşılaştır; production etiket ve gerçek takip kilitli kalır.</p>
         </div>
         <div className="ship-hero-actions">
           <button onClick={stageRateCheck} type="button">
@@ -171,7 +171,7 @@ export function ShippingConsole({ guardRows, overviewRows, rateRows, shipmentRow
               <div className="empty-state compact">
                 <p className="eyebrow">Fiyat kaydı</p>
                 <h2>Henüz fiyat yok</h2>
-                <p>Provider ve canlı Easyship kapalı olduğu için bu panel sadece PM siparişini hazırlar.</p>
+                <p>Easyship sandbox açık; önce Fiyat ekranında test fiyat kaydı hazırlanır.</p>
               </div>
             ) : null}
           </div>
@@ -204,7 +204,7 @@ export function ShippingConsole({ guardRows, overviewRows, rateRows, shipmentRow
             </span>
             <ol>
               <li>Canlı PM verisine dokunma.</li>
-              <li>Önce Fiyat ekranında güvenli fiyat kaydı hazırla.</li>
+              <li>Önce Fiyat ekranında sandbox fiyat kaydı hazırla.</li>
               <li>Ödeme kilidi olmadan etiket basma.</li>
               <li>Owner onayı olmadan partnere gönderme.</li>
             </ol>
@@ -225,7 +225,7 @@ export function ShippingConsole({ guardRows, overviewRows, rateRows, shipmentRow
 
       <div className="ship-disabled-note">
         <PackageCheck aria-hidden="true" size={16} />
-        Bu ekran Easyship benzeri operasyon düzenidir; Easyship marka arayüzünün birebir kopyası değildir. Canlı etiket, canlı gönderi ve canlı takip hâlâ kapalıdır.
+        Bu ekran Easyship benzeri operasyon düzenidir; Easyship marka arayüzünün birebir kopyası değildir. Sandbox fiyat ve teslim kontrolü açık, production etiket ve gerçek takip kilitlidir.
       </div>
     </section>
   );

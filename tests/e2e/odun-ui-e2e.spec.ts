@@ -103,8 +103,10 @@ test.describe("ODUN UI PM intake end-to-end", () => {
     await page.goto("/handoffs");
     await page.getByRole("button", { name: "Önizleme oluştur" }).click();
     await expect(page.getByText(/sipariş için .* önizlemesi hazırlandı/)).toBeVisible();
-    await expect(page.getByRole("button", { name: "Partnere gönder" })).toBeDisabled();
-    await expect(page.getByRole("button", { name: "Etiket oluştur" })).toBeDisabled();
+    await expect(page.getByRole("button", { name: "Sandbox partnere hazırla" })).toBeEnabled();
+    await page.getByRole("button", { name: "Sandbox partnere hazırla" }).click();
+    await expect(page.getByText(/sandbox teslim kontrolü hazırlandı/)).toBeVisible();
+    await expect(page.getByRole("button", { name: "Canlı etiket" })).toBeDisabled();
 
     await page.goto("/reports");
     await page.getByRole("button", { name: "7 gün" }).click();

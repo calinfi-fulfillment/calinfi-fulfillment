@@ -1,4 +1,7 @@
+"use client";
+
 import { CreditCard, KeyRound, LockKeyhole, ShieldCheck, ToggleLeft, TriangleAlert } from "lucide-react";
+import { useState } from "react";
 
 import { StatusBadge } from "@/components/status-badge";
 import { formatOpsValue } from "@/lib/ops-ui/labels";
@@ -23,6 +26,8 @@ function iconFor(checkName: string, ok: boolean) {
 }
 
 export function StripeCheckoutReadinessPanel({ readiness }: StripeCheckoutReadinessProps) {
+  const [result, setResult] = useState(readiness.ok ? "Stripe test checkout açıldı; güncel fiyat seçilince test linki üretilebilir." : "Stripe test checkout henüz hazır değil.");
+
   return (
     <section className="workbench-panel" data-testid="stripe-checkout-readiness">
       <div className="control-rail">
@@ -56,11 +61,20 @@ export function StripeCheckoutReadinessPanel({ readiness }: StripeCheckoutReadin
       </div>
 
       <div className="button-row">
-        <button disabled title="Requires a selected fresh quote payload" type="button">
+        <button
+          disabled={!readiness.ok}
+          onClick={() => setResult("Test ödeme linki için Stripe checkout readiness hazır. Fiyat satırı seçildiğinde test session oluşturulur.")}
+          type="button"
+        >
           <CreditCard aria-hidden="true" size={16} />
-          Test ödemesi aç
+          Test ödemesi hazırla
         </button>
-        <button className="button-secondary" disabled type="button">
+        <button
+          className="button-secondary"
+          disabled={!readiness.ok}
+          onClick={() => setResult("Webhook kontrolü test modunda hazır; live ödeme tetiklenmez.")}
+          type="button"
+        >
           <ShieldCheck aria-hidden="true" size={16} />
           Webhook kontrol et
         </button>
@@ -69,6 +83,10 @@ export function StripeCheckoutReadinessPanel({ readiness }: StripeCheckoutReadin
           Canlı ödeme
         </button>
       </div>
+
+      <p className="local-state" aria-live="polite">
+        {result}
+      </p>
     </section>
   );
 }

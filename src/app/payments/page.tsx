@@ -27,7 +27,7 @@ export default async function PaymentsPage() {
         </DetailPopup>
         <DetailPopup
           buttonLabel="Gelişmiş Stripe kontrolleri"
-          intro="Bu kontrol gerçek tahsilat açmaz; canlı ödeme ve sipariş kilidi kapalıdır."
+          intro="Stripe test checkout açıktır; live ödeme ve sipariş kilidi ayrı onay ister."
           title="Gelişmiş Stripe kontrolleri"
         >
           <StripeCheckoutReadinessPanel readiness={stripeReadiness} />

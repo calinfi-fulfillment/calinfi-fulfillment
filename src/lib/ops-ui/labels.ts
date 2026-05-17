@@ -114,7 +114,7 @@ const VALUE_LABELS: Record<string, string> = {
   "synthetic-fixtures": "Test verileri",
   "handoff-exports-disabled": "Canlı kargo dosyası kapalı",
   "launch-readiness": "Canlı yayın hazırlığı",
-  "live-actions": "Canlı işlemler kapalı",
+  "live-actions": "Sandbox işlem kapıları",
   "vercel-git-integration": "Vercel Git bağlantısı",
 };
 

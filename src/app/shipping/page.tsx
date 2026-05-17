@@ -14,8 +14,8 @@ export default async function ShippingPage() {
     <AppShell
       active="Kargo"
       title="Kargo merkezi"
-      subtitle="Easyship tarzı tek ekranda gönderi hazırlığı: sipariş seç, paket ölçüsünü kontrol et, fiyat karşılaştır, etiket ve takip aksiyonlarını güvenli tut."
-      steps={["Siparişi seç", "Paket bilgisini kontrol et", "Fiyatı karşılaştır", "Etiketi canlıya basma"]}
+      subtitle="Easyship sandbox açık: sipariş seç, paket ölçüsünü kontrol et, sandbox fiyatı karşılaştır, production etiketi ayrı kilitte tut."
+      steps={["Siparişi seç", "Paket bilgisini kontrol et", "Sandbox fiyatı karşılaştır", "Production etiketi kilitli tut"]}
     >
       <ShippingConsole
         guardRows={data.shippingGuardRows}
@@ -27,7 +27,7 @@ export default async function ShippingPage() {
       <div className="popup-row">
         <DetailPopup
           buttonLabel="Paketleme ve kargo ağı detayları"
-          intro="Bu alan sadece kontrol ve önizleme içindir; canlı etiket, canlı gönderi ve partner push kapalı kalır."
+          intro="Bu alan sandbox fiyat ve teslim kontrolü içindir; production etiket, canlı gönderi ve gerçek takip ayrı onay ister."
           size="wide"
           title="Paketleme ve kargo ağı detayları"
         >

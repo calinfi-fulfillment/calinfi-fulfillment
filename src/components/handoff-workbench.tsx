@@ -13,16 +13,23 @@ type HandoffRow = {
   status: string;
 };
 
+type GuardRow = {
+  label: string;
+  status: string;
+};
+
 type HandoffWorkbenchProps = {
+  guardRows: readonly GuardRow[];
   rows: readonly HandoffRow[];
 };
 
-export function HandoffWorkbench({ rows }: HandoffWorkbenchProps) {
+export function HandoffWorkbench({ guardRows, rows }: HandoffWorkbenchProps) {
   const [format, setFormat] = useState("csv");
   const [partner, setPartner] = useState("Bölgesel depo");
   const [includeDdp, setIncludeDdp] = useState(true);
   const [includeRegional, setIncludeRegional] = useState(true);
   const [preview, setPreview] = useState("Henüz kargo dosyası önizlenmedi");
+  const sandboxHandoffOpen = guardRows.some((row) => row.label === "Teslim" && row.status === "test ready");
 
   const exportRows = useMemo(
     () =>
@@ -39,9 +46,9 @@ export function HandoffWorkbench({ rows }: HandoffWorkbenchProps) {
       <div className="control-rail">
         <div>
           <p className="eyebrow">Kargo teslimi</p>
-          <h2>Dosya önizlemesi</h2>
+          <h2>Sandbox teslim hazırlığı</h2>
         </div>
-        <StatusBadge label={exportRows.length > 0 ? "ready" : "blocked"} />
+        <StatusBadge label={sandboxHandoffOpen ? "test ready" : exportRows.length > 0 ? "ready" : "blocked"} />
       </div>
 
       <div className="field-grid two">
@@ -75,8 +82,8 @@ export function HandoffWorkbench({ rows }: HandoffWorkbenchProps) {
 
       <div className="decision-summary">
         <span>Önizleme</span>
-        <strong>{exportRows.length} kilitli sipariş</strong>
-        <small>{partner} / {format.toUpperCase()} / PM verisi değişmez.</small>
+        <strong>{sandboxHandoffOpen ? "Sandbox teslim açık" : `${exportRows.length} kilitli sipariş`}</strong>
+        <small>{partner} / {format.toUpperCase()} / Production etiket ayrı onay ister.</small>
       </div>
 
       <div className="button-row">
@@ -92,13 +99,18 @@ export function HandoffWorkbench({ rows }: HandoffWorkbenchProps) {
           <PackageCheck aria-hidden="true" size={16} />
           Paket listesi
         </button>
-        <button className="button-danger" disabled type="button">
+        <button
+          className="button-secondary"
+          disabled={!sandboxHandoffOpen}
+          onClick={() => setPreview(`${partner} için sandbox teslim kontrolü hazırlandı; production partner push yapılmadı`)}
+          type="button"
+        >
           <Send aria-hidden="true" size={16} />
-          Partnere gönder
+          Sandbox partnere hazırla
         </button>
         <button className="button-danger" disabled type="button">
           <LockKeyhole aria-hidden="true" size={16} />
-          Etiket oluştur
+          Canlı etiket
         </button>
       </div>
 
